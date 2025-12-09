@@ -1,0 +1,5 @@
+APIGATEWAY
+
+Crear en apirest en api gateway, poner nombre proyecto, añadir recurso con nombre del backend {folder}, habilitar el cors
+dentro del folder entrar un tipo {object} habilitar cors
+debajo de object agregar los metodos del backend que vamos a cargar en el back poner los metodos con servicio aws, region us-east-1

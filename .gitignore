@@ -1,0 +1,91 @@
+# ---------------------------------------
+# IGNORAR ARCHIVOS ZIP
+# ---------------------------------------
+
+# Ignorar todos los .zip del proyecto
+**/*.zip
+
+# Si quieres ignorar SOLO los que están dentro de src, usa en cambio:
+**/src/*.zip
+
+
+# ---------------------------------------
+# IGNORAR ARCHIVOS O CARPETAS LLAMADAS 'main'
+# ---------------------------------------
+
+# Ignorar carpeta o archivo llamado main en cualquier parte
+**/main
+**/main/
+
+
+# ---------------------------------------
+# IGNORAR SCRIPTS .BAT
+# ---------------------------------------
+
+# Ignorar los scripts .bat específicos
+**/crear_zip.bat
+**/build_api.bat
+
+# (Opcional) Ignorar TODOS los .bat
+**/*.bat
+
+
+###########################################################
+# IGNORAR ARCHIVOS DE TERRAFORM
+###########################################################
+
+# Archivos de estado (MUY importante no subirlos)
+*.tfstate
+*.tfstate.*
+**/.terraform/
+**/.terraform/*
+
+# Carpeta local de terraform
+.terraform/
+
+# Overrides locales
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Archivos de salida de planes
+*.tfplan
+
+# Archivos de logs
+terraform.log
+
+
+###########################################################
+# IGNORAR ARCHIVOS DE VARIABLES SENSIBLES
+###########################################################
+
+# Variables locales que no deben subirse nunca
+terraform.tfvars
+*.tfvars
+*.tfvars.json
+
+# Si en dev y prod guardas tfvars o configuraciones locales:
+infra/envs/dev/*
+infra/envs/prod/*
+
+# Pero PERMITE subir subcarpetas si contienen configuraciones válidas
+# !infra/envs/dev/.keep
+# !infra/envs/prod/.keep
+
+
+###########################################################
+# IGNORAR ARCHIVOS COMUNES
+###########################################################
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log

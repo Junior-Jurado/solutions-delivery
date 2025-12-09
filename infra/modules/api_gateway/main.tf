@@ -1,0 +1,58 @@
+resource "aws_apigatewayv2_api" "api" {
+  name          = "${var.name_prefix}-http-api-${var.environment}"
+  protocol_type = "HTTP"
+}
+
+# Cognito JWT authorizer
+resource "aws_apigatewayv2_authorizer" "cognito" {
+  api_id = aws_apigatewayv2_api.api.id
+  name   = "${var.name_prefix}-jwt-authorizer"
+
+  authorizer_type = "JWT"
+  identity_sources = [
+    "$request.header.Authorization"
+  ]
+
+  jwt_configuration {
+    audience = [var.cognito_client_id]
+    issuer   = "https://cognito-idp.${var.aws_region}.amazonaws.com/${var.cognito_user_pool_id}"
+  }
+}
+
+# Integración con Lambda
+resource "aws_apigatewayv2_integration" "lambda" {
+  api_id           = aws_apigatewayv2_api.api.id
+  integration_type = "AWS_PROXY"
+  integration_uri  = var.lambda_api_invoke_arn
+  payload_format_version = "2.0"
+}
+
+# Ruta protegida
+resource "aws_apigatewayv2_route" "main" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "ANY /api/v1/{proxy+}"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# Deploy
+resource "aws_apigatewayv2_stage" "default" {
+  api_id = aws_apigatewayv2_api.api.id
+  name   = "$default"
+  auto_deploy = true
+}
+
+# Lambda permission
+resource "aws_lambda_permission" "allow_apigw" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = var.lambda_api_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
+}
+
+output "api_url" {
+  value = aws_apigatewayv2_stage.default.invoke_url
+}

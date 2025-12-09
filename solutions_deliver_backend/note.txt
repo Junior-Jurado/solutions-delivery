@@ -1,0 +1,17 @@
+LAMBDA:
+
+Crear desde cero, tiempo de ejecucion con Golang, arquitectura x86_64
+Crear rol con los permisos basicos de LAMBDA
+
+Habilitar url de funcion, habilitar la funcion
+
+poner el controlador segun corresponda al codigo
+
+Memoria de 128 almacenamiento de 512MB, tiempo de espera 15segundos
+
+APIGATEWAY
+agregar integracion de tipo lambda, agregamos la funcion creada utilizar la version2
+sin etapa default
+configurar cors con * los 4 tipos de controles
+Crear autorizador de JWT -> origen de entidad $request.header Authorization -> Url del emisor: https://cognito-idp.us-east-1.amazonaws.com/[id_grupo_de_usuario]
+Habilitar la implementacion automatica
