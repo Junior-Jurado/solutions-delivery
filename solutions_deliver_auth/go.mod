@@ -1,4 +1,4 @@
-module github.com/Junior_Jurado/solutions_deliver
+module github.com/Junior_Jurado/solutions_delivery/solutions_deliver_auth
 
 go 1.24.3
 

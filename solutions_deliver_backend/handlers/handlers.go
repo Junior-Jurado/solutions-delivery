@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Junior_Jurado/solutions_deliver_backend/auth"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/auth"
 	"github.com/aws/aws-lambda-go/events"
 	// "strconv"
 )
@@ -20,9 +20,8 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	if !isValid {
 		return statusCode, user
 	}
-
-	fmt.Println("El path del indice 0 al 4 es: ",path[0:4])
-	switch path[0:4] {
+	
+	switch path[1:5] {
 	case "user":
 		return ProcesoUsers(body, path, method, user, id, request)
 

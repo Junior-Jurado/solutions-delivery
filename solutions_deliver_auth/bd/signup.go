@@ -3,8 +3,8 @@ package bd
 import (
 	"fmt"
 
-	"github.com/Junior_Jurado/solutions_deliver/models"
-	"github.com/Junior_Jurado/solutions_deliver/tools"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_auth/models"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_auth/tools"
 	_ "github.com/go-sql-driver/mysql"
 )
 

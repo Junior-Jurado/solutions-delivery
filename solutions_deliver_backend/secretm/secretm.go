@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Junior_Jurado/solutions_deliver_backend/awsgo"
-	"github.com/Junior_Jurado/solutions_deliver_backend/models"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/awsgo"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/models"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/secretsmanager"
 )

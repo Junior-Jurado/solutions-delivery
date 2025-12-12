@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Junior_Jurado/solutions_deliver_backend/awsgo"
-	"github.com/Junior_Jurado/solutions_deliver_backend/bd"
-	"github.com/Junior_Jurado/solutions_deliver_backend/handlers"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/awsgo"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/bd"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/handlers"
 	"github.com/aws/aws-lambda-go/events"
 	lambda "github.com/aws/aws-lambda-go/lambda"
 )

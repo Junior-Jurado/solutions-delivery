@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Junior_Jurado/solutions_deliver/awsgo"
-	"github.com/Junior_Jurado/solutions_deliver/bd"
-	"github.com/Junior_Jurado/solutions_deliver/models"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_auth/awsgo"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_auth/bd"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_auth/models"
 	"github.com/aws/aws-lambda-go/events"
 	lambda "github.com/aws/aws-lambda-go/lambda"
 )

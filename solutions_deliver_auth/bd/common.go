@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_auth/models"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_auth/secretm"
 	_ "github.com/go-sql-driver/mysql"
-
-	"github.com/Junior_Jurado/solutions_deliver/models"
-	"github.com/Junior_Jurado/solutions_deliver/secretm"
 )
 
 var SecretModel models.SecretRDSJson

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Junior_Jurado/solutions_deliver_backend/models"
-	"github.com/Junior_Jurado/solutions_deliver_backend/secretm"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/models"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/secretm"
 	_ "github.com/go-sql-driver/mysql"
 )
 

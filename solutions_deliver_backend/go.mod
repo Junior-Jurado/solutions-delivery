@@ -1,4 +1,4 @@
-module github.com/Junior_Jurado/solutions_deliver_backend
+module github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend
 
 go 1.24.3
 

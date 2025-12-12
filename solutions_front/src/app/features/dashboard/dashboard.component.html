@@ -1,0 +1,276 @@
+<div class="min-h-screen">
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo-section">
+          <div class="logo-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16.5 9.4 7.55 4.24"/>
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.29 7 12 12 20.71 7"/>
+              <line x1="12" y1="22" x2="12" y2="12"/>
+            </svg>
+          </div>
+          <span class="logo-text">EnvíoExpress</span>
+        </div>
+        <div class="header-actions">
+          <button class="btn-ghost" (click)="navigateToLogin()">
+            Iniciar Sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <h1 class="hero-title">
+            Envíos seguros y rápidos por toda Colombia
+          </h1>
+          <p class="hero-description">
+            La plataforma de mensajería más confiable del país. Rastrea tus envíos en tiempo real.
+          </p>
+          
+          <div class="tracking-card">
+            <div class="card-header">
+              <h3 class="card-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="11" cy="11" r="8"/>
+                  <path d="m21 21-4.3-4.3"/>
+                </svg>
+                Rastrear Envío
+              </h3>
+              <p class="card-description">
+                Ingresa tu número de guía para conocer el estado
+              </p>
+            </div>
+            <div class="card-content">
+              <form (ngSubmit)="handleTracking($event)">
+                <div class="form-group">
+                  <label for="tracking">Número de Guía</label>
+                  <input
+                    id="tracking"
+                    type="text"
+                    class="form-input"
+                    placeholder="Ej: EE123456789CO"
+                    [(ngModel)]="trackingNumber"
+                    name="trackingNumber"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn-primary w-full">
+                  Rastrear Ahora
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        
+        <div class="map-section">
+          <div class="map-container">
+            <h3 class="map-title">Cobertura Nacional</h3>
+            <div class="map-placeholder">
+              <svg xmlns="http://www.w3.org/2000/svg" width="300" height="400" viewBox="0 0 300 400">
+                <path d="M150 50 L200 100 L180 200 L200 300 L150 350 L100 300 L120 200 L100 100 Z" 
+                      fill="#3b82f6" opacity="0.2" stroke="#3b82f6" stroke-width="2"/>
+              </svg>
+            </div>
+            <p class="map-description">
+              Conectamos más de 1,100 municipios en todo el territorio colombiano
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">
+          ¿Por qué elegir EnvíoExpress?
+        </h2>
+        <p class="section-description">
+          Más de 10 años conectando a Colombia con excelencia
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card border-blue">
+          <div class="feature-icon bg-blue">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/>
+            </svg>
+          </div>
+          <h3 class="feature-title text-blue">Seguridad Garantizada</h3>
+          <p class="feature-description">
+            Seguros completos y rastreo GPS en tiempo real para todos tus envíos.
+          </p>
+        </div>
+
+        <div class="feature-card border-red">
+          <div class="feature-icon bg-red">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <h3 class="feature-title text-red">Entrega Rápida</h3>
+          <p class="feature-description">
+            Entrega en 24-48 horas en principales ciudades. Express en el mismo día.
+          </p>
+        </div>
+
+        <div class="feature-card border-black">
+          <div class="feature-icon bg-black">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <h3 class="feature-title text-black">Excelencia</h3>
+          <p class="feature-description">
+            98.5% de entregas exitosas. Soporte personalizado 24/7.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services Section -->
+  <section class="services">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">
+          Nuestros Servicios
+        </h2>
+        <p class="section-description">
+          Soluciones flexibles para cada necesidad de envío
+        </p>
+      </div>
+
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon bg-blue">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16.5 9.4 7.55 4.24"/>
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.29 7 12 12 20.71 7"/>
+              <line x1="12" y1="22" x2="12" y2="12"/>
+            </svg>
+          </div>
+          <h3 class="service-title text-blue">Contado</h3>
+          <p class="service-subtitle">Pago inmediato, entrega garantizada</p>
+          <ul class="service-list">
+            <li>• Tarifas preferenciales</li>
+            <li>• Descuentos por volumen</li>
+            <li>• Prioridad en entrega</li>
+            <li>• Seguro incluido</li>
+          </ul>
+          <button class="btn-blue w-full">
+            Cotizar Ahora
+          </button>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon bg-red">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+          <h3 class="service-title text-red">Contra Entrega</h3>
+          <p class="service-subtitle">El destinatario paga al recibir</p>
+          <ul class="service-list">
+            <li>• Sin riesgo para el remitente</li>
+            <li>• Confirmación de pago</li>
+            <li>• Transferencia inmediata</li>
+            <li>• Ideal para e-commerce</li>
+          </ul>
+          <button class="btn-red w-full">
+            Solicitar Servicio
+          </button>
+        </div>
+
+        <div class="service-card">
+          <div class="service-icon bg-black">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+              <path d="M15 18H9"/>
+              <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/>
+              <circle cx="17" cy="18" r="2"/>
+              <circle cx="7" cy="18" r="2"/>
+            </svg>
+          </div>
+          <h3 class="service-title text-black">Crédito</h3>
+          <p class="service-subtitle">Para empresas establecidas</p>
+          <ul class="service-list">
+            <li>• Facturación mensual</li>
+            <li>• Términos flexibles</li>
+            <li>• Gestión corporativa</li>
+            <li>• Reportes detallados</li>
+          </ul>
+          <button class="btn-secondary w-full">
+            Contactar Ventas
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta">
+    <div class="container">
+      <h2 class="cta-title">
+        ¿Listo para enviar con nosotros?
+      </h2>
+      <p class="cta-description">
+        Únete a miles de clientes satisfechos en toda Colombia
+      </p>
+      <div class="cta-buttons">
+        <button class="btn-primary btn-lg" (click)="navigateToLogin()">
+          Crear Cuenta
+        </button>
+        <button class="btn-outline btn-lg">
+          Contactar Ventas
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <div class="logo-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M16.5 9.4 7.55 4.24"/>
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              <polyline points="3.29 7 12 12 20.71 7"/>
+              <line x1="12" y1="22" x2="12" y2="12"/>
+            </svg>
+          </div>
+        </div>
+        <h3 class="footer-title">EnvíoExpress</h3>
+        <p class="footer-description">
+          Conectando a Colombia con envíos seguros y confiables
+        </p>
+        <div class="footer-info">
+          <span>Bogotá, Colombia</span>
+          <span>•</span>
+          <span>contacto@envioexpress.co</span>
+          <span>•</span>
+          <span>+57 (1) 234-5678</span>
+        </div>
+        <p class="footer-copyright">
+          © 2024 EnvíoExpress. Todos los derechos reservados.
+        </p>
+      </div>
+    </div>
+  </footer>
+</div>

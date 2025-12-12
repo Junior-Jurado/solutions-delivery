@@ -1,28 +1,28 @@
-# ---------------------------------------
+###########################################################
 # IGNORAR ARCHIVOS ZIP
-# ---------------------------------------
+###########################################################
 
 # Ignorar todos los .zip del proyecto
 **/*.zip
 
-# Si quieres ignorar SOLO los que están dentro de src, usa en cambio:
+# Si quieres ignorar SOLO los que están dentro de src
 **/src/*.zip
 
 
-# ---------------------------------------
+###########################################################
 # IGNORAR ARCHIVOS O CARPETAS LLAMADAS 'main'
-# ---------------------------------------
+###########################################################
 
 # Ignorar carpeta o archivo llamado main en cualquier parte
 **/main
 **/main/
 
 
-# ---------------------------------------
+###########################################################
 # IGNORAR SCRIPTS .BAT
-# ---------------------------------------
+###########################################################
 
-# Ignorar los scripts .bat específicos
+# Ignorar scripts específicos
 **/crear_zip.bat
 **/build_api.bat
 
@@ -34,58 +34,131 @@
 # IGNORAR ARCHIVOS DE TERRAFORM
 ###########################################################
 
-# Archivos de estado (MUY importante no subirlos)
+# Archivos de estado
 *.tfstate
 *.tfstate.*
 **/.terraform/
 **/.terraform/*
 
-# Carpeta local de terraform
+# Carpeta local
 .terraform/
 
-# Overrides locales
+# Overrides
 override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
 
-# Archivos de salida de planes
+# Planes
 *.tfplan
 
-# Archivos de logs
+# Logs
 terraform.log
 
 
 ###########################################################
-# IGNORAR ARCHIVOS DE VARIABLES SENSIBLES
+# IGNORAR VARIABLES SENSIBLES
 ###########################################################
 
-# Variables locales que no deben subirse nunca
+# Variables locales
 terraform.tfvars
 *.tfvars
 *.tfvars.json
 
-# Si en dev y prod guardas tfvars o configuraciones locales:
+# Variables por entorno
 infra/envs/dev/*
 infra/envs/prod/*
 
-# Pero PERMITE subir subcarpetas si contienen configuraciones válidas
+# (Permitir mantener carpetas vacías con .keep si quieres)
 # !infra/envs/dev/.keep
 # !infra/envs/prod/.keep
 
 
 ###########################################################
-# IGNORAR ARCHIVOS COMUNES
+# ANGULAR Y NODE
 ###########################################################
 
-# OS
-.DS_Store
-Thumbs.db
+# Output Angular
+dist/
+tmp/
+out-tsc/
+bazel-out/
 
-# IDEs
-.vscode/
+# Angular cache
+.angular/cache/
+
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+
+###########################################################
+# DOCKER
+###########################################################
+
+# Archivos generados
+*.pid
+*.seed
+*.tar
+
+# Docker compose local overrides
+docker-compose.override.yml
+
+# Volúmenes locales
+docker-data/
+data/
+
+
+###########################################################
+# IDEs Y EDITORES
+###########################################################
+
+# VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# JetBrains
 .idea/
 *.iml
 
-# Logs
-*.log
+# Otros
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.sublime-project
+
+
+###########################################################
+# MISC
+###########################################################
+
+# Cobertura
+coverage/
+__screenshots__/
+
+# Cachés
+sass-cache/
+.sass-cache/
+connect.lock
+libpeerconnection.log
+testem.log
+typings/
+
+
+###########################################################
+# SISTEMA
+###########################################################
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
