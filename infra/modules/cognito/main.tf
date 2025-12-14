@@ -35,6 +35,66 @@ resource "aws_cognito_user_pool" "this" {
     required            = true
     mutable             = true
   }
+  # =========================
+  # FULL NAME
+  # =========================
+  schema {
+    name = "full_name"
+    attribute_data_type = "string"
+    required = false
+    mutable = true
+
+    string_attribute_constraints {
+      min_length = 2
+      max_length = 100
+    }
+  }
+
+  # =========================
+  # TYPE DOCUMENT
+  # =========================
+  schema {
+    name                = "type_document"
+    attribute_data_type = "String"
+    required            = true
+    mutable             = true
+
+    string_attribute_constraints {
+      min_length = 2
+      max_length = 10
+    }
+  }
+
+  # =========================
+  # NUMBER DOCUMENT
+  # =========================
+  schema {
+    name = "number_document"
+    attribute_data_type = "string"
+    required = false
+    mutable = true
+
+    string_attribute_constraints {
+      min_length = 5
+      max_length = 30
+    }
+  }
+
+  # # =========================
+  # # ROLE (user / worker / admin)
+  # # =========================
+  # schema {
+  #   name                = "role"
+  #   attribute_data_type = "String"
+  #   required            = false
+  #   mutable             = true
+
+  #   string_attribute_constraints {
+  #     min_length = 3
+  #     max_length = 20
+  #   }
+  # }
+
 
   # Agregar triggers aquí
   lambda_config {

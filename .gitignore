@@ -95,6 +95,9 @@ npm-debug.log
 yarn-error.log
 pnpm-debug.log
 
+# Ignorar toda la carpeta environments del frontend
+solutions_front/src/app/environments/
+
 
 ###########################################################
 # DOCKER

@@ -1,0 +1,6 @@
+Que debo realizar?
+
+Desarrollar en el front el proceso de login, para hacer correctamente el registro tanto
+cognito como en la base de datos 
+Realizar login y mirar que se el rol de la base de datos si esta leyendo para que lo lleve
+al dashboard correspondiente

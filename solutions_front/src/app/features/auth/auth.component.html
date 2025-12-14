@@ -1,0 +1,219 @@
+<div class="auth-container">
+  <div class="auth-wrapper">
+    <!-- Header -->
+    <div class="auth-header">
+      <div class="logo-container">
+        <div class="logo-circle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.29 7 12 12 20.71 7"></polyline>
+            <line x1="12" y1="22" x2="12" y2="12"></line>
+          </svg>
+        </div>
+      </div>
+      <h1>EnvíoExpress</h1>
+      <p>Tu plataforma de envíos confiable</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <!-- Tab Navigation -->
+      <div class="tabs-list">
+        <button 
+          class="tab-trigger" 
+          [class.active]="userType === 'user'"
+          (click)="userType = 'user'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.29 7 12 12 20.71 7"></polyline>
+            <line x1="12" y1="22" x2="12" y2="12"></line>
+          </svg>
+          Usuario
+        </button>
+        <button 
+          class="tab-trigger" 
+          [class.active]="userType === 'worker'"
+          (click)="userType = 'worker'">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"></path>
+            <path d="M15 18H9"></path>
+            <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"></path>
+            <circle cx="17" cy="18" r="2"></circle>
+            <circle cx="7" cy="18" r="2"></circle>
+          </svg>
+          Trabajador
+        </button>
+      </div>
+
+      <!-- User Tab Content -->
+      <div class="tab-content" *ngIf="userType === 'user'">
+        <div class="card">
+          <div class="card-header">
+            <h2>{{ authTab === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta' }}</h2>
+            <p>
+              {{ authTab === 'login' 
+                ? 'Accede para rastrear tus envíos y gestionar tus paquetes'
+                : 'Regístrate como cliente para comenzar a enviar paquetes'
+              }}
+            </p>
+          </div>
+          <div class="card-content">
+            <!-- Login Form -->
+            <form *ngIf="authTab === 'login'" (ngSubmit)="handleUserLogin($event)" class="form">
+              <div class="form-group">
+                <label for="user-email">Correo electrónico</label>
+                <input
+                  id="user-email"
+                  type="email"
+                  placeholder="usuario@ejemplo.com"
+                  [(ngModel)]="email"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="user-password">Contraseña</label>
+                <input
+                  id="user-password"
+                  type="password"
+                  placeholder="••••••••"
+                  [(ngModel)]="password"
+                  name="password"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+              <p class="form-footer">
+                ¿No tienes cuenta?
+                <button type="button" (click)="switchToRegister()" class="link-button">
+                  Regístrate aquí
+                </button>
+              </p>
+            </form>
+
+            <!-- Register Form -->
+            <form *ngIf="authTab === 'register'" (ngSubmit)="handleRegister($event)" class="form">
+              <div class="form-group">
+                <label for="reg-fullname">Nombre completo</label>
+                <input
+                  id="reg-fullname"
+                  type="text"
+                  placeholder="Juan Pérez"
+                  [(ngModel)]="regFullName"
+                  name="regFullName"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="reg-email">Correo electrónico</label>
+                <input
+                  id="reg-email"
+                  type="email"
+                  placeholder="usuario@ejemplo.com"
+                  [(ngModel)]="regEmail"
+                  name="regEmail"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="reg-phone">Teléfono</label>
+                <input
+                  id="reg-phone"
+                  type="tel"
+                  placeholder="+57 300 123 4567"
+                  [(ngModel)]="regPhone"
+                  name="regPhone"
+                />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="reg-type-doc">Tipo de documento</label>
+                  <select 
+                    id="reg-type-doc"
+                    [(ngModel)]="regTypeDocument"
+                    name="regTypeDocument">
+                    <option value="" disabled>Seleccionar</option>
+                    <option value="CC">Cédula de Ciudadanía</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                    <option value="NIT">NIT</option>
+                    <option value="PP">Pasaporte</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="reg-number-doc">Número de documento</label>
+                  <input
+                    id="reg-number-doc"
+                    type="text"
+                    placeholder="123456789"
+                    [(ngModel)]="regNumberDocument"
+                    name="regNumberDocument"
+                  />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="reg-password">Contraseña</label>
+                <input
+                  id="reg-password"
+                  type="password"
+                  placeholder="••••••••"
+                  [(ngModel)]="regPassword"
+                  name="regPassword"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+              <p class="form-footer">
+                ¿Ya tienes cuenta?
+                <button type="button" (click)="switchToLogin()" class="link-button">
+                  Inicia sesión
+                </button>
+              </p>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Worker Tab Content -->
+      <div class="tab-content" *ngIf="userType === 'worker'">
+        <div class="card">
+          <div class="card-header">
+            <h2>Iniciar Sesión - Trabajador</h2>
+            <p>Acceso para administradores, secretarias y entregadores</p>
+          </div>
+          <div class="card-content">
+            <form (ngSubmit)="handleWorkerLogin($event)" class="form">
+              <div class="form-group">
+                <label for="worker-email">Correo electrónico</label>
+                <input
+                  id="worker-email"
+                  type="email"
+                  placeholder="trabajador@empresa.com"
+                  [(ngModel)]="email"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="worker-password">Contraseña</label>
+                <input
+                  id="worker-password"
+                  type="password"
+                  placeholder="••••••••"
+                  [(ngModel)]="password"
+                  name="password"
+                  required
+                />
+              </div>
+              <button type="submit" class="btn btn-primary">Acceder al Sistema</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back to Home -->
+    <div class="back-link">
+      <button class="btn-link" (click)="goHome()">Volver al inicio</button>
+    </div>
+  </div>
+</div>
