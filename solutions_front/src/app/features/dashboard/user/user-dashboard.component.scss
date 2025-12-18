@@ -1,5 +1,5 @@
-@import 'colors';
-
+@use "sass:color";
+@use "colors" as *;
 
 .min-h-screen {
   min-height: 100vh;
@@ -99,7 +99,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: darken($brand-blue, 10%);
+    background-color: color.adjust($brand-blue, $lightness: 10%);
   }
 }
 
@@ -114,7 +114,7 @@
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: darken($brand-red, 10%);
+    background-color: color.adjust($brand-red, $lightness: 10%);
   }
 }
 

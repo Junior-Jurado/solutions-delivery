@@ -25,4 +25,8 @@ type SecretRDSJson struct {
 type SignUp struct {
 	UserEmail string `json:"UserEmail"`
 	UserUUID string `json:"UserUUID"`
+	FullName string
+	Phone string
+	TypeDocument string
+	NumberDocument string
 }

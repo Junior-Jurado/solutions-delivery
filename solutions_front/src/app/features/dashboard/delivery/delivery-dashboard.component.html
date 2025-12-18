@@ -1,0 +1,416 @@
+<div class="delivery-dashboard">
+  <!-- Tabs Navigation -->
+  <div class="tabs-nav">
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'deliveries'"
+      (click)="setActiveTab('deliveries')">
+      <i class="icon-package"></i>
+      Mis Entregas
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'confirm'"
+      (click)="setActiveTab('confirm')">
+      <i class="icon-check-circle"></i>
+      Confirmar Entrega
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'issues'"
+      (click)="setActiveTab('issues')">
+      <i class="icon-alert-triangle"></i>
+      Reportar Problema
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'performance'"
+      (click)="setActiveTab('performance')">
+      <i class="icon-star"></i>
+      Mi Rendimiento
+    </button>
+  </div>
+
+  <!-- Tab Content: Deliveries -->
+  <div class="tab-content" *ngIf="activeTab === 'deliveries'">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-header">Entregas Hoy</div>
+        <div class="stat-value brand-blue">12</div>
+        <div class="stat-description">3 pendientes</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-header">Completadas</div>
+        <div class="stat-value text-green">9</div>
+        <div class="stat-description text-green">75% completado</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-header">Tiempo Promedio</div>
+        <div class="stat-value brand-red">28min</div>
+        <div class="stat-description">Por entrega</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-header">Calificación</div>
+        <div class="stat-value text-yellow">4.8⭐</div>
+        <div class="stat-description">Promedio cliente</div>
+      </div>
+    </div>
+
+    <!-- Deliveries List -->
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">Entregas Asignadas</h2>
+        <p class="card-description">Paquetes para entregar hoy</p>
+      </div>
+      <div class="card-content">
+        <div class="deliveries-list">
+          <div class="delivery-item" *ngFor="let delivery of deliveries">
+            <div class="delivery-header">
+              <div>
+                <div class="delivery-id">{{ delivery.id }}</div>
+                <div class="delivery-time">
+                  <i class="icon-clock"></i>
+                  Estimado: {{ delivery.estimatedTime }}
+                </div>
+              </div>
+              <div class="badges">
+                <span class="badge" [ngClass]="getPriorityClass(delivery.priority)">
+                  {{ delivery.priority }}
+                </span>
+                <span class="badge" [ngClass]="getStatusClass(delivery.status)">
+                  {{ delivery.status }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="delivery-details">
+              <div class="detail-section">
+                <div class="detail-label">
+                  <i class="icon-map-pin brand-blue"></i>
+                  Destinatario:
+                </div>
+                <div class="detail-text">{{ delivery.recipient }}</div>
+                <div class="detail-text">{{ delivery.address }}</div>
+              </div>
+              <div class="detail-section">
+                <div class="detail-label">
+                  <i class="icon-phone brand-red"></i>
+                  Contacto:
+                </div>
+                <div class="detail-text">{{ delivery.phone }}</div>
+                <div class="detail-text"><strong>Valor: {{ delivery.value }}</strong></div>
+              </div>
+            </div>
+            
+            <div class="delivery-instructions" *ngIf="delivery.instructions">
+              <div class="instructions-label">Instrucciones especiales:</div>
+              <div class="instructions-text">{{ delivery.instructions }}</div>
+            </div>
+            
+            <div class="delivery-actions">
+              <button class="btn btn-brand btn-sm" (click)="viewMap(delivery)">
+                <i class="icon-navigation"></i>
+                Ver Mapa
+              </button>
+              <button class="btn btn-outline btn-sm" (click)="callRecipient(delivery)">
+                <i class="icon-phone"></i>
+                Llamar
+              </button>
+              <button 
+                class="btn btn-sm" 
+                [ngClass]="delivery.status === 'En ruta' ? 'btn-primary' : 'btn-secondary'"
+                (click)="confirmOrStartRoute(delivery)">
+                {{ delivery.status === 'En ruta' ? 'Confirmar Entrega' : 'Iniciar Ruta' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content: Confirm -->
+  <div class="tab-content" *ngIf="activeTab === 'confirm'">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <i class="icon-check-circle text-green"></i>
+          Confirmar Entrega
+        </h2>
+        <p class="card-description">
+          Confirma la entrega usando el código OTP y sube la imagen de entrega
+        </p>
+      </div>
+      <div class="card-content">
+        <form (submit)="handleConfirmDelivery($event)" class="confirm-form">
+          <div class="form-group">
+            <label for="guide-select">Seleccionar guía a confirmar</label>
+            <select 
+              id="guide-select" 
+              class="form-control"
+              [(ngModel)]="selectedDelivery"
+              name="selectedDelivery"
+              required>
+              <option value="">Seleccionar...</option>
+              <option *ngFor="let delivery of getEnRutaDeliveries()" [value]="delivery.id">
+                {{ delivery.id }} - {{ delivery.recipient }}
+              </option>
+            </select>
+          </div>
+
+          <div class="delivery-info" *ngIf="selectedDelivery && getSelectedDeliveryInfo() as delivery">
+            <div class="info-title">Información de la entrega:</div>
+            <div class="info-text">Destinatario: {{ delivery.recipient }}</div>
+            <div class="info-text">Dirección: {{ delivery.address }}</div>
+            <div class="info-text">Valor: {{ delivery.value }}</div>
+          </div>
+
+          <div class="form-grid">
+            <div class="form-column">
+              <div class="form-group">
+                <label for="otp">Código OTP del cliente *</label>
+                <input 
+                  type="text" 
+                  id="otp" 
+                  class="form-control"
+                  placeholder="123456"
+                  [(ngModel)]="otpCode"
+                  name="otpCode"
+                  maxlength="6"
+                  required>
+                <div class="form-hint">
+                  El cliente debe proporcionarte este código de 6 dígitos
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="delivery-notes">Notas de entrega</label>
+                <textarea 
+                  id="delivery-notes" 
+                  class="form-control"
+                  placeholder="Entregado en perfectas condiciones..."
+                  [(ngModel)]="deliveryNotes"
+                  name="deliveryNotes"
+                  rows="4"></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Estado del paquete</label>
+                <select class="form-control" [(ngModel)]="packageStatus" name="packageStatus">
+                  <option value="perfect">Perfecto estado</option>
+                  <option value="minor-damage">Daño menor</option>
+                  <option value="damaged">Dañado</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-column">
+              <div class="form-group">
+                <label>Imagen de entrega *</label>
+                <div class="upload-area">
+                  <i class="icon-camera"></i>
+                  <p class="upload-text">Toma una foto de la entrega</p>
+                  <button type="button" class="btn btn-outline btn-block" (click)="openCamera()">
+                    <i class="icon-camera"></i>
+                    Abrir Cámara
+                  </button>
+                  <button type="button" class="btn btn-ghost btn-block" (click)="uploadFromGallery()">
+                    <i class="icon-upload"></i>
+                    Subir desde Galería
+                  </button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Firma del destinatario</label>
+                <div class="signature-area">
+                  <i class="icon-file-text"></i>
+                  <div class="signature-text">Área de firma digital</div>
+                  <button type="button" class="btn btn-outline btn-sm" (click)="activateSignature()">
+                    Activar Firma
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <button type="submit" class="btn btn-brand btn-lg btn-block">
+            <i class="icon-check-circle"></i>
+            Confirmar Entrega Exitosa
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content: Issues -->
+  <div class="tab-content" *ngIf="activeTab === 'issues'">
+    <div class="card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <i class="icon-alert-triangle text-yellow"></i>
+          Reportar Problema en Entrega
+        </h2>
+        <p class="card-description">
+          Reporta cualquier inconveniente durante la entrega
+        </p>
+      </div>
+      <div class="card-content">
+        <form (submit)="handleReportIssue($event)" class="issue-form">
+          <div class="form-group">
+            <label for="problem-guide">Número de guía</label>
+            <select 
+              id="problem-guide" 
+              class="form-control" 
+              [(ngModel)]="selectedGuide"
+              name="selectedGuide"
+              required>
+              <option value="">Seleccionar guía...</option>
+              <option *ngFor="let delivery of deliveries" [value]="delivery.id">
+                {{ delivery.id }} - {{ delivery.recipient }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="issue-type">Tipo de problema</label>
+            <select 
+              id="issue-type" 
+              class="form-control" 
+              [(ngModel)]="issueType"
+              name="issueType"
+              required>
+              <option value="">Seleccionar...</option>
+              <option value="address-incorrect">Dirección incorrecta</option>
+              <option value="recipient-unavailable">Destinatario no disponible</option>
+              <option value="access-denied">Acceso denegado al edificio</option>
+              <option value="package-damaged">Paquete dañado</option>
+              <option value="payment-issue">Problema con el pago</option>
+              <option value="other">Otro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="issue-description">Descripción del problema</label>
+            <textarea 
+              id="issue-description" 
+              class="form-control"
+              placeholder="Describe detalladamente lo que ocurrió..."
+              [(ngModel)]="issueDescription"
+              name="issueDescription"
+              rows="4"
+              required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Evidencia fotográfica</label>
+            <div class="upload-area-small">
+              <i class="icon-camera"></i>
+              <p class="upload-text-small">Opcional: Sube fotos que sustenten el reporte</p>
+              <button type="button" class="btn btn-outline" (click)="addPhotos()">
+                Agregar Fotos
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="attempted-resolution">¿Qué intentaste hacer para resolver el problema?</label>
+            <textarea 
+              id="attempted-resolution" 
+              class="form-control"
+              placeholder="Llamé al cliente, pregunté al portero, etc..."
+              [(ngModel)]="attemptedResolution"
+              name="attemptedResolution"
+              rows="3"></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-danger btn-block">
+            <i class="icon-alert-triangle"></i>
+            Enviar Reporte
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab Content: Performance -->
+  <div class="tab-content" *ngIf="activeTab === 'performance'">
+    <div class="stats-grid-performance">
+      <div class="stat-card">
+        <div class="stat-header">Entregas Esta Semana</div>
+        <div class="stat-value brand-blue">47</div>
+        <div class="stat-description text-green">+15% vs semana anterior</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-header">Tasa de Éxito</div>
+        <div class="stat-value text-green">96.2%</div>
+        <div class="stat-description text-green">Entregas exitosas</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-header">Tiempo Promedio</div>
+        <div class="stat-value brand-red">26min</div>
+        <div class="stat-description text-green">-5min vs semana anterior</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-header">Calificación Promedio</div>
+        <div class="stat-value text-yellow">4.8⭐</div>
+        <div class="stat-description text-green">+0.2 vs mes anterior</div>
+      </div>
+    </div>
+
+    <div class="performance-grid">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Rendimiento Diario</h2>
+          <p class="card-description">Entregas completadas por día</p>
+        </div>
+        <div class="card-content">
+          <div class="performance-list">
+            <div class="performance-item" *ngFor="let item of dailyPerformance">
+              <div class="performance-day">{{ item.day }}</div>
+              <div class="performance-stats">
+                <div class="performance-numbers">
+                  <span class="performance-value">{{ item.deliveries }}</span>
+                  <span class="performance-target">/{{ item.target }}</span>
+                </div>
+                <span class="badge" [ngClass]="item.efficiency >= 100 ? 'badge-primary' : 'badge-secondary'">
+                  {{ item.efficiency }}%
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Comentarios de Clientes</h2>
+          <p class="card-description">Últimas calificaciones recibidas</p>
+        </div>
+        <div class="card-content">
+          <div class="reviews-list">
+            <div class="review-item" *ngFor="let review of customerReviews">
+              <div class="review-header">
+                <div class="review-stars">
+                  <i class="icon-star" 
+                     *ngFor="let star of getStarArray(5); let i = index"
+                     [class.filled]="i < review.rating"></i>
+                </div>
+                <div class="review-date">{{ review.date }}</div>
+              </div>
+              <div class="review-comment">"{{ review.comment }}"</div>
+              <div class="review-client">- {{ review.client }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

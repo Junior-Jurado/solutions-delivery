@@ -19,14 +19,29 @@ func SignUp(sig models.SignUp) error {
 
 
 	query := `
-		INSERT INTO users (user_uuid, email, created_at, last_login)
-		VALUES (?, ?, ?, ?)
+		INSERT INTO users (
+			user_uuid,
+			full_name,
+			email,
+			phone,
+			type_document,
+			number_document,
+			role,
+			created_at,
+			last_login
+		)
+		VALUES (?, ?, ?, ?, ?, ?, 'client', ?, ?)
 	`
+
 	fmt.Println(query)
 
 	_, err = Db.Exec(query,
 		sig.UserUUID,
+		sig.FullName,
 		sig.UserEmail,
+		sig.Phone,
+		sig.TypeDocument,
+		sig.NumberDocument,
 		tools.FechaMySQL(),
 		tools.FechaMySQL(),
 	)

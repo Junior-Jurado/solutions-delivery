@@ -43,7 +43,25 @@ func AuthLambda(ctx context.Context, event events.CognitoEventUserPoolsPostConfi
 		case "sub": 
 			datos.UserUUID = att
 			fmt.Println("Sub = " + datos.UserUUID)
+		
+		case "phone_number":
+			datos.Phone = att
+			fmt.Println("Phone = " + datos.Phone)
+		
+		case "custom:full_name":
+			datos.FullName = att
+			fmt.Println("FullName = " + datos.FullName)
+		
+		case "custom:type_document":
+			datos.TypeDocument = att
+			fmt.Println("TypeDocument = " + datos.TypeDocument)
+		
+		case "custom:number_document":
+			datos.NumberDocument = att
+			fmt.Println("NumberDocument = " + datos.NumberDocument)
 		}
+
+		
 	}
 
 	err := bd.ReadSecret()

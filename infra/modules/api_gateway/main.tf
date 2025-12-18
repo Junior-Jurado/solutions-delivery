@@ -1,6 +1,32 @@
 resource "aws_apigatewayv2_api" "api" {
   name          = "${var.name_prefix}-http-api-${var.environment}"
   protocol_type = "HTTP"
+
+  cors_configuration {
+    allow_origins = [
+      "http://localhost:4200"
+    ]
+
+    allow_methods = [
+      "GET",
+      "POST",
+      "PUT",
+      "PATCH",
+      "DELETE",
+      "OPTIONS"
+    ]
+
+    allow_headers = [
+      "Content-Type",
+      "Authorization"
+    ]
+
+    expose_headers = [ 
+      "Authorization"
+     ]
+
+     max_age = 3600
+  }
 }
 
 # Cognito JWT authorizer
@@ -28,14 +54,15 @@ resource "aws_apigatewayv2_integration" "lambda" {
 }
 
 # Ruta protegida
-resource "aws_apigatewayv2_route" "main" {
+resource "aws_apigatewayv2_route" "auth_role" {
   api_id = aws_apigatewayv2_api.api.id
-  route_key = "ANY /api/v1/{proxy+}"
+  route_key = "GET /api/v1/auth/role"
 
   target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
   authorization_type = "JWT"
   authorizer_id = aws_apigatewayv2_authorizer.cognito.id
 }
+
 
 # Deploy
 resource "aws_apigatewayv2_stage" "default" {

@@ -1,21 +1,81 @@
-import{
+import {
     CognitoUserPool,
-    CognitoUserAttribute
+    CognitoUserAttribute,
+    CognitoUser,
+    AuthenticationDetails,
+    CognitoUserSession
 } from 'amazon-cognito-identity-js';
 
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environments.dev';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 const poolData = {
     UserPoolId: environment.cognito.userPoolId,
     ClientId: environment.cognito.clientId
 };
 
-@Injectable({
-    providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
+    constructor(private http: HttpClient) {}
+    
     private userPool = new CognitoUserPool(poolData);
+
+    /**
+     * Inicia sesión en la aplicación con credenciales de usuario y contraseña.
+     * @param email Dirección de correo electrónico del usuario.
+     * @param password Contraseña del usuario.
+     * @returns Una promesa que se resuelve con un objeto que contiene el idToken y el accessToken.
+     */
+    login(email: string, password: string): Promise<any> {
+        const authDetails = new AuthenticationDetails({
+            Username: email,
+            Password: password
+        });
+
+        const user = new CognitoUser({
+            Username: email,
+            Pool: this.userPool
+        });
+
+        return new Promise((resolve, reject) => {
+            user.authenticateUser(authDetails, {
+                onSuccess: (session: CognitoUserSession) => {
+                    const idToken = session.getIdToken().getJwtToken();
+                    const accessToken = session.getAccessToken().getJwtToken();
+                    const refreshToken = session.getRefreshToken().getToken();
+
+                    // Guardar tokens
+                    sessionStorage.setItem('idToken', idToken);
+                    sessionStorage.setItem('accessToken', accessToken);
+                    sessionStorage.setItem('refreshToken', refreshToken);
+
+                    resolve({
+                        idToken,
+                        accessToken
+                    });
+                },
+                onFailure: (err) => {
+                    console.error('Error en login de Cognito:', err);
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    getUserRole(): Promise<string> {
+        const idToken = sessionStorage.getItem('idToken');
+
+        const headers = new HttpHeaders({
+            Authorization: `Bearer ${idToken}`
+        });
+
+        return this.http
+        .get<{ role: string }>(
+            `${environment.apiBaseUrl}/auth/role`,
+            { headers }
+        ).toPromise().then(res => res!.role)
+    }
 
     registerUser(data: {
         fullName: string,
@@ -46,23 +106,68 @@ export class AuthService {
                 [],
                 (err, result) => {
                     if (err) {
+                        console.error('Error en signUp de Cognito:', err);
                         reject(err);
                         return;
                     }
 
+                    console.log('Usuario registrado exitosamente:', result);
                     resolve(result);
                 } 
             )
         })
     }
+    
     formatPhoneNumber(phone: string): string {
+        // Limpiar el número de cualquier caracter no numérico
         let clean = phone.replace(/\D/g, '');
 
+        // Si ya tiene el código de país, devolverlo con +
         if (clean.startsWith('57')) {
-            return `+57${clean}`;
+            return `+${clean}`;
         }
         
+        // Si no tiene código de país, agregarlo
         return `+57${clean}`;
     }
-}
 
+    confirmUser(email: string, code: string): Promise<void> {
+        const user = new CognitoUser({
+            Username: email,
+            Pool: this.userPool
+        });
+
+        return new Promise((resolve, reject) => {
+            user.confirmRegistration(code, true, (err: any, result: any) => {
+                if (err) {
+                    console.error('Error en confirmación:', err);
+                    reject(err);
+                    return;
+                }
+
+                console.log('Usuario confirmado exitosamente:', result);
+                resolve();
+            });
+        });
+    }
+
+    resendConfirmationCode(email: string): Promise<void> {
+        const user = new CognitoUser({
+            Username: email,
+            Pool: this.userPool
+        });
+
+        return new Promise((resolve, reject) => {
+            user.resendConfirmationCode((err: any, result: any) => {
+                if (err) {
+                    console.error('Error al reenviar código:', err);
+                    reject(err);
+                    return;
+                }
+
+                console.log('Código reenviado exitosamente:', result);
+                resolve();
+            });
+        });
+    }
+}

@@ -25,17 +25,17 @@ export const DASHBOARD_ROUTES: Routes = [
             //         import('./admin/admin-dashboard.component').then(m => m.AdminDashboardComponent)
             // },
 
-            // {
-            //     path: 'secretary',
-            //     loadComponent: () =>
-            //         import('./secretary/secretary-dashboard.component').then(m => m.SecretaryDashboardComponent)
-            // },
+            {
+                path: 'secretary',
+                loadComponent: () =>
+                    import('./secretary/secretary-dashboard.component').then(m => m.SecretaryDashboardComponent)
+            },
 
-            // {
-            //     path: 'delivery',
-            //     loadComponent: () =>
-            //         import('./delivery/delivery-dashboard.component').then(m => m.DeliveryDashboardComponent)
-            // },
+            {
+                path: 'delivery',
+                loadComponent: () =>
+                    import('./delivery/delivery-dashboard.component').then(m => m.DeliveryDashboardComponent)
+            },
             
         ]
     }

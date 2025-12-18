@@ -40,7 +40,34 @@ func ConnStr(claves models.SecretRDSJson) string {
 	dbUser = claves.Username
 	authToken = claves.Password
 	dbEndpoint = claves.Host
-	dbName = "(Cambiar aqui por el nombre de la base de datos)"
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true", dbUser, authToken,dbEndpoint, dbName)
-	
+	dbName = claves.DBName
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true", dbUser, authToken,dbEndpoint, dbName)	
 }
+
+func UserExists(UserUUID string) (bool, error) {
+	fmt.Println("Comienza UserExists " + UserUUID)
+
+	err := DbConnect()
+	if err != nil {
+		return false, err
+	}
+	defer Db.Close()
+
+	query := "SELECT UserUUID FROM users WHERE UserUUID = ?"
+
+	rows, err := Db.Query(query, UserUUID)
+	if err != nil {
+		return false, err
+	}
+	var valor string
+	rows.Next()
+	rows.Scan(&valor)
+
+	fmt.Println("UserExists > Ejecución exitosa - valor devuelto " + valor)
+
+	if valor == "1" {
+		return true, nil
+	}
+	return false, nil
+}
+

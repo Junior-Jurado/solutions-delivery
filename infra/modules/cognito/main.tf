@@ -3,9 +3,7 @@ resource "aws_cognito_user_pool" "this" {
 
   auto_verified_attributes = ["email"]
 
-  # SOLO UNO de estos debe tener email, no ambos
   username_attributes = ["email"]
-  # alias_attributes         = ["email"]
 
   mfa_configuration = "OFF"
 
@@ -40,8 +38,8 @@ resource "aws_cognito_user_pool" "this" {
   # =========================
   schema {
     name = "full_name"
-    attribute_data_type = "string"
-    required = false
+    attribute_data_type = "String"
+  
     mutable = true
 
     string_attribute_constraints {
@@ -56,7 +54,6 @@ resource "aws_cognito_user_pool" "this" {
   schema {
     name                = "type_document"
     attribute_data_type = "String"
-    required            = true
     mutable             = true
 
     string_attribute_constraints {
@@ -70,8 +67,7 @@ resource "aws_cognito_user_pool" "this" {
   # =========================
   schema {
     name = "number_document"
-    attribute_data_type = "string"
-    required = false
+    attribute_data_type = "String"
     mutable = true
 
     string_attribute_constraints {
@@ -86,7 +82,6 @@ resource "aws_cognito_user_pool" "this" {
   # schema {
   #   name                = "role"
   #   attribute_data_type = "String"
-  #   required            = false
   #   mutable             = true
 
   #   string_attribute_constraints {

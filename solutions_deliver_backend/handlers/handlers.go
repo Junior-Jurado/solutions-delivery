@@ -3,8 +3,9 @@ package handlers
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
-	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/auth"
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/routers"
 	"github.com/aws/aws-lambda-go/events"
 	// "strconv"
 )
@@ -15,47 +16,52 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	id := request.PathParameters["id"]
 	idn, _ := strconv.Atoi(id)
 
-	isValid, statusCode, user := validateAuthorization(path, method, headers)
+	isValid, statusCode, userUUID := validateAuthorization(path, method, request)
 
 	if !isValid {
-		return statusCode, user
+		return statusCode, userUUID
 	}
 	
-	switch path[1:5] {
-	case "user":
-		return ProcesoUsers(body, path, method, user, id, request)
+	switch {
+	case strings.HasPrefix(path, "/user"):
+		return ProcesoUsers(body, path, method, userUUID, id, request)
 
-	case "guia":
-		return ProcesoGuias(body, path, method, user, idn, request)
+	case strings.HasPrefix(path, "/guide"):
+		return ProcesoGuias(body, path, method, userUUID, idn, request)
+	
+	case strings.HasPrefix(path, "/auth"):
+		return ProcesoAutencaciones(body, path, method, userUUID, id, request)
 	}
+	
 
 	return 400, "Method Invalid"
 }
 
-func validateAuthorization(path string, method string, headers map[string]string) (bool, int, string) {
+func validateAuthorization(path string, method string, request events.APIGatewayV2HTTPRequest) (bool, int, string) {
+	// Preflight CORS
+	if method == "OPTIONS" {
+		return true, 200, "OK"
+	}
+
 	if (path == "/login" && method == "POST") ||
 	   (path == "/register" && method == "POST") {
 		return true, 200, "OK"
 	}
 
-	token := headers["authorization"]
-
-	if len(token) == 0 {
-		return false, 401, "Token requerido"
+	if request.RequestContext.Authorizer == nil ||
+		request.RequestContext.Authorizer.JWT == nil ||
+		request.RequestContext.Authorizer.JWT.Claims == nil {
+		return false, 401, "No autorizado"
 	}
 
-	isValid, err, message := auth.ValidarToken(token)
+	claims := request.RequestContext.Authorizer.JWT.Claims
 	
-	if !isValid {
-		if err != nil {
-			fmt.Println("Error en el token " + err.Error())
-			return false, 401, err.Error()
-		}
-		fmt.Println("Error en el token " + message)
-		return false, 401, message
-	} 
+	userUUID, ok := claims["sub"]
+	if !ok {
+		return false, 401, "Unauthorized"
+	}
 
-	return true, 200, message
+	return true, 200, userUUID
 }
 
 func ProcesoUsers(body string, path  string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
@@ -63,5 +69,14 @@ func ProcesoUsers(body string, path  string, method string, user string, id stri
 }
 
 func ProcesoGuias(body string, path  string, method string, user string, id int, request events.APIGatewayV2HTTPRequest) (int, string) {
+	return 400, "Method Invalid"
+}
+
+func ProcesoAutencaciones(body string, path  string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
+	switch {
+		case path == "/auth/role" && method == "GET":
+			return routers.GetRole(user)
+	}
+	
 	return 400, "Method Invalid"
 }
