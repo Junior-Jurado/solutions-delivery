@@ -1,9 +1,10 @@
-import { Component } from "@angular/core";
+import { Component, NgZone } from "@angular/core";
 import { Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { AuthService } from "@core/services/auth.service";
-import { jwtDecode } from "jwt-decode";
+import { ChangeDetectorRef } from "@angular/core";
+
 @Component({
     selector: 'app-auth',
     templateUrl: './auth.component.html',
@@ -11,14 +12,12 @@ import { jwtDecode } from "jwt-decode";
     styleUrls: ['./auth.component.scss'],
     imports: [FormsModule, CommonModule]
 })
-
 export class AuthComponent {
     // Campos para hacer login
     email: string = '';
     password: string = '';
 
     // Tabs de estado
-    userType: 'user' | 'worker' = 'user';
     authTab: 'login' | 'register' | 'confirm' = 'login';
 
     // Campos para poder registrarse
@@ -32,152 +31,464 @@ export class AuthComponent {
     // Campos para confirmación
     confirmEmail: string = '';
     confirmCode: string = '';
+
+    // Estado de carga
+    isLoading: boolean = false;
     isResendingCode: boolean = false;
     
-    // Sistema de mensajes
-    message: string = '';
-    messageType: 'success' | 'error' | 'info' = 'info';
-    showMessage: boolean = false;
+    // Sistema de toast
+    toastMessage: string = '';
+    toastType: 'success' | 'error' | 'info' = 'info';
+    showToast: boolean = false;
+    private toastTimeoutId: any = null;
 
-    constructor(private router: Router, private authService: AuthService) {}
+    // Errores de validación
+    emailError: string = '';
+    passwordError: string = '';
+    regFullNameError: string = '';
+    regEmailError: string = '';
+    regPhoneError: string = '';
+    regTypeDocumentError: string = '';
+    regNumberDocumentError: string = '';
+    regPasswordError: string = '';
+    confirmCodeError: string = '';
 
-    // Método para mostrar mensajes
-    displayMessage(text: string, type: 'success' | 'error' | 'info' = 'info', duration: number = 5000): void {
-        this.message = text;
-        this.messageType = type;
-        this.showMessage = true;
+    constructor(
+        private router: Router,
+        private authService: AuthService,
+        private ngZone: NgZone,
+        private cdr: ChangeDetectorRef
+    ) {}
 
-        setTimeout(() => {
-            this.showMessage = false;
+    // Método para mostrar Toast
+    displayToast(
+        text: string,
+        type: 'success' | 'error' | 'info' = 'info',
+        duration: number = 4000
+    ): void {
+
+        // Cancelar cualquier toast anterior
+        if (this.toastTimeoutId) {
+            clearTimeout(this.toastTimeoutId);
+            this.toastTimeoutId = null;
+        }
+
+        this.toastMessage = text;
+        this.toastType = type;
+        this.showToast = true;
+        this.cdr.detectChanges();
+
+        this.toastTimeoutId = setTimeout(() => {
+            this.showToast = false;
+            this.cdr.detectChanges();
+            this.toastTimeoutId = null;
         }, duration);
+    }
+
+
+    // Validaciones individuales
+    validateEmail(email: string): string {
+        if (!email || email.trim() === '') {
+            return 'El correo electrónico es obligatorio';
+        }
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return 'Por favor ingresa un correo electrónico válido';
+        }
+        
+        return '';
+    }
+
+    validatePassword(password: string): string {
+        if (!password || password.trim() === '') {
+            return 'La contraseña es obligatoria';
+        }
+        
+        if (password.length < 8) {
+            return 'La contraseña debe tener al menos 8 caracteres';
+        }
+        
+        // Validar requisitos de Cognito
+        const hasUpperCase = /[A-Z]/.test(password);
+        const hasLowerCase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecialChar = /[^A-Za-z0-9]/.test(password);
+        
+        if (!hasUpperCase) {
+            return 'La contraseña debe contener al menos una letra mayúscula';
+        }
+        
+        if (!hasLowerCase) {
+            return 'La contraseña debe contener al menos una letra minúscula';
+        }
+        
+        if (!hasNumber) {
+            return 'La contraseña debe contener al menos un número';
+        }
+        
+        if (!hasSpecialChar) {
+            return 'La contraseña debe contener al menos un carácter especial';
+        }
+        
+        return '';
+    }
+
+    validateFullName(name: string): string {
+        if (!name || name.trim() === '') {
+            return 'El nombre completo es obligatorio';
+        }
+        
+        if (name.trim().length < 3) {
+            return 'El nombre debe tener al menos 3 caracteres';
+        }
+        
+        // Validar que contenga al menos nombre y apellido
+        const nameParts = name.trim().split(/\s+/);
+        if (nameParts.length < 2) {
+            return 'Por favor ingresa tu nombre y apellido';
+        }
+        
+        return '';
+    }
+
+    validatePhone(phone: string): string {
+        if (!phone || phone.trim() === '') {
+            return ''; // El teléfono es opcional
+        }
+        
+        // Remover espacios y caracteres especiales para validar
+        const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+        
+        // Validar formato colombiano (+57 seguido de 10 dígitos)
+        const phoneRegex = /^(\+57)?[1-9][0-9]{9}$/;
+        if (!phoneRegex.test(cleanPhone)) {
+            return 'Por favor ingresa un número de teléfono válido (+57 300 123 4567)';
+        }
+        
+        return '';
+    }
+
+    validateTypeDocument(typeDoc: string): string {
+        if (!typeDoc || typeDoc.trim() === '') {
+            return ''; // El tipo de documento es opcional
+        }
+        
+        const validTypes = ['CC', 'CE', 'NIT', 'PP'];
+        if (!validTypes.includes(typeDoc)) {
+            return 'Por favor selecciona un tipo de documento válido';
+        }
+        
+        return '';
+    }
+
+    validateNumberDocument(numberDoc: string, typeDoc: string): string {
+        if (!numberDoc || numberDoc.trim() === '') {
+            return ''; // El número de documento es opcional si no hay tipo
+        }
+        
+        if (typeDoc && !numberDoc) {
+            return 'Por favor ingresa el número de documento';
+        }
+        
+        // Validar que solo contenga números y guiones
+        const docRegex = /^[0-9\-]+$/;
+        if (!docRegex.test(numberDoc)) {
+            return 'El número de documento solo puede contener números y guiones';
+        }
+        
+        if (numberDoc.length < 5) {
+            return 'El número de documento debe tener al menos 5 caracteres';
+        }
+        
+        return '';
+    }
+
+    validateConfirmationCode(code: string): string {
+        if (!code || code.trim() === '') {
+            return 'El código de confirmación es obligatorio';
+        }
+        
+        // Cognito típicamente envía códigos de 6 dígitos
+        if (!/^\d{6}$/.test(code)) {
+            return 'El código debe ser de 6 dígitos';
+        }
+        
+        return '';
+    }
+
+    // Limpiar errores
+    clearLoginErrors(): void {
+        this.emailError = '';
+        this.passwordError = '';
+    }
+
+    clearRegisterErrors(): void {
+        this.regFullNameError = '';
+        this.regEmailError = '';
+        this.regPhoneError = '';
+        this.regTypeDocumentError = '';
+        this.regNumberDocumentError = '';
+        this.regPasswordError = '';
+    }
+
+    clearConfirmErrors(): void {
+        this.confirmCodeError = '';
+    }
+
+    // Método para obtener un mensaje de error amigable
+    getErrorMessage(error: any): string {
+        const errorMessage = error?.message || error?.toString() || '';
+        
+        // Manejar errores específicos de Cognito
+        if (errorMessage.includes('Incorrect username or password')) {
+            return 'Correo o contraseña incorrectos. Por favor verifica tus credenciales.';
+        }
+        
+        if (errorMessage.includes('User does not exist')) {
+            return 'No existe una cuenta con este correo electrónico.';
+        }
+        
+        if (errorMessage.includes('User is not confirmed')) {
+            return 'Tu cuenta no ha sido confirmada. Por favor revisa tu correo.';
+        }
+        
+        if (errorMessage.includes('Password attempts exceeded')) {
+            return 'Demasiados intentos fallidos. Intenta de nuevo más tarde.';
+        }
+        
+        if (errorMessage.includes('Network error') || errorMessage.includes('Failed to fetch')) {
+            return 'Error de conexión. Verifica tu conexión a internet.';
+        }
+
+        if (errorMessage.includes('Username should be an email') || errorMessage.includes('Invalid email')) {
+            return 'Por favor ingresa un correo electrónico válido.';
+        }
+
+        if (errorMessage.includes('Password did not conform')) {
+            return 'La contraseña no cumple con los requisitos mínimos de seguridad.';
+        }
+
+        if (errorMessage.includes('An account with the given email already exists')) {
+            return 'Ya existe una cuenta con este correo electrónico.';
+        }
+
+        if (errorMessage.includes('Invalid verification code')) {
+            return 'Código de verificación inválido. Por favor verifica el código.';
+        }
+
+        if (errorMessage.includes('Code mismatch')) {
+            return 'El código ingresado no es correcto. Intenta nuevamente.';
+        }
+
+        if (errorMessage.includes('Attempt limit exceeded')) {
+            return 'Has excedido el límite de intentos. Solicita un nuevo código.';
+        }
+        
+        // Si no coincide con ningún error conocido, devolver el mensaje original o uno genérico
+        return errorMessage || 'Ha ocurrido un error. Por favor intenta nuevamente.';
     }
 
     async handleLogin(event: Event): Promise<void> {
         event.preventDefault();
-        try {
 
+        if (this.isLoading) return;
+
+        // Limpiar errores previos
+        this.clearLoginErrors();
+
+        // Validar campos
+        this.emailError = this.validateEmail(this.email);
+        this.passwordError = this.validatePassword(this.password);
+
+        // Si hay errores, no continuar
+        if (this.emailError || this.passwordError) {
+            this.displayToast('Por favor corrige los errores en el formulario', 'error');
+            return;
+        }
+
+        this.isLoading = true;
+
+        try {
             // Login Cognito
             await this.authService.login(this.email, this.password);
 
             // Pedir rol al backend
             const role = await this.authService.getUserRole();
 
-            console.log(role)
+            this.displayToast('Inicio de sesión exitoso', 'success', 2000);
 
-            // Navegar según rol
-            this.router.navigate([`/dashboard/${role}`]);
+            // Pequeño delay para que el usuario vea el mensaje
+            setTimeout(() => {
+                this.ngZone.run(() => {
+                    this.router.navigate([`/dashboard/${role}`]);
+                });
+            }, 500);
+
         } catch (error: any) {
             console.error('Error en login:', error);
-            this.displayMessage(
-                error.message || 'Error en el login. Por favor intenta nuevamente.',
-                'error'
-            );
+            const friendlyMessage = this.getErrorMessage(error);
+            this.displayToast(friendlyMessage, 'error');
+        } finally {
+            this.isLoading = false;
+            this.cdr.detectChanges();
         }
     }
 
     async handleRegister(event: Event): Promise<void> {
         event.preventDefault();
 
+        if (this.isLoading) return;
+
+        // Limpiar errores previos
+        this.clearRegisterErrors();
+
+        // Validar campos
+        this.regFullNameError = this.validateFullName(this.regFullName);
+        this.regEmailError = this.validateEmail(this.regEmail);
+        this.regPhoneError = this.validatePhone(this.regPhone);
+        this.regTypeDocumentError = this.validateTypeDocument(this.regTypeDocument);
+        this.regNumberDocumentError = this.validateNumberDocument(this.regNumberDocument, this.regTypeDocument);
+        this.regPasswordError = this.validatePassword(this.regPassword);
+
+        // Validación especial: si hay tipo de documento, debe haber número
+        if (this.regTypeDocument && !this.regNumberDocument) {
+            this.regNumberDocumentError = 'Por favor ingresa el número de documento';
+        }
+
+        // Si hay errores, no continuar
+        if (this.regFullNameError || this.regEmailError || this.regPhoneError || 
+            this.regTypeDocumentError || this.regNumberDocumentError || this.regPasswordError) {
+            this.displayToast('Por favor corrige los errores en el formulario', 'error');
+            return;
+        }
+
+        this.isLoading = true;
+
         try {
             await this.authService.registerUser({
-                fullName: this.regFullName,
-                email: this.regEmail,
-                phone: this.regPhone,
+                fullName: this.regFullName.trim(),
+                email: this.regEmail.trim().toLowerCase(),
+                phone: this.regPhone.trim(),
                 password: this.regPassword,
                 typeDocument: this.regTypeDocument,
-                numberDocument: this.regNumberDocument
+                numberDocument: this.regNumberDocument.trim()
             });
 
-            this.confirmEmail = this.regEmail;
-            this.authTab = 'confirm';
-            
-            this.displayMessage(
-                'Registro exitoso. Revisa tu correo para obtener el código de confirmación.',
-                'success'
-            );
+            this.ngZone.run(() => {
+                this.confirmEmail = this.regEmail.trim().toLowerCase();
+                this.authTab = 'confirm';
+                
+                this.displayToast(
+                    'Registro exitoso. Revisa tu correo para obtener el código de confirmación.',
+                    'success',
+                    5000
+                );
 
-            // Limpiar campos de registro
-            this.regFullName = '';
-            this.regEmail = '';
-            this.regPhone = '';
-            this.regTypeDocument = '';
-            this.regNumberDocument = '';
-            this.regPassword = '';
+                // Limpiar campos de registro
+                this.regFullName = '';
+                this.regEmail = '';
+                this.regPhone = '';
+                this.regTypeDocument = '';
+                this.regNumberDocument = '';
+                this.regPassword = '';
+            });
 
         } catch (error: any) {
             console.error('Error en registro:', error);
-            this.displayMessage(
-                error.message || 'Error en el registro. Por favor intenta nuevamente.',
-                'error'
-            );
+            const friendlyMessage = this.getErrorMessage(error);
+            this.displayToast(friendlyMessage, 'error');
+        } finally {
+            this.isLoading = false;
+            this.cdr.detectChanges();
         }
     }
 
     async handleConfirmEmail(event: Event): Promise<void> {
         event.preventDefault();
 
-        if (!this.confirmCode) {
-            this.displayMessage('Por favor ingresa el código de confirmación', 'error');
+        // Limpiar errores previos
+        this.clearConfirmErrors();
+
+        // Validar código
+        this.confirmCodeError = this.validateConfirmationCode(this.confirmCode);
+
+        if (this.confirmCodeError) {
+            this.displayToast(this.confirmCodeError, 'error');
             return;
         }
 
+        if (this.isLoading) return;
+
+        this.isLoading = true;
+
         try {
-            await this.authService.confirmUser(this.confirmEmail, this.confirmCode);
+            await this.authService.confirmUser(this.confirmEmail, this.confirmCode.trim());
 
-            // Limpiar campos y cambiar al login
-            this.confirmCode = '';
-            this.confirmEmail = '';
-            this.authTab = 'login';
-
-            // Mostrar mensaje de éxito
-            this.displayMessage(
+            this.displayToast(
                 '¡Correo confirmado exitosamente! Ya puedes iniciar sesión.',
-                'success'
+                'success',
+                3000
             );
+
+            // Limpiar campos
+            this.confirmCode = '';
+            const emailToRemember = this.confirmEmail;
+            this.confirmEmail = '';
+
+            // Cambiar a login después del mensaje y prellenar el email
+            setTimeout(() => {
+                this.authTab = 'login';
+                this.email = emailToRemember;
+                this.cdr.detectChanges();
+            }, 1000);
 
         } catch (error: any) {
             console.error('Error en confirmación:', error);
-            this.displayMessage(
-                error.message || 'Error al confirmar el código. Verifica que sea correcto.',
-                'error'
-            );
+            const friendlyMessage = this.getErrorMessage(error);
+            this.displayToast(friendlyMessage, 'error');
+        } finally {
+            this.isLoading = false;
+            this.cdr.detectChanges();
         }
     }
 
     async handleResendCode(): Promise<void> {
-        if (this.isResendingCode) return;
+        if (this.isResendingCode || this.isLoading) return;
 
         this.isResendingCode = true;
 
         try {
             await this.authService.resendConfirmationCode(this.confirmEmail);
-            this.displayMessage(
-                'Código reenviado. Revisa tu correo electrónico.',
+            this.displayToast(
+                'Código reenviado exitosamente. Revisa tu correo electrónico.',
                 'success'
             );
         } catch (error: any) {
             console.error('Error al reenviar código:', error);
-            this.displayMessage(
-                error.message || 'Error al reenviar el código',
-                'error'
-            );
+            const friendlyMessage = this.getErrorMessage(error);
+            this.displayToast(friendlyMessage, 'error');
         } finally {
-            this.isResendingCode = false;
+            this.isLoading = false;
+            this.cdr.detectChanges();
         }
     }
 
     switchToRegister(): void {
+        if (this.isLoading) return;
+        this.clearLoginErrors();
         this.authTab = 'register';
-        this.showMessage = false;
     }
 
     switchToLogin(): void {
+        if (this.isLoading) return;
+        this.clearRegisterErrors();
+        this.clearConfirmErrors();
         this.authTab = 'login';
-        this.showMessage = false;
     }
 
     goHome(): void {
+        if (this.isLoading) return;
         this.router.navigate(['/']);
     }
-
 }
