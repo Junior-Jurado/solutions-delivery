@@ -1,0 +1,36 @@
+# 1. Eliminar la imagen anterior
+docker rmi solutions-lambda-repo-create_guides-dev:latest
+docker rmi 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-create_guides-dev:latest
+
+# 2. Construir SIN multi-plataforma
+docker build --platform linux/amd64 --provenance=false -t solutions-lambda-repo-create_guides-dev:latest .
+
+# 3. Etiquetar
+docker tag solutions-lambda-repo-create_guides-dev:latest 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-create_guides-dev:latest
+
+# 4. Verificar que es una sola plataforma (debe mostrar solo linux/amd64)
+docker inspect solutions-lambda-repo-create_guides-dev:latest | grep Architecture
+
+# 5. Subir a ECR (sin login, ya estás autenticado)
+docker push 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-create_guides-dev:latest
+
+
+# Login
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 386452074334.dkr.ecr.us-east-1.amazonaws.com
+
+
+aws lambda update-function-code --function-name guia-app-lambda --image-uri 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-create_guides-dev:latest --region us-east-1
+
+# Construir
+docker build --platform linux/amd64 --provenance=false -t solutions-lambda-repo-create_guides-dev:latest .
+
+# Etiquetar
+docker tag guia-app-lambda-repo:latest 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-create_guides-dev:latest
+
+# Subir
+docker push 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-create_guides-dev:latest
+
+# Actualizar Lambda
+aws lambda update-function-code --function-name guia-app-lambda --image-uri 386452074334.dkr.ecr.us-east-1.amazonaws.com/guia-app-lambda-repo:latest --region us-east-1
+
+docker system prune -a

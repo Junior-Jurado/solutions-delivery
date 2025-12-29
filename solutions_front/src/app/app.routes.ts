@@ -17,8 +17,12 @@ export const routes: Routes = [
     // Dashboard (shell)
     {
         path: 'dashboard',
+        /**
+         * Lazy loads the dashboard routes
+         * @returns {Promise<Routes[]>} The dashboard routes
+         */
         loadChildren: () =>
-            import('./features/dashboard/dashboard.routes')
+            import('./features/dashboard/shell/dashboard.routes')
                 .then(m => m.DASHBOARD_ROUTES),
     }
     

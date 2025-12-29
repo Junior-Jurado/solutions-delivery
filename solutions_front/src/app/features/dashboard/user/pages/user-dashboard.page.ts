@@ -2,13 +2,13 @@ import { Component } from "@angular/core";
 import { Router } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 @Component({
-    selector: 'app-dashboard-default',
+    selector: 'app-dashboard',
     standalone: true,
-    templateUrl: './dashboard-default.component.html',
-    styleUrls: ['./dashboard-default.component.scss'], 
+    templateUrl: './user-dashboard.page.html',
+    styleUrls: ['./user-dashboard.page.scss'], 
     imports: [ FormsModule]
 })
-export class DashboardDefaultComponent {
+export class UserDashboardComponent {
     trackingNumber: string = '';
 
     constructor(private router: Router) {}

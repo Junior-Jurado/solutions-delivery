@@ -1,5 +1,6 @@
-APIGATEWAY
+aws cognito-idp initiate-auth \
+  --auth-flow USER_PASSWORD_AUTH \
+  --client-id <APP_CLIENT_ID> \
+  --auth-parameters USERNAME=<EMAIL>,PASSWORD=<PASSWORD>
 
-Crear en apirest en api gateway, poner nombre proyecto, añadir recurso con nombre del backend {folder}, habilitar el cors
-dentro del folder entrar un tipo {object} habilitar cors
-debajo de object agregar los metodos del backend que vamos a cargar en el back poner los metodos con servicio aws, region us-east-1
+aws cognito-idp initiate-auth --auth-flow USER_PASSWORD_AUTH --client-id 25vaa2k172genlkaf0731ip8j5 --auth-parameters USERNAME=germane.juradov+4@gmail.com,PASSWORD=G3rm4n**

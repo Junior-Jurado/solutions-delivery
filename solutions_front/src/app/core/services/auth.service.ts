@@ -19,6 +19,7 @@ const poolData = {
 export class AuthService {
     constructor(private http: HttpClient) {}
     
+    private cachedRole: string | null = null;
     private userPool = new CognitoUserPool(poolData);
 
     /**
@@ -27,7 +28,11 @@ export class AuthService {
      * @param password Contraseña del usuario.
      * @returns Una promesa que se resuelve con un objeto que contiene el idToken y el accessToken.
      */
-    login(email: string, password: string): Promise<any> {
+    login(email: string, password: string): Promise<{
+        idToken: string,
+        accessToken: string;
+        role: string;
+    }> {
         const authDetails = new AuthenticationDetails({
             Username: email,
             Password: password
@@ -40,20 +45,28 @@ export class AuthService {
 
         return new Promise((resolve, reject) => {
             user.authenticateUser(authDetails, {
-                onSuccess: (session: CognitoUserSession) => {
-                    const idToken = session.getIdToken().getJwtToken();
-                    const accessToken = session.getAccessToken().getJwtToken();
-                    const refreshToken = session.getRefreshToken().getToken();
+                onSuccess: async (session: CognitoUserSession) => {
+                    try {
+                        const idToken = session.getIdToken().getJwtToken();
+                        const accessToken = session.getAccessToken().getJwtToken();
+                        const refreshToken = session.getRefreshToken().getToken();
 
-                    // Guardar tokens
-                    sessionStorage.setItem('idToken', idToken);
-                    sessionStorage.setItem('accessToken', accessToken);
-                    sessionStorage.setItem('refreshToken', refreshToken);
+                        // Guardar tokens
+                        sessionStorage.setItem('idToken', idToken);
+                        sessionStorage.setItem('accessToken', accessToken);
+                        sessionStorage.setItem('refreshToken', refreshToken);
 
-                    resolve({
-                        idToken,
-                        accessToken
-                    });
+                        const role = await this.fetchAndCacheUserRole();
+
+                        resolve({
+                            idToken,
+                            accessToken,
+                            role
+                        });
+                    } catch (error) {
+                        reject(error);
+                    }
+                    
                 },
                 onFailure: (err) => {
                     console.error('Error en login de Cognito:', err);
@@ -63,7 +76,46 @@ export class AuthService {
         });
     }
 
+    private async fetchAndCacheUserRole(): Promise<string> {
+        const idToken = sessionStorage.getItem('idToken');
+
+        if (!idToken) {
+            throw new Error('No se encontró el token de identificación');
+        }
+
+        const headers = new HttpHeaders({
+            Authorization: `Bearer ${idToken}`
+        });
+
+        const response = await this.http
+        .get<{ role: string }>(
+            `${environment.apiBaseUrl}/auth/role`,
+            { headers }
+        ).toPromise();
+        
+        const role = response!.role.toUpperCase();
+
+        // Guardar en cache
+        sessionStorage.setItem('role', role);
+        this.cachedRole = role;
+
+        return role;
+    }
+
     getUserRole(): Promise<string> {
+        // 1. cache en memoria
+        if (this.cachedRole) {
+            return Promise.resolve(this.cachedRole);
+        }
+
+        // 2. cache en sessionStorage
+        const storedRole = sessionStorage.getItem('role');
+        if (storedRole) {
+            this.cachedRole = storedRole;
+            return Promise.resolve(storedRole);
+        }
+        
+        // 3. llamada a la API
         const idToken = sessionStorage.getItem('idToken');
 
         const headers = new HttpHeaders({

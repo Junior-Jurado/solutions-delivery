@@ -22,11 +22,11 @@ interface DailyStats {
 @Component({
     selector: 'app-secretary-dashboard',
     standalone: true,
-    templateUrl: './secretary-dashboard.component.html',
-    styleUrls: ['./secretary-dashboard.component.scss'],
+    templateUrl: './secretary-dashboard.page.html',
+    styleUrls: ['./secretary-dashboard.page.scss'],
     imports: [ReactiveFormsModule, CommonModule, FormsModule]
 })
-export class SecretaryDashboardComponent {
+export class SecretaryDashboardPage {
     activeTab: string = 'create-guide';
     trackingSearch: string = '';
     selectedGuide: string = '';

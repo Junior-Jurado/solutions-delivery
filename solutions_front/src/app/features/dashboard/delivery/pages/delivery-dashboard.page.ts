@@ -31,8 +31,8 @@ interface CustomerReview {
 @Component({
   selector: 'app-delivery-dashboard',
   standalone: true,
-  templateUrl: './delivery-dashboard.component.html',
-  styleUrls: ['./delivery-dashboard.component.scss'],
+  templateUrl: './delivery-dashboard.page.html',
+  styleUrls: ['./delivery-dashboard.page.scss'],
   imports: [FormsModule, CommonModule]
 })
 export class DeliveryDashboardComponent {

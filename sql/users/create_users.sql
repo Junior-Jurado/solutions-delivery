@@ -5,13 +5,12 @@ CREATE TABLE users (
   phone       VARCHAR(50),
   type_document VARCHAR(50),
   number_document NUMERIC(20,0),
-  role        ENUM('client','admin','secretary','delivery') NOT NULL DEFAULT 'client',
+  role        ENUM('CLIENT','ADMIN','SECRETARY','DELIVERY') NOT NULL DEFAULT 'CLIENT',
   last_login  TIMESTAMP NULL,
   updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT pk_users PRIMARY KEY (user_uuid),
   CONSTRAINT uq_users_email UNIQUE (email),
   CONSTRAINT uq_users_number_document UNIQUE (number_document),
-  CONSTRAINT uq_users_phone UNIQUE (phone),
+  CONSTRAINT uq_users_phone UNIQUE (phone)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-;

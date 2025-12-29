@@ -238,6 +238,28 @@ export class AuthComponent {
 
     // Método para obtener un mensaje de error amigable
     getErrorMessage(error: any): string {
+        // ERROR HTTP (backend)
+        if (error?.status) {
+            switch (error.status) {
+
+                case 404:
+                    return 'Tu cuenta no está registrada en el sistema. Contacta al administrador.';
+
+                case 401:
+                    return 'Correo o contraseña incorrectos.';
+
+                case 403:
+                    return 'No tienes permisos para acceder al sistema.';
+
+                case 500:
+                    return 'Error interno del servidor. Intenta más tarde.';
+
+                default:
+                    return 'Error inesperado. Intenta nuevamente.';
+            }
+        }
+
+        // ERRORES DE COGNITO (fallback)
         const errorMessage = error?.message || error?.toString() || '';
         
         // Manejar errores específicos de Cognito
@@ -247,6 +269,10 @@ export class AuthComponent {
         
         if (errorMessage.includes('User does not exist')) {
             return 'No existe una cuenta con este correo electrónico.';
+        }
+
+        if (errorMessage.includes('User already exists')) {
+            return 'Usuario ya registrado. Por favor inicia sesión.';
         }
         
         if (errorMessage.includes('User is not confirmed')) {
@@ -311,17 +337,24 @@ export class AuthComponent {
 
         try {
             // Login Cognito
-            await this.authService.login(this.email, this.password);
-
-            // Pedir rol al backend
-            const role = await this.authService.getUserRole();
+            const { role } = await this.authService.login(this.email, this.password);
 
             this.displayToast('Inicio de sesión exitoso', 'success', 2000);
 
+            
+
+            const roleRouteMap: Record<string, string> = {
+                SECRETARY: 'secretary',
+                ADMIN: 'admin',
+                DELIVERY: 'delivery',
+                CLIENT: 'client'
+            }
+
+            const targetRoute = roleRouteMap[role] ?? '';
             // Pequeño delay para que el usuario vea el mensaje
             setTimeout(() => {
                 this.ngZone.run(() => {
-                    this.router.navigate([`/dashboard/${role}`]);
+                    this.router.navigate(['/dashboard', targetRoute]);
                 });
             }, 500);
 
