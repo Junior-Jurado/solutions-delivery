@@ -32,7 +32,7 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	case strings.HasPrefix(path, "/auth"):
 		return ProcesoAutencaciones(body, path, method, userUUID, id, request)
 	
-	case strings.HasPrefix(path, "/location"):
+	case strings.HasPrefix(path, "/locations"):
 		return ProcesoUbicaciones(body, path, method, userUUID, id, request)
 	}
 

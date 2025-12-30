@@ -1,9 +1,12 @@
-import { CommonModule } from "@angular/common";
+
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { GuideService, CreateGuideResponse } from "@core/services/guide.service";
 import { AuthService } from "@core/services/auth.service";
+import { LocationService, City } from "@core/services/location.service";
+import { CitySelectorComponent } from "@shared/components/city-selector.component";
+import { CommonModule } from "@angular/common";
 
 interface Guide {
     id: string;
@@ -26,7 +29,7 @@ interface DailyStats {
     standalone: true,
     templateUrl: './secretary-dashboard.page.html',
     styleUrls: ['./secretary-dashboard.page.scss'],
-    imports: [ReactiveFormsModule, CommonModule, FormsModule]
+    imports: [ReactiveFormsModule, CommonModule, FormsModule, CitySelectorComponent]
 })
 export class SecretaryDashboardPage implements OnInit {
     activeTab: string = 'create-guide';
@@ -35,6 +38,9 @@ export class SecretaryDashboardPage implements OnInit {
     guideForm: FormGroup;
     isSubmitting: boolean = false;
     currentUserId: string = '';
+    selectedCityId: string = 'all';
+
+    filterCities: City[] = [];
 
     guides: Guide[] = [
         { 
@@ -66,7 +72,7 @@ export class SecretaryDashboardPage implements OnInit {
         }
     ];
 
-    cities: string[] = ['Bogotá', 'Medellín', 'Cali', 'Barranquilla', 'Cartagena'];
+    // Las ciudades ahora se manejan en el componente CitySelectorComponent
     serviceTypes: string[] = ['Contado', 'Contra Entrega', 'Crédito'];
     priorities: string[] = ['Normal', 'Express', 'Urgente'];
     insuranceOptions: string[] = ['No', 'Básico', 'Completo'];
@@ -85,7 +91,8 @@ export class SecretaryDashboardPage implements OnInit {
         private fb: FormBuilder,
         private router: Router,
         private guideService: GuideService,
-        private authService: AuthService
+        private authService: AuthService,
+        private locationService: LocationService
     ){
         this.guideForm = this.fb.group({
             // Remitente
@@ -121,6 +128,13 @@ export class SecretaryDashboardPage implements OnInit {
 
     ngOnInit(): void {
         this.loadCurrentUser();
+        this.loadCities();
+    }
+
+    private loadCities(): void {
+        this.locationService.getCities().subscribe(cities => {
+            this.filterCities = cities;
+        });
     }
 
     /**
@@ -292,8 +306,20 @@ El PDF se descargará automáticamente.`);
     }
 
     /**
-     * Verifica si un campo específico tiene errores y ha sido touched
+     * Maneja la selección de ciudad del remitente
      */
+    onSenderCitySelected(city: City): void {
+        console.log('Ciudad remitente seleccionada:', city);
+        // El ID ya está en el formulario gracias al selector
+    }
+
+    /**
+     * Maneja la selección de ciudad del destinatario
+     */
+    onReceiverCitySelected(city: City): void {
+        console.log('Ciudad destinatario seleccionada:', city);
+        // El ID ya está en el formulario gracias al selector
+    }
     hasError(fieldName: string): boolean {
         const field = this.guideForm.get(fieldName);
         return !!(field && field.invalid && field.touched);

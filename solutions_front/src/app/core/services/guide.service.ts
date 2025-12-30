@@ -1,8 +1,7 @@
-import { Injectable } from "@angular/core";
-import { environment } from "../../environments/environments.dev";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { firstValueFrom, Observable } from "rxjs";
-
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environments.dev';
 
 // Interfaces para el request
 export interface ServiceInfo {
@@ -101,17 +100,17 @@ export class GuideService {
                 )
             );
 
-            console.log('Guía creada exitosamente: ', response);
+            console.log('Guía creada exitosamente:', response);
             return response;
         } catch (error: any) {
-            console.error('Error al crear guía: ', error);
+            console.error('Error al crear la guía:', error);
             
             if (error.error) {
                 const errorResponse = error.error as GuideErrorResponse;
-                throw new Error(errorResponse.details || errorResponse.error || 'Error desconocido al crear la guía.');
+                throw new Error(errorResponse.details || errorResponse.error || 'Error desconocido al crear la guía');
             }
-
-            throw new Error('Error de conexión al crear la guía.');
+            
+            throw new Error('Error de conexión al crear la guía');
         }
     }
 
@@ -122,20 +121,21 @@ export class GuideService {
      * @returns Objeto CreateGuideRequest completo
      */
     buildGuideRequest(formValue: any, userId: string): CreateGuideRequest {
+        // Parsear dimensiones si vienen en formato "20x15x10"
         const dimensions = this.parseDimensions(formValue.dimensions || '20x15x10');
 
         return {
             created_by: userId,
-
+            
             service: {
                 service_type: formValue.serviceType?.toUpperCase() || 'NORMAL',
                 payment_method: this.mapPaymentMethod(formValue.serviceType),
-                shipping_type: formValue.shippingType
+                shipping_type: 'TERRESTRE'
             },
 
             pricing: {
-                declared_value: parseFloat(formValue.declaredValue || 0),
-                price: this.calculatePrice(formValue)
+                declared_value: parseFloat(formValue.declaredValue) || 0,
+                price: this.calculatePrice(formValue) // Implementar lógica de cálculo
             },
 
             route: {
@@ -153,7 +153,7 @@ export class GuideService {
                 city_id: this.getCityId(formValue.senderCity),
                 city_name: formValue.senderCity
             },
-            
+
             receiver: {
                 full_name: formValue.receiverName,
                 document_type: formValue.receiverDocType || 'CC',
@@ -164,10 +164,10 @@ export class GuideService {
                 city_id: this.getCityId(formValue.receiverCity),
                 city_name: formValue.receiverCity
             },
-            
+
             package: {
-                weight_kg: parseFloat(formValue.weight || 0),
-                pieces: parseInt(formValue.pieces || 1),
+                weight_kg: parseFloat(formValue.weight) || 0,
+                pieces: parseInt(formValue.pieces) || 1,
                 length_cm: dimensions.length,
                 width_cm: dimensions.width,
                 height_cm: dimensions.height,
@@ -193,15 +193,16 @@ export class GuideService {
     /**
      * Parsea las dimensiones del formato "20x15x10"
      */
-    private parseDimensions(dimensionsStr: string): { length: number, width: number, height: number } {
-        const parts = dimensionsStr.split('x').map(d => parseFloat(d.trim())); 
-        return { 
+    private parseDimensions(dimensionsStr: string): { length: number; width: number; height: number } {
+        const parts = dimensionsStr.split('x').map(d => parseFloat(d.trim()));
+        
+        return {
             length: parts[0] || 20,
             width: parts[1] || 15,
-            height: parts[2] || 10 
-        }; 
-    } 
-    
+            height: parts[2] || 10
+        };
+    }
+
     /**
      * Formatea el número de teléfono
      */
@@ -215,6 +216,7 @@ export class GuideService {
      * El formulario ahora debe guardar el ID directamente
      */
     private getCityId(cityIdOrName: string | number): number {
+        // Si ya es un número, retornarlo
         if (typeof cityIdOrName === 'number') {
             return cityIdOrName;
         }
@@ -225,7 +227,7 @@ export class GuideService {
             return parsed;
         }
         
-        // Fallback
+        // Fallback - esto no debería ocurrir con el nuevo selector
         console.warn('No se pudo obtener el ID de la ciudad:', cityIdOrName);
         return 0;
     }
@@ -264,12 +266,12 @@ export class GuideService {
      */
     getGuideById(guideId: number): Observable<any> {
         const idToken = sessionStorage.getItem('idToken');
-
+        
         const headers = new HttpHeaders({
             'Authorization': `Bearer ${idToken}`
         });
 
-        return this.http.get(`${this.BASE_URL}/guides/${guideId}`, { headers });
+        return this.http.get(`${this.BASE_URL}/${guideId}`, { headers });
     }
 
     /**
