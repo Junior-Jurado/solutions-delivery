@@ -31,7 +31,12 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	
 	case strings.HasPrefix(path, "/auth"):
 		return ProcesoAutencaciones(body, path, method, userUUID, id, request)
+	
+	case strings.HasPrefix(path, "/location"):
+		return ProcesoUbicaciones(body, path, method, userUUID, id, request)
 	}
+
+	
 	
 
 	return 400, "Method Invalid"
@@ -76,6 +81,50 @@ func ProcesoAutencaciones(body string, path  string, method string, user string,
 	switch {
 		case path == "/auth/role" && method == "GET":
 			return routers.GetRole(user)
+	}
+	
+	return 400, "Method Invalid"
+}
+
+func ProcesoUbicaciones(body string, path string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
+	fmt.Println("ProcesoUbicaciones -> Path: %s, Mehtod: %s \n", path, method)
+
+	switch {
+		// GET /locations/departments - Obtener todos los departamentos
+		case path == "/locations/departments" && method == "GET":
+			return routers.GetDepartments()
+		
+		// GET /locations/cities - Obtener ciudades (con filtro opcional por departamento)
+		case path == "/locations/cities" && method == "GET":
+			// Obtener parámetro de query department_id si existe
+			departmentID := ""
+			if request.QueryStringParameters != nil {
+				departmentID = request.QueryStringParameters["department_id"]
+			}
+			return routers.GetCities(departmentID)
+		
+		// GET /locations/cities/{id} - Obtener una ciudad especifica
+		case strings.HasPrefix(path, "/locations/cities/") && method == "GET":
+			// Extraer el ID de la ciudad del path
+			cityIDStr := strings.TrimPrefix(path, "/locations/cities/")
+			cityID, err := strconv.ParseInt(cityIDStr, 10, 64)
+			if err != nil {
+				return 400, fmt.Sprintf(`{"error": "ID de ciudad inválido"}`)
+			}
+			return routers.GetCityByID(cityID)
+
+		// GET /locations/search - Búsqueda de ciudades por nombre
+		case path == "/locations/search" && method == "GET":
+			// Obtener parámetro de query search_term si existe
+			searchTerm := ""
+			if request.QueryStringParameters != nil {
+				searchTerm = request.QueryStringParameters["q"]
+			}
+
+			if searchTerm == "" {
+				return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
+			}
+			return routers.SearchCities(searchTerm)
 	}
 	
 	return 400, "Method Invalid"
