@@ -53,17 +53,6 @@ resource "aws_apigatewayv2_integration" "lambda" {
   payload_format_version = "2.0"
 }
 
-# Ruta protegida
-resource "aws_apigatewayv2_route" "auth_role" {
-  api_id = aws_apigatewayv2_api.api.id
-  route_key = "GET /api/v1/auth/role"
-
-  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
-  authorization_type = "JWT"
-  authorizer_id = aws_apigatewayv2_authorizer.cognito.id
-}
-
-
 # Deploy
 resource "aws_apigatewayv2_stage" "default" {
   api_id = aws_apigatewayv2_api.api.id
@@ -80,6 +69,44 @@ resource "aws_lambda_permission" "allow_apigw" {
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
 
-output "api_url" {
-  value = aws_apigatewayv2_stage.default.invoke_url
+# RUTAS PROTEGIDAS
+
+## Auth
+resource "aws_apigatewayv2_route" "auth_role" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/auth/role"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id = aws_apigatewayv2_authorizer.cognito.id
+}
+
+## Locations
+resource "aws_apigatewayv2_route" "locations_cities" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/locations/cities"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# GET /api/v1/locations/cities/{id} - Obtener ciudad por ID (Protegida)
+resource "aws_apigatewayv2_route" "locations_city_by_id" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/locations/cities/{id}"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# GET /api/v1/locations/search - Buscar ciudades (Protegida)
+resource "aws_apigatewayv2_route" "locations_search" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/locations/search"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
