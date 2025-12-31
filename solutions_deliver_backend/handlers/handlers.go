@@ -26,7 +26,7 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	case strings.HasPrefix(path, "/user"):
 		return ProcesoUsers(body, path, method, userUUID, id, request)
 
-	case strings.HasPrefix(path, "/guide"):
+	case strings.HasPrefix(path, "/guides"):
 		return ProcesoGuias(body, path, method, userUUID, idn, request)
 	
 	case strings.HasPrefix(path, "/auth"):
@@ -74,7 +74,48 @@ func ProcesoUsers(body string, path  string, method string, user string, id stri
 }
 
 func ProcesoGuias(body string, path  string, method string, user string, id int, request events.APIGatewayV2HTTPRequest) (int, string) {
-	return 400, "Method Invalid"
+	fmt.Printf("ProcesoGuias -> Path: %s, Mehtod: %s \n", path, method)
+
+	switch {
+		// GET /guides - Obtener lista de guías con filtros
+	
+		case path == "/guides" && method == "GET":
+			return routers.GetGuides(request, user)
+
+		// GET /guides/{id} - Obtener detalle de una guía específica
+		case strings.HasPrefix(path, "/guides/")&& !strings.Contains(path, "/status") && method == "GET":
+			if id <= 0{
+				return 400, `{"error": "ID de guía inválido"}`
+			}
+			return routers.GetGuideByID(int64(id)  )
+
+		// PUT /guides/{id}/status - Actualizar estado de una guía
+		case strings.HasPrefix(path, "/guides/")&& strings.HasSuffix(path, "/status") && method == "PUT":
+			if id <= 0{
+				return 400, `{"error": "ID de guía inválido"}`
+			}
+			return routers.UpdateGuideStatus(int64(id), body, user)
+		
+		// GET /guides/stats - Obtener estadísticas de guías
+		case path == "/guides/stats" && method == "GET":
+			return routers.GetGuidesStats(user)
+
+		// GET /guides/search
+		case path == "/guides/search" && method == "GET":
+			searchTerm := ""
+			if request.QueryStringParameters != nil {
+				searchTerm = request.QueryStringParameters["q"]
+			}
+
+			if searchTerm == "" {
+				return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
+			}
+			return routers.SearchGuides(searchTerm)
+		
+		default:
+			return 400, "Method Invalid"
+	}
+	
 }
 
 func ProcesoAutencaciones(body string, path  string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
@@ -87,7 +128,7 @@ func ProcesoAutencaciones(body string, path  string, method string, user string,
 }
 
 func ProcesoUbicaciones(body string, path string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
-	fmt.Println("ProcesoUbicaciones -> Path: %s, Mehtod: %s \n", path, method)
+	fmt.Printf("ProcesoUbicaciones -> Path: %s, Mehtod: %s \n", path, method)
 
 	switch {
 		// GET /locations/departments - Obtener todos los departamentos

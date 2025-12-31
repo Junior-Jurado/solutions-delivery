@@ -71,6 +71,7 @@ resource "aws_lambda_permission" "allow_apigw" {
 
 # RUTAS PROTEGIDAS
 
+# -----------------------------------------
 ## Auth
 resource "aws_apigatewayv2_route" "auth_role" {
   api_id = aws_apigatewayv2_api.api.id
@@ -80,6 +81,7 @@ resource "aws_apigatewayv2_route" "auth_role" {
   authorization_type = "JWT"
   authorizer_id = aws_apigatewayv2_authorizer.cognito.id
 }
+# -----------------------------------------
 
 ## Locations
 resource "aws_apigatewayv2_route" "locations_cities" {
@@ -110,3 +112,56 @@ resource "aws_apigatewayv2_route" "locations_search" {
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
+# -----------------------------------------
+# Guides
+
+# GET /api/v1/guides
+resource "aws_apigatewayv2_route" "guides" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/guides"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# GET /api/v1/guides/{id}
+resource "aws_apigatewayv2_route" "guides_by_id" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/guides/{id}"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# GET /api/v1/guides/stats
+resource "aws_apigatewayv2_route" "guides_stats" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/guides/stats"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# GET /api/v1/guides/search
+resource "aws_apigatewayv2_route" "guides_search" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/guides/search"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# PUT /guides/{id}/status
+resource "aws_apigatewayv2_route" "guides_status" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "PUT /api/v1/guides/{id}/status"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+

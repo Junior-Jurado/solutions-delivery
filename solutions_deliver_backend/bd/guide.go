@@ -1,0 +1,529 @@
+package bd
+
+import (
+	"database/sql"
+	"fmt"
+	"strings"
+
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/models"
+)
+
+// GetGuidesByFilters obtiene guías aplicando filtros
+func GetGuidesByFilters(filters models.GuideFilters) ([]models.ShippingGuide, int, error) {
+	fmt.Println("GetGuidesByFilters")
+
+	var guides []models.ShippingGuide
+	var total int
+
+	err := DbConnect()
+	if err != nil {
+		return guides, 0, err
+	}
+	defer Db.Close()
+
+	// Construcción dinámica de WHERE
+	var conditions []string
+	var args []interface{}
+
+	if filters.Status != "" {
+		conditions = append(conditions, "sg.current_status = ?")
+		args = append(args, filters.Status)
+	}
+
+	if filters.OriginCityID != nil {
+		conditions = append(conditions, "sg.origin_city_id = ?")
+		args = append(args, *filters.OriginCityID)
+	}
+
+	if filters.DestinationCityID != nil {
+		conditions = append(conditions, "sg.destination_city_id = ?")
+		args = append(args, *filters.DestinationCityID)
+	}
+
+	if filters.CreatedBy != "" {
+		conditions = append(conditions, "sg.created_by = ?")
+		args = append(args, filters.CreatedBy)
+	}
+
+	if filters.SearchTerm != "" {
+		searchPattern := "%" + filters.SearchTerm + "%"
+		conditions = append(conditions, "(CAST(sg.guide_id AS CHAR) LIKE ? OR oc.name LIKE ? OR dc.name LIKE ?)")
+		args = append(args, searchPattern, searchPattern, searchPattern)
+	}
+
+	if filters.DateFrom != nil {
+		conditions = append(conditions, "sg.created_at >= ?")
+		args = append(args, *filters.DateFrom)
+	}
+
+	if filters.DateTo != nil {
+		conditions = append(conditions, "sg.created_at <= ?")
+		args = append(args, *filters.DateTo)
+	}
+
+	whereClause := ""
+	if len(conditions) > 0 {
+		whereClause = "WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	// Contar total
+	countQuery := fmt.Sprintf(`
+		SELECT COUNT(*)
+		FROM shipping_guides sg
+		LEFT JOIN cities oc ON sg.origin_city_id = oc.id
+		LEFT JOIN cities dc ON sg.destination_city_id = dc.id
+		%s
+	`, whereClause)
+
+	err = Db.QueryRow(countQuery, args...).Scan(&total)
+	if err != nil {
+		return guides, 0, err
+	}
+
+	// Consulta principal
+	query := fmt.Sprintf(`
+		SELECT 
+			sg.guide_id,
+			sg.service_type,
+			sg.payment_method,
+			sg.declared_value,
+			sg.price,
+			sg.current_status,
+			sg.origin_city_id,
+			oc.name AS origin_city_name,
+			sg.destination_city_id,
+			dc.name AS destination_city_name,
+			sg.pdf_url,
+			sg.pdf_s3_key,
+			sg.created_by,
+			sg.created_at,
+			sg.updated_at
+		FROM shipping_guides sg
+		LEFT JOIN cities oc ON sg.origin_city_id = oc.id
+		LEFT JOIN cities dc ON sg.destination_city_id = dc.id
+		%s
+		ORDER BY sg.created_at DESC
+		LIMIT ? OFFSET ?
+	`, whereClause)
+
+	args = append(args, filters.Limit, filters.Offset)
+
+	rows, err := Db.Query(query, args...)
+	if err != nil {
+		return guides, 0, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var guide models.ShippingGuide
+
+		err := rows.Scan(
+			&guide.GuideID,
+			&guide.ServiceType,
+			&guide.PaymentMethod,
+			&guide.DeclaredValue,
+			&guide.Price,
+			&guide.CurrentStatus,
+			&guide.OriginCityID,
+			&guide.OriginCityName,
+			&guide.DestinationCityID,
+			&guide.DestinationCityName,
+			&guide.PDFUrl,
+			&guide.PDFS3Key,
+			&guide.CreatedBy,
+			&guide.CreatedAt,
+			&guide.UpdatedAt,
+		)
+
+		if err != nil {
+			return guides, 0, err
+		}
+
+		guides = append(guides, guide)
+	}
+
+	return guides, total, nil
+}
+
+// GetGuideByID obtiene una guía completa con todas sus relaciones
+func GetGuideByID(guideID int64) (models.ShippingGuide, error) {
+	fmt.Printf("GetGuideByID -> GuideID: %d\n", guideID)
+
+	var guide models.ShippingGuide
+
+	err := DbConnect()
+	if err != nil {
+		return guide, err
+	}
+	defer Db.Close()
+
+	// Consulta principal de la guía
+	query := `
+		SELECT 
+			sg.guide_id,
+			sg.service_type,
+			sg.payment_method,
+			sg.declared_value,
+			sg.price,
+			sg.current_status,
+			sg.origin_city_id,
+			oc.name AS origin_city_name,
+			sg.destination_city_id,
+			dc.name AS destination_city_name,
+			sg.pdf_url,
+			sg.pdf_s3_key,
+			sg.created_by,
+			sg.created_at,
+			sg.updated_at
+		FROM shipping_guides sg
+		LEFT JOIN cities oc ON sg.origin_city_id = oc.id
+		LEFT JOIN cities dc ON sg.destination_city_id = dc.id
+		WHERE sg.guide_id = ?
+	`
+
+	row := Db.QueryRow(query, guideID)
+	err = row.Scan(
+		&guide.GuideID,
+		&guide.ServiceType,
+		&guide.PaymentMethod,
+		&guide.DeclaredValue,
+		&guide.Price,
+		&guide.CurrentStatus,
+		&guide.OriginCityID,
+		&guide.OriginCityName,
+		&guide.DestinationCityID,
+		&guide.DestinationCityName,
+		&guide.PDFUrl,
+		&guide.PDFS3Key,
+		&guide.CreatedBy,
+		&guide.CreatedAt,
+		&guide.UpdatedAt,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return guide, fmt.Errorf("Guía no encontrada")
+		}
+		return guide, err
+	}
+
+	// Obtener partes (remitente y destinatario)
+	parties, err := getGuideParties(guideID)
+	if err == nil {
+		for _, party := range parties {
+			// if party.PartyRole == models.RoleSender {
+			// 	guide.Sender = &party
+			// } else if party.PartyRole == models.RoleReceiver {
+			// 	guide.Receiver = &party
+			// }
+
+			switch party.PartyRole {
+				case models.RoleSender:
+					guide.Sender = &party
+				case models.RoleReceiver:
+					guide.Receiver = &party
+			}
+		}
+	}
+
+	// Obtener paquete
+	pkg, err := getGuidePackage(guideID)
+	if err == nil {
+		guide.Package = &pkg
+	}
+
+	// Obtener historial
+	history, err := getGuideHistory(guideID)
+	if err == nil {
+		guide.History = history
+	}
+
+	return guide, nil
+}
+
+// getGuideParties obtiene las partes de una guía (remitente/destinatario)
+func getGuideParties(guideID int64) ([]models.GuideParty, error) {
+	var parties []models.GuideParty
+
+	query := `
+		SELECT 
+			gp.party_id,
+			gp.guide_id,
+			gp.party_role,
+			gp.full_name,
+			gp.document_type,
+			gp.document_number,
+			gp.phone,
+			gp.email,
+			gp.address,
+			gp.city_id,
+			c.name AS city_name
+		FROM guide_parties gp
+		LEFT JOIN cities c ON gp.city_id = c.id
+		WHERE gp.guide_id = ?
+	`
+
+	rows, err := Db.Query(query, guideID)
+	if err != nil {
+		return parties, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var party models.GuideParty
+
+		err := rows.Scan(
+			&party.PartyID,
+			&party.GuideID,
+			&party.PartyRole,
+			&party.FullName,
+			&party.DocumentType,
+			&party.DocumentNumber,
+			&party.Phone,
+			&party.Email,
+			&party.Address,
+			&party.CityID,
+			&party.CityName,
+		)
+
+		if err != nil {
+			return parties, err
+		}
+
+		parties = append(parties, party)
+	}
+
+	return parties, nil
+}
+
+// getGuidePackage obtiene el paquete de una guía
+func getGuidePackage(guideID int64) (models.Package, error) {
+	var pkg models.Package
+
+	query := `
+		SELECT 
+			package_id,
+			guide_id,
+			weight_kg,
+			pieces,
+			length_cm,
+			width_cm,
+			height_cm,
+			insured,
+			description,
+			special_notes
+		FROM packages
+		WHERE guide_id = ?
+	`
+
+	row := Db.QueryRow(query, guideID)
+	err := row.Scan(
+		&pkg.PackageID,
+		&pkg.GuideID,
+		&pkg.WeightKg,
+		&pkg.Pieces,
+		&pkg.LengthCM,
+		&pkg.WidthCM,
+		&pkg.HeightCM,
+		&pkg.Insured,
+		&pkg.Description,
+		&pkg.SpecialNotes,
+	)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return pkg, fmt.Errorf("Paquete no encontrado")
+		}
+		return pkg, err
+	}
+
+	return pkg, nil
+}
+
+// getGuideHistory obtiene el historial de estados de una guía
+func getGuideHistory(guideID int64) ([]models.StatusHistory, error) {
+	var history []models.StatusHistory
+
+	query := `
+		SELECT 
+			history_id,
+			guide_id,
+			status,
+			updated_by,
+			created_at
+		FROM guide_status_history
+		WHERE guide_id = ?
+		ORDER BY created_at DESC
+	`
+
+	rows, err := Db.Query(query, guideID)
+	if err != nil {
+		return history, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var h models.StatusHistory
+
+		err := rows.Scan(
+			&h.HistoryID,
+			&h.GuideID,
+			&h.Status,
+			&h.UpdatedBy,
+			&h.CreatedAt,
+		)
+
+		if err != nil {
+			return history, err
+		}
+
+		history = append(history, h)
+	}
+
+	return history, nil
+}
+
+// UpdateGuideStatus actualiza el estado de una guía y registra en el historial
+func UpdateGuideStatus(guideID int64, status models.GuideStatus, userUUID string) error {
+	fmt.Printf("UpdateGuideStatus -> GuideID: %d, Status: %s\n", guideID, status)
+
+	err := DbConnect()
+	if err != nil {
+		return err
+	}
+	defer Db.Close()
+
+	// Iniciar transacción
+	tx, err := Db.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Actualizar estado en shipping_guides
+	updateQuery := `
+		UPDATE shipping_guides
+		SET current_status = ?, updated_at = CURRENT_TIMESTAMP
+		WHERE guide_id = ?
+	`
+
+	_, err = tx.Exec(updateQuery, status, guideID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Insertar en historial
+	historyQuery := `
+		INSERT INTO guide_status_history (guide_id, status, updated_by, created_at)
+		VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+	`
+
+	_, err = tx.Exec(historyQuery, guideID, status, userUUID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Commit de la transacción
+	err = tx.Commit()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetGuideStats obtiene estadísticas de guías
+func GetGuideStats(userUUID string) (models.GuideStatsResponse, error) {
+	fmt.Println("GetGuideStats")
+
+	var stats models.GuideStatsResponse
+	stats.ByStatus = make(map[string]int)
+
+	err := DbConnect()
+	if err != nil {
+		return stats, err
+	}
+	defer Db.Close()
+
+	// Total del día
+	todayQuery := `
+		SELECT COUNT(*)
+		FROM shipping_guides
+		WHERE DATE(created_at) = CURDATE()
+	`
+	err = Db.QueryRow(todayQuery).Scan(&stats.TotalToday)
+	if err != nil {
+		return stats, err
+	}
+
+	// Total procesados (entregados)
+	processedQuery := `
+		SELECT COUNT(*)
+		FROM shipping_guides
+		WHERE current_status = 'DELIVERED'
+	`
+	err = Db.QueryRow(processedQuery).Scan(&stats.TotalProcessed)
+	if err != nil {
+		return stats, err
+	}
+
+	// Total pendientes (no entregados)
+	pendingQuery := `
+		SELECT COUNT(*)
+		FROM shipping_guides
+		WHERE current_status != 'DELIVERED' 
+	`
+	err = Db.QueryRow(pendingQuery).Scan(&stats.TotalPending)
+	if err != nil {
+		return stats, err
+	}
+
+	// Por estado
+	statusQuery := `
+		SELECT current_status, COUNT(*) as count
+		FROM shipping_guides
+		GROUP BY current_status
+	`
+
+	rows, err := Db.Query(statusQuery)
+	if err != nil {
+		return stats, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var status string
+		var count int
+
+		err := rows.Scan(&status, &count)
+		if err != nil {
+			return stats, err
+		}
+
+		stats.ByStatus[status] = count
+	}
+
+	return stats, nil
+}
+
+// GuideExists verifica si existe una guía
+func GuideExists(guideID int64) bool {
+	fmt.Printf("GuideExists -> GuideID: %d\n", guideID)
+
+	err := DbConnect()
+	if err != nil {
+		return false
+	}
+	defer Db.Close()
+
+	query := `SELECT COUNT(*) FROM shipping_guides WHERE guide_id = ?`
+
+	var count int
+	err = Db.QueryRow(query, guideID).Scan(&count)
+	if err != nil {
+		return false
+	}
+
+	return count > 0
+}

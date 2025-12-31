@@ -6,8 +6,8 @@ CREATE TABLE guide_status_history (
     'CREATED',
     'IN_ROUTE',
     'IN_WAREHOUSE',
-    'DELIVERED',
-    'CANCELLED'
+    'OUT_FOR_DELIVERY',
+    'DELIVERED'
   ) NOT NULL,
 
   updated_by VARCHAR(255)

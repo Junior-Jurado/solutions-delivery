@@ -97,7 +97,7 @@ func GetAllCities() ([]models.City, error) {
 
 // GetCitiesByDepartment obtiene ciudades filtradas por departamento
 func GetCitiesByDepartment(departmentID int64) ([]models.City, error) {
-	fmt.Println("GetCitiesByDepartment -> DepartmentID: %d\n", departmentID)
+	fmt.Printf("GetCitiesByDepartment -> DepartmentID: %d\n", departmentID)
 
 	var cities []models.City
 
@@ -149,7 +149,7 @@ func GetCitiesByDepartment(departmentID int64) ([]models.City, error) {
 
 // GetCityByID obtiene una ciudad por ID
 func GetCityByID(cityID int64) (models.City, error) {
-	fmt.Println("GetCityByID -> CityID: %d\n", cityID)
+	fmt.Printf("GetCityByID -> CityID: %d\n", cityID)
 
 	var city models.City
 
@@ -194,7 +194,7 @@ func GetCityByID(cityID int64) (models.City, error) {
 
 // SearchCities busca ciudades por nombre (LIKE)
 func SearchCities(searchTerm string) ([]models.City, error) {
-	fmt.Println("SearchCities -> SearchTerm: %s\n", searchTerm)
+	fmt.Printf("SearchCities -> SearchTerm: %s\n", searchTerm)
 
 	var cities []models.City
 
@@ -251,7 +251,7 @@ func SearchCities(searchTerm string) ([]models.City, error) {
 
 // DepartmentExists verifica si existe un departamento
 func DepartmentExists(departmentID int64) bool {
-	fmt.Println("DepartmentExists -> DepartmentID: %d\n", departmentID)
+	fmt.Printf("DepartmentExists -> DepartmentID: %d\n", departmentID)
 
 	err := DbConnect()
 	if err != nil {
@@ -272,7 +272,7 @@ func DepartmentExists(departmentID int64) bool {
 
 // CityExists verifica si existe una ciudad
 func CityExists(cityID int64) bool {
-	fmt.Println("CityExists -> CityID: %d\n", cityID)
+	fmt.Printf("CityExists -> CityID: %d\n", cityID)
 
 	err := DbConnect()
 	if err != nil {
