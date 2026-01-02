@@ -20,8 +20,8 @@ CREATE TABLE shipping_guides (
     'CREATED',
     'IN_ROUTE',
     'IN_WAREHOUSE',
-    'DELIVERED',
-    'CANCELLED'
+    'OUT_FOR_DELIVERY',
+    'DELIVERED'
   ) NOT NULL DEFAULT 'CREATED',
 
   /* ---------------------------------
@@ -64,6 +64,6 @@ CREATE TABLE shipping_guides (
     FOREIGN KEY (created_by)
     REFERENCES users(user_uuid)
 ) ENGINE=InnoDB
-AUTO_INCREMENT = 10000
+AUTO_INCREMENT = 10000000
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci;

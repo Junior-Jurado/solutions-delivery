@@ -14,6 +14,7 @@ import { AuthService } from "@core/services/auth.service";
 import { LocationService, City } from "@core/services/location.service";
 import { CitySelectorComponent } from "@shared/components/city-selector.component";
 import { CommonModule } from "@angular/common";
+import { ToastService } from "@shared/services/toast.service";
 
 interface DailyStats {
     day: string;
@@ -26,7 +27,12 @@ interface DailyStats {
     standalone: true,
     templateUrl: './secretary-dashboard.page.html',
     styleUrls: ['./secretary-dashboard.page.scss'],
-    imports: [ReactiveFormsModule, CommonModule, FormsModule, CitySelectorComponent]
+    imports: [
+        ReactiveFormsModule, 
+        CommonModule, 
+        FormsModule, 
+        CitySelectorComponent
+    ]
 })
 export class SecretaryDashboardPage implements OnInit {
     // Navegación de tabs
@@ -85,7 +91,8 @@ export class SecretaryDashboardPage implements OnInit {
         private guideService: GuideService,
         private authService: AuthService,
         private locationService: LocationService,
-        private cdr: ChangeDetectorRef
+        private cdr: ChangeDetectorRef,
+        private toast: ToastService
     ){
         this.guideForm = this.initializeForm();
     }
@@ -204,7 +211,7 @@ export class SecretaryDashboardPage implements OnInit {
             console.log('Guías cargadas:', this.guides.length, 'de', this.totalGuides);
         } catch (error) {
             console.error('Error al cargar guías:', error);
-            alert('Error al cargar las guías');
+            this.toast.error('Error al cargar las guías');
         } finally {
             this.isLoadingGuides = false;
             this.cdr.detectChanges();
@@ -251,7 +258,7 @@ export class SecretaryDashboardPage implements OnInit {
             await this.guideService.downloadGuidePDF(guideId);
         } catch (error) {
             console.error('Error al descargar PDF:', error);
-            alert('Error al descargar el PDF de la guía');
+            this.toast.error('Error al descargar el PDF de la guía');
         }
     }
 
@@ -261,7 +268,7 @@ export class SecretaryDashboardPage implements OnInit {
     async handleCreateGuide(): Promise<void> {
         if (!this.guideForm.valid) {
             this.markFormGroupTouched(this.guideForm);
-            alert('Por favor complete todos los campos requeridos');
+            this.toast.error('Por favor complete todos los campos requeridos');
             return;
         }
 
@@ -283,7 +290,7 @@ export class SecretaryDashboardPage implements OnInit {
 
             console.log('Respuesta del servidor:', response);
 
-            alert(`¡Guía creada exitosamente!
+            this.toast.success(`¡Guía creada exitosamente!
             
 Número de guía: ${response.guide_number}
 ID: ${response.guide_id}
@@ -309,7 +316,7 @@ El PDF se descargará automáticamente.`);
                 errorMessage = error.message;
             }
 
-            alert(errorMessage);
+            this.toast.error(errorMessage);
         } finally {
             this.isSubmitting = false;
             this.cdr.detectChanges();
@@ -333,13 +340,13 @@ El PDF se descargará automáticamente.`);
                 this.cdr.detectChanges();
             }
 
-            alert(`Estado actualizado correctamente a: ${this.guideService.translateStatus(newStatus)}`);
+            this.toast.success(`Estado actualizado correctamente a: ${this.guideService.translateStatus(newStatus)}`);
             
             await this.loadStats();
             
         } catch (error) {
             console.error('Error al actualizar estado:', error);
-            alert('Error al actualizar el estado de la guía');
+            this.toast.error('Error al actualizar el estado de la guía');
         }
     }
 
@@ -348,7 +355,7 @@ El PDF se descargará automáticamente.`);
      */
     async handleSearchTracking(): Promise<void> {
         if (!this.trackingSearch || this.trackingSearch.length < 3) {
-            alert('Ingrese al menos 3 caracteres para buscar');
+            this.toast.error('Ingrese al menos 3 caracteres para buscar');
             return;
         }
 
@@ -360,11 +367,11 @@ El PDF se descargará automáticamente.`);
             console.log('Resultados de búsqueda:', this.searchResults.length);
 
             if (this.searchResults.length === 0) {
-                alert('No se encontraron resultados');
+                this.toast.success('No se encontraron resultados');
             }
         } catch (error) {
             console.error('Error en búsqueda:', error);
-            alert('Error al buscar guías');
+            this.toast.error('Error al buscar guías');
         } finally {
             this.isSearching = false;
             this.cdr.detectChanges();
@@ -403,28 +410,30 @@ El PDF se descargará automáticamente.`);
             console.log('Detalles de guía:', guide);
             
             const details = `
-Guía #${guide.guide_id}
-Estado: ${this.guideService.translateStatus(guide.current_status)}
+<strong>Guía #${guide.guide_id}</strong>
+<strong>Estado:</strong> ${this.guideService.translateStatus(guide.current_status)}
 
-Remitente: ${guide.sender?.full_name || 'N/A'}
-Ciudad origen: ${guide.origin_city_name}
+<strong>Remitente:</strong> ${guide.sender?.full_name || 'N/A'}
+<strong>Ciudad origen:</strong> ${guide.origin_city_name}
 
-Destinatario: ${guide.receiver?.full_name || 'N/A'}
-Ciudad destino: ${guide.destination_city_name}
+<strong>Destinatario:</strong> ${guide.receiver?.full_name || 'N/A'}
+<strong>Ciudad destino:</strong> ${guide.destination_city_name}
 
-Paquete:
-- Peso: ${guide.package?.weight_kg || 0} kg
-- Piezas: ${guide.package?.pieces || 0}
-- Dimensiones: ${guide.package?.length_cm}x${guide.package?.width_cm}x${guide.package?.height_cm} cm
+<strong>Paquete:</strong>
+• Peso: ${guide.package?.weight_kg || 0} kg
+• Piezas: ${guide.package?.pieces || 0}
+• Dimensiones: ${guide.package?.length_cm}x${guide.package?.width_cm}x${guide.package?.height_cm} cm
 
-Valor declarado: $${guide.declared_value.toLocaleString()}
-Precio: $${guide.price.toLocaleString()}
-            `;
-            
-            alert(details);
+<strong>Valor declarado:</strong> $${guide.declared_value.toLocaleString()}
+<strong>Precio:</strong> $${guide.price.toLocaleString()}
+      `.trim();
+      
+      // Toast centrado con HTML para formato mejorado
+      this.toast.info(details, 8000);
+      
         } catch (error) {
             console.error('Error al obtener detalles:', error);
-            alert('Error al cargar los detalles de la guía');
+            this.toast.error('Error al cargar los detalles de la guía');
         }
     }
 

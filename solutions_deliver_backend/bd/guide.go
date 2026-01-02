@@ -350,7 +350,7 @@ func getGuideHistory(guideID int64) ([]models.StatusHistory, error) {
 			guide_id,
 			status,
 			updated_by,
-			created_at
+			updated_at
 		FROM guide_status_history
 		WHERE guide_id = ?
 		ORDER BY created_at DESC
@@ -370,7 +370,7 @@ func getGuideHistory(guideID int64) ([]models.StatusHistory, error) {
 			&h.GuideID,
 			&h.Status,
 			&h.UpdatedBy,
-			&h.CreatedAt,
+			&h.UpdatedAt,
 		)
 
 		if err != nil {
@@ -414,7 +414,7 @@ func UpdateGuideStatus(guideID int64, status models.GuideStatus, userUUID string
 
 	// Insertar en historial
 	historyQuery := `
-		INSERT INTO guide_status_history (guide_id, status, updated_by, created_at)
+		INSERT INTO guide_status_history (guide_id, status, updated_by, updated_at)
 		VALUES (?, ?, ?, CURRENT_TIMESTAMP)
 	`
 
