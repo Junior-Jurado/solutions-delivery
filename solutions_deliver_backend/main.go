@@ -16,6 +16,18 @@ import (
 // Se encarga de inicializar la función lambda que se va a ejecutar.
 
 func main() {
+	awsgo.InicializoAWS()
+
+	bucket := os.Getenv("S3_BUCKET_NAME")
+	if bucket == "" {
+		panic("S3_BUCKET_NAME no definido")
+	}
+
+	err := bd.InitS3Client(bucket)
+	if err != nil {
+		panic(err)
+	}
+
 	lambda.Start(EjecutarLambda)
 }
 
@@ -64,3 +76,4 @@ func ValidoParametros() bool{
 
 	return traeParametros
 }
+

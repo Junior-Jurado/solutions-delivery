@@ -32,6 +32,7 @@ resource "aws_lambda_function" "api" {
       DB_SECRET_ARN = var.db_secret_arn,
       SecretName = var.secret_name
       UrlPrefix = "/api/v1"
+      S3_BUCKET_NAME = var.s3_bucket_name
     }
   }
 }
@@ -64,4 +65,44 @@ resource "aws_iam_policy" "lambda_secrets_policy" {
 resource "aws_iam_role_policy_attachment" "secrets_attach" {
   role = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.lambda_secrets_policy.arn
+}
+
+# Politicas S3
+resource "aws_iam_policy" "lambda_s3_full" {
+  name = "${var.name_prefix}-lambda-s3-full-${var.environment}"
+  description = "Permite a Lambda leer y escribir en el bucket de S3"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:PutObjectAcl",
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:GetObjectAttributes"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.s3_bucket_name}",
+          "arn:aws:s3:::${var.s3_bucket_name}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::${var.s3_bucket_name}"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_s3_attach" {
+  role = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_s3_full.arn
 }

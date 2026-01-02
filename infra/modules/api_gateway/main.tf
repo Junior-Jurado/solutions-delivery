@@ -112,6 +112,17 @@ resource "aws_apigatewayv2_route" "locations_search" {
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
+
+// GET /guides/{id}/pdf
+resource "aws_apigatewayv2_route" "guides_pdf" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/guides/{id}/pdf"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
 # -----------------------------------------
 # Guides
 
@@ -164,4 +175,3 @@ resource "aws_apigatewayv2_route" "guides_status" {
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
-

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable, firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environments.dev';
 
@@ -52,7 +52,7 @@ export interface CreateGuideRequest {
     package: PackageInfo;
 }
 
-// Interface para la respuesta
+// Interfaces para respuestas
 export interface CreateGuideResponse {
     guide_id: number;
     guide_number: string;
@@ -68,6 +68,117 @@ export interface GuideErrorResponse {
     guide_id?: number;
 }
 
+// Tipos de estado de guía
+export type GuideStatus = 
+    | 'CREATED'
+    | 'IN_ROUTE' 
+    | 'IN_WAREHOUSE'
+    | 'OUT_FOR_DELIVERY'
+    | 'DELIVERED';
+
+export type ServiceType = 'NORMAL' | 'PRIORITY' | 'EXPRESS';
+export type PaymentMethod = 'CONTADO' | 'CONTRAENTREGA';
+
+// Interfaces para los modelos de guía
+export interface ShippingGuide {
+    guide_id: number;
+    service_type: ServiceType;
+    payment_method: PaymentMethod;
+    declared_value: number;
+    price: number;
+    current_status: GuideStatus;
+    origin_city_id: number;
+    origin_city_name?: string;
+    destination_city_id: number;
+    destination_city_name?: string;
+    pdf_url?: string;
+    pdf_s3_key?: string;
+    created_by: string;
+    created_at: string;
+    updated_at: string;
+    sender?: GuideParty;
+    receiver?: GuideParty;
+    package?: Package;
+    history?: StatusHistory[];
+}
+
+export interface GuideParty {
+    party_id: number;
+    guide_id: number;
+    party_role: 'SENDER' | 'RECEIVER';
+    full_name: string;
+    document_type: string;
+    document_number: string;
+    phone: string;
+    email: string;
+    address: string;
+    city_id: number;
+    city_name?: string;
+}
+
+export interface Package {
+    package_id: number;
+    guide_id: number;
+    weight_kg: number;
+    pieces: number;
+    length_cm: number;
+    width_cm: number;
+    height_cm: number;
+    insured: boolean;
+    description: string;
+    special_notes: string;
+}
+
+export interface StatusHistory {
+    history_id: number;
+    guide_id: number;
+    status: GuideStatus;
+    updated_by: string;
+    created_at: string;
+}
+
+// Interfaces para listados y filtros
+export interface GuideFilters {
+    status?: GuideStatus;
+    origin_city_id?: number;
+    destination_city_id?: number;
+    created_by?: string;
+    search?: string;
+    date_from?: string;
+    date_to?: string;
+    limit?: number;
+    offset?: number;
+}
+
+export interface GuidesListResponse {
+    guides: ShippingGuide[];
+    total: number;
+    limit: number;
+    offset: number;
+}
+
+export interface GuideDetailResponse {
+    guide: ShippingGuide;
+}
+
+export interface UpdateStatusRequest {
+    status: GuideStatus;
+}
+
+export interface UpdateStatusResponse {
+    success: boolean;
+    guide_id: number;
+    new_status: GuideStatus;
+    message: string;
+}
+
+export interface GuideStatsResponse {
+    total_today: number;
+    total_processed: number;
+    total_pending: number;
+    by_status: Record<string, number>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GuideService {
     private readonly BASE_URL = `${environment.apiBaseUrl}/guides`;
@@ -76,20 +187,9 @@ export class GuideService {
 
     /**
      * Crea una nueva guía de envío
-     * @param guideData Datos completos de la guía
-     * @returns Promise con la respuesta de creación de guía
      */
     async createGuide(guideData: CreateGuideRequest): Promise<CreateGuideResponse> {
-        const idToken = sessionStorage.getItem('idToken');
-
-        if (!idToken) {
-            throw new Error('No se encontró el token de identificación. Por favor inicie sesión.');
-        }
-
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${idToken}`,
-            'Content-Type': 'application/json'
-        });
+        const headers = this.getHeaders();
 
         try {
             const response = await firstValueFrom(
@@ -115,27 +215,144 @@ export class GuideService {
     }
 
     /**
+     * Obtiene lista de guías con filtros
+     */
+    async listGuides(filters?: GuideFilters): Promise<GuidesListResponse> {
+        const headers = this.getHeaders();
+        
+        let params = new HttpParams();
+        
+        if (filters) {
+            if (filters.status) params = params.set('status', filters.status);
+            if (filters.origin_city_id) params = params.set('origin_city_id', filters.origin_city_id.toString());
+            if (filters.destination_city_id) params = params.set('destination_city_id', filters.destination_city_id.toString());
+            if (filters.created_by) params = params.set('created_by', filters.created_by);
+            if (filters.search) params = params.set('search', filters.search);
+            if (filters.date_from) params = params.set('date_from', filters.date_from);
+            if (filters.date_to) params = params.set('date_to', filters.date_to);
+            if (filters.limit) params = params.set('limit', filters.limit.toString());
+            if (filters.offset) params = params.set('offset', filters.offset.toString());
+        }
+
+        try {
+            return await firstValueFrom(
+                this.http.get<GuidesListResponse>(this.BASE_URL, { headers, params })
+            );
+        } catch (error) {
+            console.error('Error al obtener guías:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtiene una guía por su ID con toda su información
+     */
+    async getGuideById(guideId: number): Promise<GuideDetailResponse> {
+        const headers = this.getHeaders();
+
+        try {
+            return await firstValueFrom(
+                this.http.get<GuideDetailResponse>(
+                    `${this.BASE_URL}/${guideId}`,
+                    { headers }
+                )
+            );
+        } catch (error) {
+            console.error('Error al obtener guía:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Actualiza el estado de una guía
+     */
+    async updateGuideStatus(guideId: number, newStatus: GuideStatus): Promise<UpdateStatusResponse> {
+        const headers = this.getHeaders();
+        
+        const body: UpdateStatusRequest = {
+            status: newStatus
+        };
+
+        try {
+            return await firstValueFrom(
+                this.http.put<UpdateStatusResponse>(
+                    `${this.BASE_URL}/${guideId}/status`,
+                    body,
+                    { headers }
+                )
+            );
+        } catch (error) {
+            console.error('Error al actualizar estado:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Obtiene estadísticas de guías
+     */
+    async getGuideStats(): Promise<GuideStatsResponse> {
+        const headers = this.getHeaders();
+
+        try {
+            return await firstValueFrom(
+                this.http.get<GuideStatsResponse>(
+                    `${this.BASE_URL}/stats`,
+                    { headers }
+                )
+            );
+        } catch (error) {
+            console.error('Error al obtener estadísticas:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Busca guías por término de búsqueda
+     */
+    async searchGuides(searchTerm: string): Promise<GuidesListResponse> {
+        if (searchTerm.length < 3) {
+            return {
+                guides: [],
+                total: 0,
+                limit: 50,
+                offset: 0
+            };
+        }
+
+        const headers = this.getHeaders();
+        const params = new HttpParams().set('q', searchTerm);
+
+        try {
+            return await firstValueFrom(
+                this.http.get<GuidesListResponse>(
+                    `${this.BASE_URL}/search`,
+                    { headers, params }
+                )
+            );
+        } catch (error) {
+            console.error('Error en búsqueda:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Construye el objeto de request desde los datos del formulario
-     * @param formValue Valores del formulario
-     * @param userId ID del usuario que crea la guía
-     * @returns Objeto CreateGuideRequest completo
      */
     buildGuideRequest(formValue: any, userId: string): CreateGuideRequest {
-        // Parsear dimensiones si vienen en formato "20x15x10"
         const dimensions = this.parseDimensions(formValue.dimensions || '20x15x10');
 
         return {
             created_by: userId,
             
             service: {
-                service_type: formValue.serviceType?.toUpperCase() || 'NORMAL',
+                service_type: this.mapServiceType(formValue.serviceType),
                 payment_method: this.mapPaymentMethod(formValue.serviceType),
                 shipping_type: 'TERRESTRE'
             },
 
             pricing: {
                 declared_value: parseFloat(formValue.declaredValue) || 0,
-                price: this.calculatePrice(formValue) // Implementar lógica de cálculo
+                price: this.calculatePrice(formValue)
             },
 
             route: {
@@ -151,7 +368,7 @@ export class GuideService {
                 email: formValue.senderEmail || '',
                 address: formValue.senderAddress,
                 city_id: this.getCityId(formValue.senderCity),
-                city_name: formValue.senderCity
+                city_name: formValue.senderCityName || ''
             },
 
             receiver: {
@@ -162,7 +379,7 @@ export class GuideService {
                 email: formValue.receiverEmail || '',
                 address: formValue.receiverAddress,
                 city_id: this.getCityId(formValue.receiverCity),
-                city_name: formValue.receiverCity
+                city_name: formValue.receiverCityName || ''
             },
 
             package: {
@@ -179,20 +396,77 @@ export class GuideService {
     }
 
     /**
-     * Mapea el tipo de servicio al método de pago
+     * Descarga el PDF de una guía obteniendo una URL pre-firmada del backend
      */
-    private mapPaymentMethod(serviceType: string): string {
-        const mapping: Record<string, string> = {
+    async downloadGuidePDF(guideId: number): Promise<void> {
+        const headers = this.getHeaders();
+
+        try {
+            // Obtener la URL pre-firmada del backend
+            const response = await firstValueFrom(
+                this.http.get<{ url: string; expires_in: number; message: string }>(
+                    `${this.BASE_URL}/${guideId}/pdf`,
+                    { headers }
+                )
+            );
+
+            // Abrir la URL pre-firmada en una nueva pestaña
+            window.open(response.url, '_blank');
+        } catch (error) {
+            console.error('Error al obtener URL de descarga:', error);
+            throw new Error('Error al descargar el PDF');
+        }
+    }
+
+    /**
+     * Traduce el estado a texto legible en español
+     */
+    translateStatus(status: GuideStatus): string {
+        const translations: Record<GuideStatus, string> = {
+            'CREATED': 'Creada',
+            'IN_ROUTE': 'En ruta',
+            'IN_WAREHOUSE': 'En bodega',
+            'OUT_FOR_DELIVERY': 'En reparto',
+            'DELIVERED': 'Entregada'
+        };
+        return translations[status] || status;
+    }
+
+    /**
+     * Obtiene la clase CSS para el badge de estado
+     */
+    getStatusBadgeClass(status: GuideStatus): string {
+        const classes: Record<GuideStatus, string> = {
+            'CREATED': 'badge-default',
+            'IN_ROUTE': 'badge-secondary',
+            'IN_WAREHOUSE': 'badge-warning',
+            'OUT_FOR_DELIVERY': 'badge-secondary',
+            'DELIVERED': 'badge-success'
+        };
+        return classes[status] || 'badge-default';
+    }
+
+    // Métodos privados de utilidad
+    private mapServiceType(serviceType: string): ServiceType {
+        const mapping: Record<string, ServiceType> = {
+            'Contado': 'NORMAL',
+            'Contra Entrega': 'NORMAL',
+            'Crédito': 'NORMAL',
+            'Express': 'PRIORITY',
+            'Urgente': 'EXPRESS'
+        };
+        return mapping[serviceType] || 'NORMAL';
+    }
+
+    private mapPaymentMethod(serviceType: string): PaymentMethod {
+        const mapping: Record<string, PaymentMethod> = {
             'Contado': 'CONTADO',
-            'Contra Entrega': 'CONTRA_ENTREGA',
-            'Crédito': 'CREDITO'
+            'Contra Entrega': 'CONTRAENTREGA',
+            'Crédito': 'CONTADO'
         };
         return mapping[serviceType] || 'CONTADO';
     }
 
-    /**
-     * Parsea las dimensiones del formato "20x15x10"
-     */
     private parseDimensions(dimensionsStr: string): { length: number; width: number; height: number } {
         const parts = dimensionsStr.split('x').map(d => parseFloat(d.trim()));
         
@@ -203,48 +477,32 @@ export class GuideService {
         };
     }
 
-    /**
-     * Formatea el número de teléfono
-     */
     private formatPhone(phone: string): string {
         if (!phone) return '';
         return phone.replace(/\D/g, '');
     }
 
-    /**
-     * Obtiene el ID de la ciudad desde el valor del formulario
-     * El formulario ahora debe guardar el ID directamente
-     */
     private getCityId(cityIdOrName: string | number): number {
-        // Si ya es un número, retornarlo
         if (typeof cityIdOrName === 'number') {
             return cityIdOrName;
         }
         
-        // Si es string, intentar parsearlo
         const parsed = parseInt(cityIdOrName);
         if (!isNaN(parsed)) {
             return parsed;
         }
         
-        // Fallback - esto no debería ocurrir con el nuevo selector
         console.warn('No se pudo obtener el ID de la ciudad:', cityIdOrName);
         return 0;
     }
 
-    /**
-     * Calcula el precio del envío según los parámetros
-     * TODO: Implementar lógica real de cálculo de precios
-     */
     private calculatePrice(formValue: any): number {
         const weight = parseFloat(formValue.weight) || 0;
         const basePrice = 15000;
         const pricePerKg = 3000;
         
-        // Lógica básica de ejemplo
         let price = basePrice + (weight * pricePerKg);
 
-        // Ajustar por prioridad
         if (formValue.priority === 'express') {
             price *= 1.5;
         } else if (formValue.priority === 'urgente') {
@@ -254,56 +512,16 @@ export class GuideService {
         return Math.round(price);
     }
 
-    /**
-     * Descarga el PDF de una guía
-     */
-    async downloadGuidePDF(pdfUrl: string): Promise<void> {
-        window.open(pdfUrl, '_blank');
-    }
-
-    /**
-     * Obtiene una guía por su ID
-     */
-    getGuideById(guideId: number): Observable<any> {
+    private getHeaders(): HttpHeaders {
         const idToken = sessionStorage.getItem('idToken');
         
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${idToken}`
-        });
+        if (!idToken) {
+            throw new Error('No se encontró el token de identificación. Por favor inicie sesión.');
+        }
 
-        return this.http.get(`${this.BASE_URL}/${guideId}`, { headers });
-    }
-
-    /**
-     * Lista todas las guías
-     */
-    listGuides(filters?: any): Observable<any> {
-        const idToken = sessionStorage.getItem('idToken');
-        
-        const headers = new HttpHeaders({
-            'Authorization': `Bearer ${idToken}`
-        });
-
-        return this.http.get(this.BASE_URL, { headers, params: filters });
-    }
-
-    /**
-     * Actualiza el estado de una guía
-     */
-    async updateGuideStatus(guideId: number, newStatus: string): Promise<any> {
-        const idToken = sessionStorage.getItem('idToken');
-        
-        const headers = new HttpHeaders({
+        return new HttpHeaders({
             'Authorization': `Bearer ${idToken}`,
             'Content-Type': 'application/json'
         });
-
-        return firstValueFrom(
-            this.http.patch(
-                `${this.BASE_URL}/${guideId}/status`,
-                { status: newStatus },
-                { headers }
-            )
-        );
     }
 }

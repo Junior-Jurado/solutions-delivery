@@ -7,14 +7,21 @@ import (
 	"github.com/aws/aws-sdk-go-v2/config"
 )
 
-var Ctx context.Context
-var Cfg aws.Config
-var err error
+var (
+	Ctx context.Context
+	Cfg aws.Config
+)
 
 func InicializoAWS() {
 	Ctx = context.Background()
-	Cfg, err = config.LoadDefaultConfig(Ctx, config.WithRegion("us-east-1"))
+
+	cfg, err := config.LoadDefaultConfig(
+		Ctx,
+		config.WithRegion("us-east-1"),
+	)
 	if err != nil {
-		panic("Error al cargar la configuracion de AWS: " + err.Error())
+		panic("Error AWS config: " + err.Error())
 	}
+
+	Cfg = cfg
 }

@@ -32,7 +32,7 @@ func GetDepartments() (int, string) {
 }
 
 func GetCities(deparmentIDStr  string) (int, string) {
-	fmt.Println("GetCities -> DepartmentID: %s\n", deparmentIDStr)
+	fmt.Printf("GetCities -> DepartmentID: %s\n", deparmentIDStr)
 
 	var cities []models.City
 	var err error
@@ -77,7 +77,7 @@ func GetCities(deparmentIDStr  string) (int, string) {
 
 // GetCityByID obtiene una ciudad especifica
 func GetCityByID(cityID int64) (int, string) {
-	fmt.Println("GetCityByID -> CityID: %d\n", cityID)
+	fmt.Printf("GetCityByID -> CityID: %d\n", cityID)
 
 	city, err := bd.GetCityByID(cityID)
 	if err != nil {

@@ -13,6 +13,9 @@ import (
 func Manejadores(path string, method string, body string, headers map[string]string, request events.APIGatewayV2HTTPRequest) (int, string) {
 	fmt.Println("Voy a procesar " + path + " > " + method)
 
+	// NORMALIZAR PATH: Eliminar prefijo /api/v1 si existe
+	path = strings.TrimPrefix(path, "/api/v1")
+
 	id := request.PathParameters["id"]
 	idn, _ := strconv.Atoi(id)
 
@@ -78,9 +81,31 @@ func ProcesoGuias(body string, path  string, method string, user string, id int,
 
 	switch {
 		// GET /guides - Obtener lista de guías con filtros
-	
 		case path == "/guides" && method == "GET":
 			return routers.GetGuides(request, user)
+
+		// GET /guides/stats - Obtener estadísticas de guías
+		case path == "/guides/stats" && method == "GET":
+			return routers.GetGuidesStats(user)
+		
+		// GET /guides/search
+		case path == "/guides/search" && method == "GET":
+			searchTerm := ""
+			if request.QueryStringParameters != nil {
+				searchTerm = request.QueryStringParameters["q"]
+			}
+
+			if searchTerm == "" {
+				return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
+			}
+			return routers.SearchGuides(searchTerm)
+
+		// GET /guides/{id}/pdf - Obtener URL pre-firmada para descargar PDF
+		case strings.HasPrefix(path, "/guides/") && strings.HasSuffix(path, "/pdf") && method == "GET":
+			if id <= 0{
+				return 400, `{"error": "ID de guía inválido"}`
+			}
+			return routers.GetGuidePDFURL(int64(id))
 
 		// GET /guides/{id} - Obtener detalle de una guía específica
 		case strings.HasPrefix(path, "/guides/")&& !strings.Contains(path, "/status") && method == "GET":
@@ -96,21 +121,8 @@ func ProcesoGuias(body string, path  string, method string, user string, id int,
 			}
 			return routers.UpdateGuideStatus(int64(id), body, user)
 		
-		// GET /guides/stats - Obtener estadísticas de guías
-		case path == "/guides/stats" && method == "GET":
-			return routers.GetGuidesStats(user)
 
-		// GET /guides/search
-		case path == "/guides/search" && method == "GET":
-			searchTerm := ""
-			if request.QueryStringParameters != nil {
-				searchTerm = request.QueryStringParameters["q"]
-			}
-
-			if searchTerm == "" {
-				return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
-			}
-			return routers.SearchGuides(searchTerm)
+		
 		
 		default:
 			return 400, "Method Invalid"

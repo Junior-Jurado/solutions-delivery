@@ -41,7 +41,10 @@ func ConnStr(claves models.SecretRDSJson) string {
 	authToken = claves.Password
 	dbEndpoint = claves.Host
 	dbName = claves.DBName
-	return fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true", dbUser, authToken,dbEndpoint, dbName)	
+	return fmt.Sprintf(
+		"%s:%s@tcp(%s)/%s?allowCleartextPasswords=true&parseTime=true&loc=Local",
+		dbUser, authToken, dbEndpoint, dbName,
+	)	
 }
 
 func UserExists(UserUUID string) (bool, error) {

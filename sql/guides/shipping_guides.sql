@@ -64,5 +64,6 @@ CREATE TABLE shipping_guides (
     FOREIGN KEY (created_by)
     REFERENCES users(user_uuid)
 ) ENGINE=InnoDB
+AUTO_INCREMENT = 10000
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_unicode_ci;

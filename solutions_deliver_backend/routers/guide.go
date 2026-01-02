@@ -110,7 +110,7 @@ func GetGuides(request events.APIGatewayV2HTTPRequest, userUUID string) (int, st
 
 // GetGuideByID obtiene el detalle completo de una guía
 func GetGuideByID(guideID int64) (int, string) {
-	fmt.Println("GetGuideByID -> GuideID: %d\n", guideID)
+	fmt.Printf("GetGuideByID -> GuideID: %d\n", guideID)
 
 	guide, err := bd.GetGuideByID(guideID)
 	if err != nil {
@@ -134,7 +134,7 @@ func GetGuideByID(guideID int64) (int, string) {
 
 // UpdateGuide actualiza el estado de una guía
 func UpdateGuideStatus(guideID int64, body string, userUUID string) (int, string) {
-	fmt.Println("UpdateGuideStatus -> GuideID: %d\n", guideID)
+	fmt.Printf("UpdateGuideStatus -> GuideID: %d\n", guideID)
 
 	// Verificar que la guía existe
 	if !bd.GuideExists(guideID) {

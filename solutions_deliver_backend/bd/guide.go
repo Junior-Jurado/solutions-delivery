@@ -527,3 +527,36 @@ func GuideExists(guideID int64) bool {
 
 	return count > 0
 }
+
+// GetGuidePDFInfo obtiene la información del PDF de una guía
+func GetGuidePDFInfo(guideID int64) (string, error) {
+	fmt.Printf("GetGuidePDFInfo -> GuideID: %d\n", guideID)
+
+	var pdfS3Key string
+
+	err := DbConnect()
+	if err != nil {
+		return "", err
+	}
+	defer Db.Close()
+
+	query := `
+		SELECT pdf_s3_key
+		FROM shipping_guides
+		WHERE guide_id = ?
+	`
+
+	err = Db.QueryRow(query, guideID).Scan(&pdfS3Key)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return "", fmt.Errorf("Guía no encontrada")
+		}
+		return "", err
+	}
+
+	if pdfS3Key == "" {
+		return "", fmt.Errorf("La guía no tiene PDF asociado")
+	}
+
+	return pdfS3Key, nil
+}

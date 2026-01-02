@@ -1,22 +1,19 @@
-
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
-import { GuideService, CreateGuideResponse } from "@core/services/guide.service";
+import { 
+    GuideService, 
+    CreateGuideResponse, 
+    ShippingGuide,
+    GuideStatus,
+    GuideStatsResponse,
+    GuidesListResponse,
+    GuideFilters
+} from "@core/services/guide.service";
 import { AuthService } from "@core/services/auth.service";
 import { LocationService, City } from "@core/services/location.service";
 import { CitySelectorComponent } from "@shared/components/city-selector.component";
 import { CommonModule } from "@angular/common";
-
-interface Guide {
-    id: string;
-    status: string;
-    destination: string;
-    sender: string;
-    receiver: string;
-    value: string;
-    created: string;
-}
 
 interface DailyStats {
     day: string;
@@ -32,59 +29,54 @@ interface DailyStats {
     imports: [ReactiveFormsModule, CommonModule, FormsModule, CitySelectorComponent]
 })
 export class SecretaryDashboardPage implements OnInit {
+    // Navegación de tabs
     activeTab: string = 'create-guide';
-    trackingSearch: string = '';
-    selectedGuide: string = '';
+    
+    // Formulario de guía
     guideForm: FormGroup;
     isSubmitting: boolean = false;
     currentUserId: string = '';
-    selectedCityId: string = 'all';
-
+    
+    // Datos de ciudades seleccionadas
+    selectedSenderCity: City | null = null;
+    selectedReceiverCity: City | null = null;
+    
+    // Búsqueda y rastreo
+    trackingSearch: string = '';
+    searchResults: ShippingGuide[] = [];
+    isSearching: boolean = false;
+    
+    // Gestión de guías
+    guides: ShippingGuide[] = [];
+    isLoadingGuides: boolean = false;
+    totalGuides: number = 0;
+    currentPage: number = 0;
+    pageSize: number = 20;
+    
+    // Filtros
     filterCities: City[] = [];
-
-    guides: Guide[] = [
-        { 
-            id: 'EE123456789', 
-            status: 'En oficina', 
-            destination: 'Medellín',
-            sender: 'Juan Pérez',
-            receiver: 'María López',
-            created: 'Hoy 09:30',
-            value: '$25,000'
-        },
-        { 
-            id: 'EE987654321', 
-            status: 'En tránsito', 
-            destination: 'Cali',
-            sender: 'Ana García', 
-            receiver: 'Carlos Ruiz',
-            created: 'Ayer 16:45',
-            value: '$45,000'
-        },
-        { 
-            id: 'EE456789123', 
-            status: 'Pendiente', 
-            destination: 'Barranquilla',
-            sender: 'Luis Martín',
-            receiver: 'Sofia Cruz',
-            created: 'Hoy 11:15',
-            value: '$15,000'
-        }
-    ];
-
-    // Las ciudades ahora se manejan en el componente CitySelectorComponent
+    selectedStatusFilter: GuideStatus | '' = '';
+    selectedCityFilter: number | '' = '';
+    dateFromFilter: string = '';
+    dateToFilter: string = '';
+    
+    // Estadísticas
+    stats: GuideStatsResponse | null = null;
+    isLoadingStats: boolean = false;
+    
+    // Opciones de formulario
     serviceTypes: string[] = ['Contado', 'Contra Entrega', 'Crédito'];
     priorities: string[] = ['Normal', 'Express', 'Urgente'];
     insuranceOptions: string[] = ['No', 'Básico', 'Completo'];
-    statuses: string[] = ['Pendiente', 'En oficina', 'En tránsito', 'En reparto', 'Entregado'];
     documentTypes: string[] = ['CC', 'CE', 'NIT', 'TI', 'PAS'];
-
-    dailyStats: DailyStats[] = [
-        { day: 'Lunes', created: 18, processed: 16 },
-        { day: 'Martes', created: 22, processed: 20 },
-        { day: 'Miércoles', created: 15, processed: 15 },
-        { day: 'Jueves', created: 28, processed: 25 },
-        { day: 'Viernes', created: 24, processed: 20 }
+    
+    // Estados disponibles para actualización
+    availableStatuses: { value: GuideStatus; label: string }[] = [
+        { value: 'CREATED', label: 'Creada' },
+        { value: 'IN_ROUTE', label: 'En ruta' },
+        { value: 'IN_WAREHOUSE', label: 'En bodega' },
+        { value: 'OUT_FOR_DELIVERY', label: 'En reparto' },
+        { value: 'DELIVERED', label: 'Entregada' }
     ];
 
     constructor(
@@ -92,9 +84,24 @@ export class SecretaryDashboardPage implements OnInit {
         private router: Router,
         private guideService: GuideService,
         private authService: AuthService,
-        private locationService: LocationService
+        private locationService: LocationService,
+        private cdr: ChangeDetectorRef
     ){
-        this.guideForm = this.fb.group({
+        this.guideForm = this.initializeForm();
+    }
+
+    ngOnInit(): void {
+        this.loadCurrentUser();
+        this.loadCities();
+        this.loadGuides();
+        this.loadStats();
+    }
+
+    /**
+     * Inicializa el formulario de guía
+     */
+    private initializeForm(): FormGroup {
+        return this.fb.group({
             // Remitente
             senderName: ['', Validators.required],
             senderDocType: ['CC', Validators.required],
@@ -103,6 +110,7 @@ export class SecretaryDashboardPage implements OnInit {
             senderEmail: ['', Validators.email],
             senderAddress: ['', Validators.required],
             senderCity: ['', Validators.required],
+            senderCityName: [''],
             
             // Destinatario
             receiverName: ['', Validators.required],
@@ -112,6 +120,7 @@ export class SecretaryDashboardPage implements OnInit {
             receiverEmail: ['', Validators.email],
             receiverAddress: ['', Validators.required],
             receiverCity: ['', Validators.required],
+            receiverCityName: [''],
             
             // Paquete
             serviceType: ['Contado', Validators.required],
@@ -126,37 +135,124 @@ export class SecretaryDashboardPage implements OnInit {
         });
     }
 
-    ngOnInit(): void {
-        this.loadCurrentUser();
-        this.loadCities();
-    }
-
-    private loadCities(): void {
-        this.locationService.getCities().subscribe(cities => {
-            this.filterCities = cities;
-        });
-    }
-
     /**
-     * Carga el ID del usuario actual
+     * Carga el ID del usuario actual desde el token
      */
     private loadCurrentUser(): void {
-        // TODO: Obtener el ID del usuario desde el token o servicio de auth
-        // Por ahora usamos un valor de ejemplo
         const idToken = sessionStorage.getItem('idToken');
         if (idToken) {
             try {
                 const payload = JSON.parse(atob(idToken.split('.')[1]));
                 this.currentUserId = payload.sub || payload['cognito:username'];
+                console.log('Usuario actual:', this.currentUserId);
             } catch (error) {
                 console.error('Error al decodificar token:', error);
-                this.currentUserId = 'd4f8f468-d051-70f3-7d8a-8095ee4b832c'; // Fallback
+                this.router.navigate(['/auth']);
             }
+        } else {
+            this.router.navigate(['/auth']);
         }
     }
 
+    /**
+     * Carga la lista de ciudades para filtros
+     */
+    private loadCities(): void {
+        this.locationService.getCities().subscribe({
+            next: (cities) => {
+                this.filterCities = cities;
+                console.log('Ciudades cargadas:', cities.length);
+            },
+            error: (error) => {
+                console.error('Error al cargar ciudades:', error);
+            }
+        });
+    }
+
+    /**
+     * Carga la lista de guías con filtros
+     */
+    async loadGuides(): Promise<void> {
+        this.isLoadingGuides = true;
+        this.cdr.detectChanges();
+
+        const filters: GuideFilters = {
+            limit: this.pageSize,
+            offset: this.currentPage * this.pageSize
+        };
+
+        if (this.selectedStatusFilter) {
+            filters.status = this.selectedStatusFilter;
+        }
+
+        if (this.selectedCityFilter) {
+            filters.destination_city_id = Number(this.selectedCityFilter);
+        }
+
+        if (this.dateFromFilter) {
+            filters.date_from = this.dateFromFilter;
+        }
+
+        if (this.dateToFilter) {
+            filters.date_to = this.dateToFilter;
+        }
+
+        try {
+            const response: GuidesListResponse = await this.guideService.listGuides(filters);
+            this.guides = response.guides;
+            this.totalGuides = response.total;
+            console.log('Guías cargadas:', this.guides.length, 'de', this.totalGuides);
+        } catch (error) {
+            console.error('Error al cargar guías:', error);
+            alert('Error al cargar las guías');
+        } finally {
+            this.isLoadingGuides = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    /**
+     * Carga las estadísticas de guías
+     */
+    async loadStats(): Promise<void> {
+        this.isLoadingStats = true;
+        this.cdr.detectChanges();
+
+        try {
+            this.stats = await this.guideService.getGuideStats();
+            console.log('Estadísticas cargadas:', this.stats);
+        } catch (error) {
+            console.error('Error al cargar estadísticas:', error);
+        } finally {
+            this.isLoadingStats = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    /**
+     * Cambia de tab
+     */
     setActiveTab(tab: string): void {
         this.activeTab = tab;
+        
+        // Cargar datos según el tab
+        if (tab === 'manage-guides') {
+            this.loadGuides();
+        } else if (tab === 'reports') {
+            this.loadStats();
+        }
+    }
+
+    /**
+     * Descarga el PDF de una guía
+     */
+    async downloadGuidePDF(guideId: number): Promise<void> {
+        try {
+            await this.guideService.downloadGuidePDF(guideId);
+        } catch (error) {
+            console.error('Error al descargar PDF:', error);
+            alert('Error al descargar el PDF de la guía');
+        }
     }
 
     /**
@@ -176,7 +272,6 @@ export class SecretaryDashboardPage implements OnInit {
         this.isSubmitting = true;
 
         try {
-            // Construir el request
             const guideRequest = this.guideService.buildGuideRequest(
                 this.guideForm.value,
                 this.currentUserId
@@ -184,12 +279,10 @@ export class SecretaryDashboardPage implements OnInit {
 
             console.log('Enviando guía:', guideRequest);
 
-            // Llamar al servicio
             const response: CreateGuideResponse = await this.guideService.createGuide(guideRequest);
 
             console.log('Respuesta del servidor:', response);
 
-            // Mostrar mensaje de éxito
             alert(`¡Guía creada exitosamente!
             
 Número de guía: ${response.guide_number}
@@ -197,26 +290,15 @@ ID: ${response.guide_id}
 
 El PDF se descargará automáticamente.`);
 
-            // Descargar el PDF
-            if (response.pdf_url) {
-                await this.guideService.downloadGuidePDF(response.pdf_url);
+            if (response.guide_id) {
+                await this.guideService.downloadGuidePDF(response.guide_id);
             }
 
-            // Limpiar el formulario
-            this.guideForm.reset({
-                senderDocType: 'CC',
-                receiverDocType: 'CC',
-                serviceType: 'Contado',
-                pieces: 1,
-                dimensions: '20x15x10',
-                priority: 'normal',
-                insurance: 'no'
-            });
+            this.guideForm.reset(this.getDefaultFormValues());
+            this.selectedSenderCity = null;
+            this.selectedReceiverCity = null;
 
-            // Cambiar a la pestaña de gestión de guías
             this.setActiveTab('manage-guides');
-
-            // TODO: Recargar la lista de guías
 
         } catch (error: any) {
             console.error('Error al crear la guía:', error);
@@ -230,79 +312,120 @@ El PDF se descargará automáticamente.`);
             alert(errorMessage);
         } finally {
             this.isSubmitting = false;
+            this.cdr.detectChanges();
         }
     }
 
     /**
-     * Marca todos los controles del formulario como touched para mostrar errores
+     * Actualiza el estado de una guía
      */
-    private markFormGroupTouched(formGroup: FormGroup): void {
-        Object.keys(formGroup.controls).forEach(key => {
-            const control = formGroup.get(key);
-            control?.markAsTouched();
-
-            if (control instanceof FormGroup) {
-                this.markFormGroupTouched(control);
-            }
-        });
-    }
-
-    async handleUpdateStatus(guideId: string, newStatus: string): Promise<void> {
+    async handleUpdateStatus(guideId: number, newStatus: GuideStatus): Promise<void> {
         if (!newStatus) {
             return;
         }
 
         try {
-            const numericId = parseInt(guideId.replace(/\D/g, ''));
-            await this.guideService.updateGuideStatus(numericId, newStatus);
+            const response = await this.guideService.updateGuideStatus(guideId, newStatus);
             
-            // Actualizar la guía en la lista local
-            const guide = this.guides.find(g => g.id === guideId);
+            const guide = this.guides.find(g => g.guide_id === guideId);
             if (guide) {
-                guide.status = newStatus;
+                guide.current_status = newStatus;
+                this.cdr.detectChanges();
             }
 
-            alert(`Estado actualizado correctamente a: ${newStatus}`);
+            alert(`Estado actualizado correctamente a: ${this.guideService.translateStatus(newStatus)}`);
+            
+            await this.loadStats();
+            
         } catch (error) {
             console.error('Error al actualizar estado:', error);
             alert('Error al actualizar el estado de la guía');
         }
     }
 
-    handleSearchTracking(): void {
-        console.log('Searching tracking:', this.trackingSearch);
-        // TODO: Implementar búsqueda real
-    }
+    /**
+     * Busca y rastrea envíos
+     */
+    async handleSearchTracking(): Promise<void> {
+        if (!this.trackingSearch || this.trackingSearch.length < 3) {
+            alert('Ingrese al menos 3 caracteres para buscar');
+            return;
+        }
 
-    getStatusBadgeClass(status: string): string {
-        switch(status) {
-            case 'Entregado':
-                return 'badge-success';
-            case 'En tránsito':
-            case 'En oficina':
-                return 'badge-secondary';
-            case 'En reparto':
-                return 'badge-default';
-            case 'Pendiente':
-                return 'badge-warning';
-            default:
-                return 'badge-default';
+        this.isSearching = true;
+
+        try {
+            const response = await this.guideService.searchGuides(this.trackingSearch);
+            this.searchResults = response.guides;
+            console.log('Resultados de búsqueda:', this.searchResults.length);
+
+            if (this.searchResults.length === 0) {
+                alert('No se encontraron resultados');
+            }
+        } catch (error) {
+            console.error('Error en búsqueda:', error);
+            alert('Error al buscar guías');
+        } finally {
+            this.isSearching = false;
+            this.cdr.detectChanges();
         }
     }
 
-    editGuide(guideId: string): void {
-        console.log('Editing guide: ', guideId);
-        // TODO: Implementar edición
+    /**
+     * Aplica filtros a la lista de guías
+     */
+    async applyFilters(): Promise<void> {
+        this.currentPage = 0;
+        await this.loadGuides();
     }
 
-    viewDetails(guideId: string): void {
-        console.log('Viewing details: ', guideId);
-        // TODO: Implementar vista de detalles
+    /**
+     * Limpia todos los filtros
+     */
+    async clearFilters(): Promise<void> {
+        this.selectedStatusFilter = '';
+        this.selectedCityFilter = '';
+        this.dateFromFilter = '';
+        this.dateToFilter = '';
+        this.currentPage = 0;
+        await this.loadGuides();
     }
 
-    handleLogout(): void {
-        sessionStorage.clear();
-        this.router.navigate(['/auth']);
+    /**
+     * Ver detalles de una guía
+     */
+    async viewDetails(guideId: number): Promise<void> {
+        try {
+            const response = await this.guideService.getGuideById(guideId);
+            const guide = response.guide;
+            
+            // Aquí podrías mostrar un modal o navegar a una página de detalles
+            console.log('Detalles de guía:', guide);
+            
+            const details = `
+Guía #${guide.guide_id}
+Estado: ${this.guideService.translateStatus(guide.current_status)}
+
+Remitente: ${guide.sender?.full_name || 'N/A'}
+Ciudad origen: ${guide.origin_city_name}
+
+Destinatario: ${guide.receiver?.full_name || 'N/A'}
+Ciudad destino: ${guide.destination_city_name}
+
+Paquete:
+- Peso: ${guide.package?.weight_kg || 0} kg
+- Piezas: ${guide.package?.pieces || 0}
+- Dimensiones: ${guide.package?.length_cm}x${guide.package?.width_cm}x${guide.package?.height_cm} cm
+
+Valor declarado: $${guide.declared_value.toLocaleString()}
+Precio: $${guide.price.toLocaleString()}
+            `;
+            
+            alert(details);
+        } catch (error) {
+            console.error('Error al obtener detalles:', error);
+            alert('Error al cargar los detalles de la guía');
+        }
     }
 
     /**
@@ -310,7 +433,10 @@ El PDF se descargará automáticamente.`);
      */
     onSenderCitySelected(city: City): void {
         console.log('Ciudad remitente seleccionada:', city);
-        // El ID ya está en el formulario gracias al selector
+        this.selectedSenderCity = city;
+        this.guideForm.patchValue({
+            senderCityName: city.name
+        });
     }
 
     /**
@@ -318,15 +444,22 @@ El PDF se descargará automáticamente.`);
      */
     onReceiverCitySelected(city: City): void {
         console.log('Ciudad destinatario seleccionada:', city);
-        // El ID ya está en el formulario gracias al selector
+        this.selectedReceiverCity = city;
+        this.guideForm.patchValue({
+            receiverCityName: city.name
+        });
     }
+
+    /**
+     * Verifica si un campo tiene error
+     */
     hasError(fieldName: string): boolean {
         const field = this.guideForm.get(fieldName);
         return !!(field && field.invalid && field.touched);
     }
 
     /**
-     * Obtiene el mensaje de error para un campo específico
+     * Obtiene el mensaje de error para un campo
      */
     getErrorMessage(fieldName: string): string {
         const field = this.guideForm.get(fieldName);
@@ -344,5 +477,119 @@ El PDF se descargará automáticamente.`);
         }
         
         return '';
+    }
+
+    /**
+     * Obtiene la clase CSS para el badge de estado
+     */
+    getStatusBadgeClass(status: GuideStatus): string {
+        return this.guideService.getStatusBadgeClass(status);
+    }
+
+    /**
+     * Traduce el estado a español
+     */
+    translateStatus(status: GuideStatus): string {
+        return this.guideService.translateStatus(status);
+    }
+
+    /**
+     * Formatea una fecha
+     */
+    formatDate(dateString: string): string {
+        const date = new Date(dateString);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (date.toDateString() === today.toDateString()) {
+            return `Hoy ${date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return `Ayer ${date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
+        } else {
+            return date.toLocaleDateString('es-CO', { 
+                day: '2-digit', 
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    }
+
+    /**
+     * Cerrar sesión
+     */
+    handleLogout(): void {
+        sessionStorage.clear();
+        this.router.navigate(['/auth']);
+    }
+
+    /**
+     * Marca todos los controles como touched
+     */
+    private markFormGroupTouched(formGroup: FormGroup): void {
+        Object.keys(formGroup.controls).forEach(key => {
+            const control = formGroup.get(key);
+            control?.markAsTouched();
+
+            if (control instanceof FormGroup) {
+                this.markFormGroupTouched(control);
+            }
+        });
+    }
+
+    /**
+     * Obtiene los valores por defecto del formulario
+     */
+    private getDefaultFormValues(): any {
+        return {
+            senderDocType: 'CC',
+            receiverDocType: 'CC',
+            serviceType: 'Contado',
+            pieces: 1,
+            dimensions: '20x15x10',
+            priority: 'normal',
+            insurance: 'no',
+            senderCityName: '',
+            receiverCityName: ''
+        };
+    }
+
+    /**
+     * Navega a la página anterior
+     */
+    previousPage(): void {
+        if (this.currentPage > 0) {
+            this.currentPage--;
+            this.loadGuides();
+        }
+    }
+
+    /**
+     * Navega a la página siguiente
+     */
+    nextPage(): void {
+        const totalPages = Math.ceil(this.totalGuides / this.pageSize);
+        if (this.currentPage < totalPages - 1) {
+            this.currentPage++;
+            this.loadGuides();
+        }
+    }
+
+    /**
+     * Obtiene el número total de páginas
+     */
+    getTotalPages(): number {
+        return Math.ceil(this.totalGuides / this.pageSize);
+    }
+
+    /**
+     * Calcula el porcentaje para barras de progreso
+     */
+    calculatePercentage(count: number): number {
+        if (!this.stats) return 0;
+        
+        const total = Object.values(this.stats.by_status).reduce((sum, val) => sum + val, 0);
+        return total > 0 ? (count / total) * 100 : 0;
     }
 }
