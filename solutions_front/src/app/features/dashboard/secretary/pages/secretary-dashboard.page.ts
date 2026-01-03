@@ -13,6 +13,7 @@ import {
 import { AuthService } from "@core/services/auth.service";
 import { LocationService, City } from "@core/services/location.service";
 import { CitySelectorComponent } from "@shared/components/city-selector.component";
+import { GuideDetailsModalComponent } from "@shared/components/guide-details-modal.component";
 import { CommonModule } from "@angular/common";
 import { ToastService } from "@shared/services/toast.service";
 
@@ -31,7 +32,8 @@ interface DailyStats {
         ReactiveFormsModule, 
         CommonModule, 
         FormsModule, 
-        CitySelectorComponent
+        CitySelectorComponent,
+        GuideDetailsModalComponent
     ]
 })
 export class SecretaryDashboardPage implements OnInit {
@@ -53,7 +55,7 @@ export class SecretaryDashboardPage implements OnInit {
     isSearching: boolean = false;
     
     // Gestión de guías
-    guides: ShippingGuide[] = [];
+    guides: ShippingGuide[] = []; 
     isLoadingGuides: boolean = false;
     totalGuides: number = 0;
     currentPage: number = 0;
@@ -66,9 +68,17 @@ export class SecretaryDashboardPage implements OnInit {
     dateFromFilter: string = '';
     dateToFilter: string = '';
     
+    // Para manejo visual de fechas
+    displayDateFrom: string = '';
+    displayDateTo: string = '';
+    
     // Estadísticas
     stats: GuideStatsResponse | null = null;
     isLoadingStats: boolean = false;
+    
+    // Modal de detalles
+    selectedGuideForDetails: ShippingGuide | null = null;
+    isDetailsModalOpen: boolean = false;
     
     // Opciones de formulario
     serviceTypes: string[] = ['Contado', 'Contra Entrega', 'Crédito'];
@@ -181,6 +191,7 @@ export class SecretaryDashboardPage implements OnInit {
      */
     async loadGuides(): Promise<void> {
         this.isLoadingGuides = true;
+        this.guides = []; 
         this.cdr.detectChanges();
 
         const filters: GuideFilters = {
@@ -190,6 +201,7 @@ export class SecretaryDashboardPage implements OnInit {
 
         if (this.selectedStatusFilter) {
             filters.status = this.selectedStatusFilter;
+            console.log('Filtro de estado aplicado:', filters.status);
         }
 
         if (this.selectedCityFilter) {
@@ -206,12 +218,23 @@ export class SecretaryDashboardPage implements OnInit {
 
         try {
             const response: GuidesListResponse = await this.guideService.listGuides(filters);
-            this.guides = response.guides;
-            this.totalGuides = response.total;
+            
+            this.guides = Array.isArray(response.guides) ? response.guides : [];
+            this.totalGuides = response.total || 0;
+            
             console.log('Guías cargadas:', this.guides.length, 'de', this.totalGuides);
-        } catch (error) {
+            
+            if (this.guides.length === 0 && this.totalGuides === 0) {
+                const filterApplied = this.selectedStatusFilter || this.selectedCityFilter || this.dateFromFilter || this.dateToFilter;
+                if (filterApplied) {
+                    this.toast.info('No se encontraron guías con los filtros seleccionados');
+                }
+            }
+        } catch (error: any) {
             console.error('Error al cargar guías:', error);
-            this.toast.error('Error al cargar las guías');
+            this.guides = []; 
+            this.totalGuides = 0;
+            this.toast.error('Error al cargar las guías: ' + (error.message || 'Error desconocido'));
         } finally {
             this.isLoadingGuides = false;
             this.cdr.detectChanges();
@@ -230,6 +253,7 @@ export class SecretaryDashboardPage implements OnInit {
             console.log('Estadísticas cargadas:', this.stats);
         } catch (error) {
             console.error('Error al cargar estadísticas:', error);
+            this.toast.error('Error al cargar las estadísticas');
         } finally {
             this.isLoadingStats = false;
             this.cdr.detectChanges();
@@ -290,12 +314,7 @@ export class SecretaryDashboardPage implements OnInit {
 
             console.log('Respuesta del servidor:', response);
 
-            this.toast.success(`¡Guía creada exitosamente!
-            
-Número de guía: ${response.guide_number}
-ID: ${response.guide_id}
-
-El PDF se descargará automáticamente.`);
+            this.toast.success(`¡Guía creada exitosamente!\n\nNúmero de guía: ${response.guide_number}\nID: ${response.guide_id}\n\nEl PDF se descargará automáticamente.`);
 
             if (response.guide_id) {
                 await this.guideService.downloadGuidePDF(response.guide_id);
@@ -360,20 +379,26 @@ El PDF se descargará automáticamente.`);
         }
 
         this.isSearching = true;
+        this.searchResults = []; 
 
         try {
             const response = await this.guideService.searchGuides(this.trackingSearch);
-            this.searchResults = response.guides;
+            
+            this.searchResults = Array.isArray(response.guides) ? response.guides : [];
+            
             console.log('Resultados de búsqueda:', this.searchResults.length);
 
             if (this.searchResults.length === 0) {
-                this.toast.success('No se encontraron resultados');
+                this.toast.info(`No se encontraron resultados para "${this.trackingSearch}"`);
+            } else {
+                this.toast.success(`Se encontraron ${this.searchResults.length} resultado(s)`);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error en búsqueda:', error);
-            this.toast.error('Error al buscar guías');
+            this.searchResults = []; 
+            this.toast.error('Error al buscar guías: ' + (error.message || 'Error desconocido'));
         } finally {
-            this.isSearching = false;
+            this.isSearching = false; 
             this.cdr.detectChanges();
         }
     }
@@ -390,51 +415,149 @@ El PDF se descargará automáticamente.`);
      * Limpia todos los filtros
      */
     async clearFilters(): Promise<void> {
-        this.selectedStatusFilter = '';
-        this.selectedCityFilter = '';
-        this.dateFromFilter = '';
-        this.dateToFilter = '';
-        this.currentPage = 0;
-        await this.loadGuides();
+        try {
+            // Limpiar todos los filtros
+            this.selectedStatusFilter = '';
+            this.selectedCityFilter = '';
+            this.dateFromFilter = '';
+            this.dateToFilter = '';
+            this.displayDateFrom = '';
+            this.displayDateTo = '';
+            this.currentPage = 0;
+            
+            // Forzar detección de cambios
+            this.cdr.detectChanges();
+            
+            // Recargar las guías
+            await this.loadGuides();
+            
+            console.log('Filtros limpiados exitosamente');
+        } catch (error) {
+            console.error('Error al limpiar filtros:', error);
+            this.toast.error('Error al limpiar los filtros');
+            this.isLoadingGuides = false;
+            this.cdr.detectChanges();
+        }
     }
 
     /**
-     * Ver detalles de una guía
+     * Convierte fecha de dd/mm/yyyy a yyyy-mm-dd
+     */
+    formatDateForAPI(displayDate: string): string {
+        if (!displayDate || displayDate.length !== 10) return '';
+        
+        const parts = displayDate.split('/');
+        if (parts.length !== 3) return '';
+        
+        const day = parts[0].padStart(2, '0');
+        const month = parts[1].padStart(2, '0');
+        const year = parts[2];
+        
+        // Validación básica
+        const dayNum = parseInt(day);
+        const monthNum = parseInt(month);
+        const yearNum = parseInt(year);
+        
+        if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12 || yearNum < 2000) {
+            return '';
+        }
+        
+        return `${year}-${month}-${day}`;
+    }
+
+    /**
+     * Maneja el cambio en el input de fecha desde
+     */
+    onDateFromChange(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        let value = input.value.replace(/\D/g, '');
+        
+        if (value.length > 8) {
+            value = value.substring(0, 8);
+        }
+        
+        let formatted = '';
+        if (value.length >= 1) {
+            formatted = value.substring(0, 2);
+        }
+        if (value.length >= 3) {
+            formatted += '/' + value.substring(2, 4);
+        }
+        if (value.length >= 5) {
+            formatted += '/' + value.substring(4, 8);
+        }
+        
+        this.displayDateFrom = formatted;
+        
+        if (value.length === 8) {
+            this.dateFromFilter = this.formatDateForAPI(formatted);
+            console.log('Fecha desde (API):', this.dateFromFilter);
+        } else {
+            this.dateFromFilter = '';
+        }
+    }
+
+    /**
+     * Maneja el cambio en el input de fecha hasta
+     */
+    onDateToChange(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        let value = input.value.replace(/\D/g, '');
+        
+        if (value.length > 8) {
+            value = value.substring(0, 8);
+        }
+        
+        let formatted = '';
+        if (value.length >= 1) {
+            formatted = value.substring(0, 2);
+        }
+        if (value.length >= 3) {
+            formatted += '/' + value.substring(2, 4);
+        }
+        if (value.length >= 5) {
+            formatted += '/' + value.substring(4, 8);
+        }
+        
+        this.displayDateTo = formatted;
+        
+        if (value.length === 8) {
+            this.dateToFilter = this.formatDateForAPI(formatted);
+            console.log('Fecha hasta (API):', this.dateToFilter);
+        } else {
+            this.dateToFilter = '';
+        }
+    }
+
+    /**
+     * Ver detalles de una guía (abre el modal)
      */
     async viewDetails(guideId: number): Promise<void> {
         try {
             const response = await this.guideService.getGuideById(guideId);
-            const guide = response.guide;
-            
-            // Aquí podrías mostrar un modal o navegar a una página de detalles
-            console.log('Detalles de guía:', guide);
-            
-            const details = `
-<strong>Guía #${guide.guide_id}</strong>
-<strong>Estado:</strong> ${this.guideService.translateStatus(guide.current_status)}
-
-<strong>Remitente:</strong> ${guide.sender?.full_name || 'N/A'}
-<strong>Ciudad origen:</strong> ${guide.origin_city_name}
-
-<strong>Destinatario:</strong> ${guide.receiver?.full_name || 'N/A'}
-<strong>Ciudad destino:</strong> ${guide.destination_city_name}
-
-<strong>Paquete:</strong>
-• Peso: ${guide.package?.weight_kg || 0} kg
-• Piezas: ${guide.package?.pieces || 0}
-• Dimensiones: ${guide.package?.length_cm}x${guide.package?.width_cm}x${guide.package?.height_cm} cm
-
-<strong>Valor declarado:</strong> $${guide.declared_value.toLocaleString()}
-<strong>Precio:</strong> $${guide.price.toLocaleString()}
-      `.trim();
-      
-      // Toast centrado con HTML para formato mejorado
-      this.toast.info(details, 8000);
-      
+            this.selectedGuideForDetails = response.guide;
+            this.isDetailsModalOpen = true;
+            this.cdr.detectChanges();
         } catch (error) {
             console.error('Error al obtener detalles:', error);
             this.toast.error('Error al cargar los detalles de la guía');
         }
+    }
+
+    /**
+     * Cierra el modal de detalles
+     */
+    closeDetailsModal(): void {
+        this.isDetailsModalOpen = false;
+        this.selectedGuideForDetails = null;
+        this.cdr.detectChanges();
+    }
+
+    /**
+     * Descarga el PDF desde el modal
+     */
+    async downloadPDFFromModal(guideId: number): Promise<void> {
+        await this.downloadGuidePDF(guideId);
     }
 
     /**

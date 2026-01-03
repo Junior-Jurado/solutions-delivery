@@ -45,10 +45,19 @@ func GetGuidesByFilters(filters models.GuideFilters) ([]models.ShippingGuide, in
 		args = append(args, filters.CreatedBy)
 	}
 
+	// BÚSQUEDA MEJORADA: Incluye guide_id, ciudades, nombres y documentos
 	if filters.SearchTerm != "" {
 		searchPattern := "%" + filters.SearchTerm + "%"
-		conditions = append(conditions, "(CAST(sg.guide_id AS CHAR) LIKE ? OR oc.name LIKE ? OR dc.name LIKE ?)")
-		args = append(args, searchPattern, searchPattern, searchPattern)
+		conditions = append(conditions, `(
+			CAST(sg.guide_id AS CHAR) LIKE ? OR 
+			oc.name LIKE ? OR 
+			dc.name LIKE ? OR
+			sender.full_name LIKE ? OR
+			receiver.full_name LIKE ? OR
+			sender.document_number LIKE ? OR
+			receiver.document_number LIKE ?
+		)`)
+		args = append(args, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern, searchPattern)
 	}
 
 	if filters.DateFrom != nil {
@@ -66,12 +75,14 @@ func GetGuidesByFilters(filters models.GuideFilters) ([]models.ShippingGuide, in
 		whereClause = "WHERE " + strings.Join(conditions, " AND ")
 	}
 
-	// Contar total
+	// Contar total - AHORA CON JOINS DE LAS PARTES
 	countQuery := fmt.Sprintf(`
 		SELECT COUNT(*)
 		FROM shipping_guides sg
 		LEFT JOIN cities oc ON sg.origin_city_id = oc.id
 		LEFT JOIN cities dc ON sg.destination_city_id = dc.id
+		LEFT JOIN guide_parties sender ON sg.guide_id = sender.guide_id AND sender.party_role = 'SENDER'
+		LEFT JOIN guide_parties receiver ON sg.guide_id = receiver.guide_id AND receiver.party_role = 'RECEIVER'
 		%s
 	`, whereClause)
 
@@ -80,7 +91,7 @@ func GetGuidesByFilters(filters models.GuideFilters) ([]models.ShippingGuide, in
 		return guides, 0, err
 	}
 
-	// Consulta principal
+	// Consulta principal - AGREGAMOS CAMPOS DE SENDER Y RECEIVER
 	query := fmt.Sprintf(`
 		SELECT 
 			sg.guide_id,
@@ -97,10 +108,28 @@ func GetGuidesByFilters(filters models.GuideFilters) ([]models.ShippingGuide, in
 			sg.pdf_s3_key,
 			sg.created_by,
 			sg.created_at,
-			sg.updated_at
+			sg.updated_at,
+			sender.party_id,
+			sender.full_name,
+			sender.document_type,
+			sender.document_number,
+			sender.phone,
+			sender.email,
+			sender.address,
+			sender.city_id,
+			receiver.party_id,
+			receiver.full_name,
+			receiver.document_type,
+			receiver.document_number,
+			receiver.phone,
+			receiver.email,
+			receiver.address,
+			receiver.city_id
 		FROM shipping_guides sg
 		LEFT JOIN cities oc ON sg.origin_city_id = oc.id
 		LEFT JOIN cities dc ON sg.destination_city_id = dc.id
+		LEFT JOIN guide_parties sender ON sg.guide_id = sender.guide_id AND sender.party_role = 'SENDER'
+		LEFT JOIN guide_parties receiver ON sg.guide_id = receiver.guide_id AND receiver.party_role = 'RECEIVER'
 		%s
 		ORDER BY sg.created_at DESC
 		LIMIT ? OFFSET ?
@@ -116,6 +145,15 @@ func GetGuidesByFilters(filters models.GuideFilters) ([]models.ShippingGuide, in
 
 	for rows.Next() {
 		var guide models.ShippingGuide
+		var sender models.GuideParty
+		var receiver models.GuideParty
+
+		// Variables nullable para el scan
+		var senderPartyID, receiverPartyID sql.NullInt64
+		var senderName, senderDocType, senderDocNum, senderPhone, senderEmail, senderAddr sql.NullString
+		var senderCityID sql.NullInt64
+		var receiverName, receiverDocType, receiverDocNum, receiverPhone, receiverEmail, receiverAddr sql.NullString
+		var receiverCityID sql.NullInt64
 
 		err := rows.Scan(
 			&guide.GuideID,
@@ -133,10 +171,58 @@ func GetGuidesByFilters(filters models.GuideFilters) ([]models.ShippingGuide, in
 			&guide.CreatedBy,
 			&guide.CreatedAt,
 			&guide.UpdatedAt,
+			// Sender
+			&senderPartyID,
+			&senderName,
+			&senderDocType,
+			&senderDocNum,
+			&senderPhone,
+			&senderEmail,
+			&senderAddr,
+			&senderCityID,
+			// Receiver
+			&receiverPartyID,
+			&receiverName,
+			&receiverDocType,
+			&receiverDocNum,
+			&receiverPhone,
+			&receiverEmail,
+			&receiverAddr,
+			&receiverCityID,
 		)
 
 		if err != nil {
 			return guides, 0, err
+		}
+
+		// Asignar sender si existe
+		if senderPartyID.Valid {
+			sender.PartyID = senderPartyID.Int64
+			sender.GuideID = guide.GuideID
+			sender.PartyRole = models.RoleSender
+			sender.FullName = senderName.String
+			sender.DocumentType = senderDocType.String
+			sender.DocumentNumber = senderDocNum.String
+			sender.Phone = senderPhone.String
+			sender.Email = senderEmail.String
+			sender.Address = senderAddr.String
+			sender.CityID = senderCityID.Int64
+			guide.Sender = &sender
+		}
+
+		// Asignar receiver si existe
+		if receiverPartyID.Valid {
+			receiver.PartyID = receiverPartyID.Int64
+			receiver.GuideID = guide.GuideID
+			receiver.PartyRole = models.RoleReceiver
+			receiver.FullName = receiverName.String
+			receiver.DocumentType = receiverDocType.String
+			receiver.DocumentNumber = receiverDocNum.String
+			receiver.Phone = receiverPhone.String
+			receiver.Email = receiverEmail.String
+			receiver.Address = receiverAddr.String
+			receiver.CityID = receiverCityID.Int64
+			guide.Receiver = &receiver
 		}
 
 		guides = append(guides, guide)
@@ -211,12 +297,6 @@ func GetGuideByID(guideID int64) (models.ShippingGuide, error) {
 	parties, err := getGuideParties(guideID)
 	if err == nil {
 		for _, party := range parties {
-			// if party.PartyRole == models.RoleSender {
-			// 	guide.Sender = &party
-			// } else if party.PartyRole == models.RoleReceiver {
-			// 	guide.Receiver = &party
-			// }
-
 			switch party.PartyRole {
 				case models.RoleSender:
 					guide.Sender = &party

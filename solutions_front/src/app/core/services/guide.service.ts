@@ -134,7 +134,7 @@ export interface StatusHistory {
     guide_id: number;
     status: GuideStatus;
     updated_by: string;
-    created_at: string;
+    updated_at: string;
 }
 
 // Interfaces para listados y filtros
