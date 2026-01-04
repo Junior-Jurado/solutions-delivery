@@ -37,6 +37,9 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	
 	case strings.HasPrefix(path, "/locations"):
 		return ProcesoUbicaciones(body, path, method, userUUID, id, request)
+
+	case strings.HasPrefix(path, "/cash-close"):
+		return ProccessCashClose(body, path, method, userUUID, idn, request) 
 	}
 
 	
@@ -181,4 +184,37 @@ func ProcesoUbicaciones(body string, path string, method string, user string, id
 	}
 	
 	return 400, "Method Invalid"
+}
+
+func ProccessCashClose(body string, path string, method string, user string, id int, request events.APIGatewayV2HTTPRequest) (int, string) {
+	switch {
+		// POST /cash-close - Generate new close
+		case path == "/cash-close" && method == "POST":
+			return routers.GenerateCashClose(body, user)
+
+		// GET /cash-close - List closes
+		case path == "/cash-close" && method == "GET":
+			return routers.GetCashCloses(request)
+		
+		// GET /cash-close/stats - Statistics
+		case path == "/cash-close/stats" && method == "GET":
+			return routers.GetCashCloseStats()
+
+		// GET /cash-close/{id}/pdf - Get specific close PDF
+		case strings.HasPrefix(path, "/cash-close/") && strings.Contains(path, "/pdf") && method == "GET":
+			if id <= 0{
+				return 400, `{"error": "Invalid close ID"}`
+			}
+			return routers.GetCashClosePDFURL(int64(id))
+		
+		// GET /cash-close/{id} - Get specific close
+		case strings.HasPrefix(path, "/cash-close/") && !strings.Contains(path, "/stats") && method == "GET":
+			if id <= 0{
+				return 400, `{"error": "Invalid close ID"}`
+			}
+			return routers.GetCashCloseByID(int64(id))
+		
+		default:
+			return 400, "Method Invalid"
+	}
 }

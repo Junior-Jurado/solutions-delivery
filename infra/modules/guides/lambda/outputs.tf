@@ -4,11 +4,15 @@ output "function_name" {
   description = "Nombre de la función Lambda"
 }
 
-output "lambda_invoke_arn" {
-  value       = aws_lambda_function.this.invoke_arn
-  description = "ARN de invocación de la función Lambda"
+output "lambda_function_arn" {
+  description = "ARN of the PDF Lambda function"
+  value       = aws_lambda_function.this.arn
 }
 
+output "lambda_invoke_arn" {
+  description = "Invoke ARN of the PDF Lambda function"
+  value       = aws_lambda_function.this.invoke_arn
+}
 output "lambda_role_name" {
   value       = aws_iam_role.lambda_create_guides.name
   description = "Nombre del rol IAM asociado a la Lambda"

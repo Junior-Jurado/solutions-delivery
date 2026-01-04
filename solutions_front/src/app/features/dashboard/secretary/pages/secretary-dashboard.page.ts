@@ -8,7 +8,9 @@ import {
     GuideStatus,
     GuideStatsResponse,
     GuidesListResponse,
-    GuideFilters
+    GuideFilters,
+    PaymentMethod,
+    ServiceType
 } from "@core/services/guide.service";
 import { AuthService } from "@core/services/auth.service";
 import { LocationService, City } from "@core/services/location.service";
@@ -16,6 +18,7 @@ import { CitySelectorComponent } from "@shared/components/city-selector.componen
 import { GuideDetailsModalComponent } from "@shared/components/guide-details-modal.component";
 import { CommonModule } from "@angular/common";
 import { ToastService } from "@shared/services/toast.service";
+import { CashClose, CashCloseRequest, CashCloseService, CashCloseStatsResponse, PeriodType } from "@core/services/cash-close.service";
 
 interface DailyStats {
     day: string;
@@ -95,6 +98,40 @@ export class SecretaryDashboardPage implements OnInit {
         { value: 'DELIVERED', label: 'Entregada' }
     ];
 
+    // Cierre de Caja
+    selectedPeriodType: PeriodType = 'DAILY';
+    selectedYear: number = new Date().getFullYear();
+    selectedMonth: number = new Date().getMonth() + 1;
+    selectedDay: number = new Date().getDate();
+    isGeneratingClose: boolean = false;
+    
+    cashCloses: CashClose[] = [];
+    isLoadingCloses: boolean = false;
+    totalCloses: number = 0;
+    currentClosePage: number = 0;
+    closePageSize: number = 10;
+    
+    cashCloseStats: CashCloseStatsResponse | null = null;
+    isLoadingCloseStats: boolean = false;
+
+    // Datos para los selectores
+    years: number[] = [];
+    months: { value: number; label: string }[] = [
+        { value: 1, label: 'Enero' },
+        { value: 2, label: 'Febrero' },
+        { value: 3, label: 'Marzo' },
+        { value: 4, label: 'Abril' },
+        { value: 5, label: 'Mayo' },
+        { value: 6, label: 'Junio' },
+        { value: 7, label: 'Julio' },
+        { value: 8, label: 'Agosto' },
+        { value: 9, label: 'Septiembre' },
+        { value: 10, label: 'Octubre' },
+        { value: 11, label: 'Noviembre' },
+        { value: 12, label: 'Diciembre' }
+    ];
+    days: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
+
     constructor(
         private fb: FormBuilder,
         private router: Router,
@@ -102,9 +139,11 @@ export class SecretaryDashboardPage implements OnInit {
         private authService: AuthService,
         private locationService: LocationService,
         private cdr: ChangeDetectorRef,
+        private cashCloseService: CashCloseService,
         private toast: ToastService
     ){
         this.guideForm = this.initializeForm();
+        this.initializeYears();
     }
 
     ngOnInit(): void {
@@ -112,6 +151,17 @@ export class SecretaryDashboardPage implements OnInit {
         this.loadCities();
         this.loadGuides();
         this.loadStats();
+    }
+
+    /**
+     * Inicializa el array de años (últimos 5 años + próximo año)
+     */
+    private initializeYears(): void {
+        const currentYear = new Date().getFullYear();
+        this.years = [];
+        for (let i = currentYear - 5; i <= currentYear + 1; i++) {
+            this.years.push(i);
+        }
     }
 
     /**
@@ -266,11 +316,13 @@ export class SecretaryDashboardPage implements OnInit {
     setActiveTab(tab: string): void {
         this.activeTab = tab;
         
-        // Cargar datos según el tab
         if (tab === 'manage-guides') {
             this.loadGuides();
         } else if (tab === 'reports') {
             this.loadStats();
+        } else if (tab === 'cash-close') {
+            this.loadCashCloses();
+            this.loadCashCloseStats();
         }
     }
 
@@ -723,5 +775,222 @@ export class SecretaryDashboardPage implements OnInit {
         
         const total = Object.values(this.stats.by_status).reduce((sum, val) => sum + val, 0);
         return total > 0 ? (count / total) * 100 : 0;
+    }
+
+    /**
+     * Traduce el método de pago a español
+     */
+    translatePaymentMethod(method: PaymentMethod): string {
+        return this.guideService.translatePaymentMethod(method);
+    }
+
+    /**
+     * Traduce el tipo de servicio a español
+     */
+    translateServiceType(serviceType: ServiceType): string {
+        return this.guideService.translateServiceType(serviceType);
+    }
+
+    /**
+     * Genera un nuevo cierre de caja
+     */
+    async handleGenerateCashClose(): Promise<void> {
+        if (this.isGeneratingClose) return;
+
+        // Validaciones según el tipo de período
+        if (this.selectedPeriodType === 'DAILY' && (!this.selectedYear || !this.selectedMonth || !this.selectedDay)) {
+            this.toast.error('Por favor seleccione año, mes y día para el cierre diario');
+            return;
+        }
+
+        if (this.selectedPeriodType === 'WEEKLY' && (!this.selectedYear || !this.selectedMonth || !this.selectedDay)) {
+            this.toast.error('Por favor seleccione año, mes y día de inicio para el cierre semanal');
+            return;
+        }
+
+        if (this.selectedPeriodType === 'MONTHLY' && (!this.selectedYear || !this.selectedMonth)) {
+            this.toast.error('Por favor seleccione año y mes para el cierre mensual');
+            return;
+        }
+
+        if (this.selectedPeriodType === 'YEARLY' && !this.selectedYear) {
+            this.toast.error('Por favor seleccione el año para el cierre anual');
+            return;
+        }
+
+        this.isGeneratingClose = true;
+
+        try {
+            const request: CashCloseRequest = {
+                period_type: this.selectedPeriodType,
+                year: Number(this.selectedYear)
+            };
+
+            // Agregar campos según el tipo de período
+            if (this.selectedPeriodType === 'DAILY') {
+                request.month = Number(this.selectedMonth);
+                request.day = Number(this.selectedDay);
+            } else if (this.selectedPeriodType === 'WEEKLY') {
+                // Calcular número de semana del año
+                const weekNumber = this.getWeekNumber(
+                    Number(this.selectedYear),
+                    Number(this.selectedMonth),
+                    Number(this.selectedDay)
+                );
+                request.week = weekNumber;
+            } else if (this.selectedPeriodType === 'MONTHLY') {
+                request.month = Number(this.selectedMonth);
+            }
+            // YEARLY solo necesita year (ya está asignado arriba)
+
+            console.log('Request para cierre:', request);
+
+            const response = await this.cashCloseService.generateCashClose(request);
+
+            this.toast.success(`¡Cierre de caja generado exitosamente!\n\nTotal: $${response.close.total_amount.toLocaleString()}\nGuías: ${response.close.total_guides}`);
+
+            // Descargar PDF automáticamente si está disponible
+            if (response.close.pdf_url) {
+                await this.cashCloseService.downloadCashClosePDF(response.close.close_id);
+            }
+
+            // Recargar la lista de cierres
+            await this.loadCashCloses();
+            await this.loadCashCloseStats();
+
+        } catch (error: any) {
+            console.error('Error al generar cierre:', error);
+            this.toast.error(error.message || 'Error al generar el cierre de caja');
+        } finally {
+            this.isGeneratingClose = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    /**
+     * Calcula el número de semana del año (ISO 8601)
+     * La semana 1 es la primera semana con al menos 4 días en el año
+     */
+    private getWeekNumber(year: number, month: number, day: number): number {
+        const date = new Date(year, month - 1, day);
+        
+        // Copiar la fecha para no modificar la original
+        const tempDate = new Date(date.getTime());
+        
+        // Ajustar al jueves de la semana actual (ISO 8601)
+        // Los jueves siempre están en la semana correcta
+        tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
+        
+        // Obtener el primer día del año
+        const yearStart = new Date(tempDate.getFullYear(), 0, 1);
+        
+        // Calcular el número de semana
+        const weekNumber = Math.ceil((((tempDate.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+        
+        return weekNumber;
+    }
+
+    /**
+     * Carga la lista de cierres de caja
+     */
+    async loadCashCloses(): Promise<void> {
+        this.isLoadingCloses = true;
+        this.cdr.detectChanges();
+
+        try {
+            const response = await this.cashCloseService.listCashCloses(
+                this.closePageSize,
+                this.currentClosePage * this.closePageSize
+            );
+
+            this.cashCloses = response.closes;
+            this.totalCloses = response.total;
+
+            console.log('Cierres de caja cargados:', this.cashCloses.length);
+        } catch (error) {
+            console.error('Error al cargar cierres:', error);
+            this.toast.error('Error al cargar los cierres de caja');
+        } finally {
+            this.isLoadingCloses = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    /**
+     * Carga las estadísticas de cierres
+     */
+    async loadCashCloseStats(): Promise<void> {
+        this.isLoadingCloseStats = true;
+        this.cdr.detectChanges();
+
+        try {
+            this.cashCloseStats = await this.cashCloseService.getCashCloseStats();
+            console.log('Estadísticas de cierres cargadas:', this.cashCloseStats);
+        } catch (error) {
+            console.error('Error al cargar estadísticas de cierres:', error);
+            this.toast.error('Error al cargar las estadísticas');
+        } finally {
+            this.isLoadingCloseStats = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    /**
+     * Descarga el PDF de un cierre
+     */
+    async downloadClosePDF(closeId: number): Promise<void> {
+        try {
+            await this.cashCloseService.downloadCashClosePDF(closeId);
+        } catch (error) {
+            console.error('Error al descargar PDF:', error);
+            this.toast.error('Error al descargar el PDF del cierre');
+        }
+    }
+
+    /**
+     * Traduce el tipo de período
+     */
+    translatePeriodType(periodType: PeriodType): string {
+        return this.cashCloseService.translatePeriodType(periodType);
+    }
+
+    /**
+     * Formatea una fecha de cierre
+     */
+    formatCloseDate(dateString: string): string {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-CO', {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
+
+    /**
+     * Página anterior de cierres
+     */
+    previousClosePage(): void {
+        if (this.currentClosePage > 0) {
+            this.currentClosePage--;
+            this.loadCashCloses();
+        }
+    }
+
+    /**
+     * Página siguiente de cierres
+     */
+    nextClosePage(): void {
+        const totalPages = Math.ceil(this.totalCloses / this.closePageSize);
+        if (this.currentClosePage < totalPages - 1) {
+            this.currentClosePage++;
+            this.loadCashCloses();
+        }
+    }
+
+    /**
+     * Total de páginas de cierres
+     */
+    getTotalClosePages(): number {
+        return Math.ceil(this.totalCloses / this.closePageSize);
     }
 }

@@ -34,3 +34,15 @@ docker push 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-c
 aws lambda update-function-code --function-name guia-app-lambda --image-uri 386452074334.dkr.ecr.us-east-1.amazonaws.com/guia-app-lambda-repo:latest --region us-east-1
 
 docker system prune -a
+
+
+
+# Para Produccion
+docker build --platform linux/amd64 --provenance=false -t solutions-lambda-repo-create_guides-prod:latest .
+
+docker tag solutions-lambda-repo-create_guides-prod:latest 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-create_guides-prod:latest
+
+docker push 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-create_guides-prod:latest
+
+# Actualizar Lambda
+aws lambda update-function-code --function-name solutions-lambda-create-guides-prod --image-uri 386452074334.dkr.ecr.us-east-1.amazonaws.com/solutions-lambda-repo-create_guides-prod:latest --region us-east-1

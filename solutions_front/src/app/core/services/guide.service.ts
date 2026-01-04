@@ -77,8 +77,7 @@ export type GuideStatus =
     | 'DELIVERED';
 
 export type ServiceType = 'NORMAL' | 'PRIORITY' | 'EXPRESS';
-export type PaymentMethod = 'CONTADO' | 'CONTRAENTREGA';
-
+export type PaymentMethod = 'CASH' | 'COD' | 'CREDIT';
 // Interfaces para los modelos de guía
 export interface ShippingGuide {
     guide_id: number;
@@ -418,19 +417,7 @@ export class GuideService {
         }
     }
 
-    /**
-     * Traduce el estado a texto legible en español
-     */
-    translateStatus(status: GuideStatus): string {
-        const translations: Record<GuideStatus, string> = {
-            'CREATED': 'Creada',
-            'IN_ROUTE': 'En ruta',
-            'IN_WAREHOUSE': 'En bodega',
-            'OUT_FOR_DELIVERY': 'En reparto',
-            'DELIVERED': 'Entregada'
-        };
-        return translations[status] || status;
-    }
+    
 
     /**
      * Obtiene la clase CSS para el badge de estado
@@ -444,27 +431,6 @@ export class GuideService {
             'DELIVERED': 'badge-success'
         };
         return classes[status] || 'badge-default';
-    }
-
-    // Métodos privados de utilidad
-    private mapServiceType(serviceType: string): ServiceType {
-        const mapping: Record<string, ServiceType> = {
-            'Contado': 'NORMAL',
-            'Contra Entrega': 'NORMAL',
-            'Crédito': 'NORMAL',
-            'Express': 'PRIORITY',
-            'Urgente': 'EXPRESS'
-        };
-        return mapping[serviceType] || 'NORMAL';
-    }
-
-    private mapPaymentMethod(serviceType: string): PaymentMethod {
-        const mapping: Record<string, PaymentMethod> = {
-            'Contado': 'CONTADO',
-            'Contra Entrega': 'CONTRAENTREGA',
-            'Crédito': 'CONTADO'
-        };
-        return mapping[serviceType] || 'CONTADO';
     }
 
     private parseDimensions(dimensionsStr: string): { length: number; width: number; height: number } {
@@ -524,4 +490,67 @@ export class GuideService {
             'Content-Type': 'application/json'
         });
     }
+
+    /**
+     * Traduce el método de pago a español
+     */
+    translatePaymentMethod(method: PaymentMethod): string {
+        const translations: Record<PaymentMethod, string> = {
+            'CASH': 'Contado',
+            'COD': 'Contraentrega',
+            'CREDIT': 'Crédito'
+        };
+        return translations[method] || method;
+    }
+
+    /**
+     * Traduce el tipo de servicio a español
+     */
+    translateServiceType(serviceType: ServiceType): string {
+        const translations: Record<ServiceType, string> = {
+            'NORMAL': 'Normal',
+            'PRIORITY': 'Prioritario',
+            'EXPRESS': 'Express'
+        };
+        return translations[serviceType] || serviceType;
+    }
+
+    /**
+     * Traduce el estado a texto legible en español
+     */
+    translateStatus(status: GuideStatus): string {
+        const translations: Record<GuideStatus, string> = {
+            'CREATED': 'Creada',
+            'IN_ROUTE': 'En ruta',
+            'IN_WAREHOUSE': 'En bodega',
+            'OUT_FOR_DELIVERY': 'En reparto',
+            'DELIVERED': 'Entregada'
+        };
+        return translations[status] || status;
+    }
+
+    // Métodos privados de utilidad - ACTUALIZADOS para enviar en inglés
+    private mapServiceType(serviceType: string): ServiceType {
+        // Ahora estos mapeos son solo internos del frontend
+        // El backend espera los valores en inglés
+        const mapping: Record<string, ServiceType> = {
+            'Contado': 'NORMAL',
+            'Contra Entrega': 'NORMAL',
+            'Crédito': 'NORMAL',
+            'Express': 'PRIORITY',
+            'Urgente': 'EXPRESS'
+        };
+        return mapping[serviceType] || 'NORMAL';
+    }
+
+    private mapPaymentMethod(serviceType: string): PaymentMethod {
+        // Mapeamos lo que el usuario selecciona a los valores en inglés
+        const mapping: Record<string, PaymentMethod> = {
+            'Contado': 'CASH',
+            'Contra Entrega': 'COD',
+            'Crédito': 'CREDIT'
+        };
+        return mapping[serviceType] || 'CASH';
+    }
+    
 }

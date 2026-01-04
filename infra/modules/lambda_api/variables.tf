@@ -22,3 +22,11 @@ variable "environment" {
 variable "s3_bucket_name" {
   type = string
 }
+
+variable "pdf_lambda_function_name" {
+  type = string
+}
+
+variable "pdf_lambda_arn" {
+  type = string
+}

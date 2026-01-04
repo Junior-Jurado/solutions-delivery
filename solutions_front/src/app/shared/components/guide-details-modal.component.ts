@@ -1,6 +1,8 @@
+// guide-details-modal.component.ts
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ShippingGuide } from '@core/services/guide.service';
+import { TranslationService } from '@shared/services/translation.service';
 
 @Component({
   selector: 'app-guide-details-modal',
@@ -29,8 +31,8 @@ import { ShippingGuide } from '@core/services/guide.service';
           <!-- Estado -->
           <div class="detail-section">
             <div class="section-title">Estado Actual</div>
-            <span class="badge-large" [ngClass]="getStatusClass(guide.current_status)">
-              {{ translateStatus(guide.current_status) }}
+            <span class="badge-large" [ngClass]="translation.getStatusBadgeClass(guide.current_status)">
+              {{ translation.translateGuideStatus(guide.current_status) }}
             </span>
             <div class="detail-date">Creada: {{ formatDate(guide.created_at) }}</div>
           </div>
@@ -51,7 +53,7 @@ import { ShippingGuide } from '@core/services/guide.service';
               </div>
               <div class="detail-item">
                 <span class="label">Documento:</span>
-                <span class="value">{{ guide.sender?.document_type || '' }} {{ guide.sender?.document_number || 'N/A' }}</span>
+                <span class="value">{{ translation.translateDocumentType(guide.sender?.document_type || '') }} {{ guide.sender?.document_number || 'N/A' }}</span>
               </div>
               <div class="detail-item">
                 <span class="label">Teléfono:</span>
@@ -88,7 +90,7 @@ import { ShippingGuide } from '@core/services/guide.service';
               </div>
               <div class="detail-item">
                 <span class="label">Documento:</span>
-                <span class="value">{{ guide.receiver?.document_type || '' }} {{ guide.receiver?.document_number || 'N/A' }}</span>
+                <span class="value">{{ translation.translateDocumentType(guide.receiver?.document_type || '') }} {{ guide.receiver?.document_number || 'N/A' }}</span>
               </div>
               <div class="detail-item">
                 <span class="label">Teléfono:</span>
@@ -158,11 +160,13 @@ import { ShippingGuide } from '@core/services/guide.service';
             <div class="detail-grid">
               <div class="detail-item">
                 <span class="label">Tipo de servicio:</span>
-                <span class="value">{{ guide.service_type }}</span>
+                <span class="value">{{ translation.translateServiceType(guide.service_type) }}</span>
               </div>
               <div class="detail-item">
                 <span class="label">Método de pago:</span>
-                <span class="value">{{ guide.payment_method }}</span>
+                <span class="badge" [ngClass]="translation.getPaymentMethodBadgeClass(guide.payment_method)">
+                  {{ translation.translatePaymentMethod(guide.payment_method) }}
+                </span>
               </div>
               <div class="detail-item">
                 <span class="label">Valor declarado:</span>
@@ -188,7 +192,7 @@ import { ShippingGuide } from '@core/services/guide.service';
               <div *ngFor="let item of guide.history" class="history-item">
                 <div class="history-dot"></div>
                 <div class="history-content">
-                  <div class="history-status">{{ translateStatus(item.status) }}</div>
+                  <div class="history-status">{{ translation.translateGuideStatus(item.status) }}</div>
                   <div class="history-date">{{ formatDate(item.updated_at) }}</div>
                 </div>
               </div>
@@ -331,29 +335,47 @@ import { ShippingGuide } from '@core/services/guide.service';
       margin-bottom: 8px;
     }
 
-    .badge-large.badge-created {
+    .badge-large.badge-default {
       background: #dbeafe;
       color: #1e40af;
     }
 
-    .badge-large.badge-in-route {
+    .badge-large.badge-secondary {
       background: #fef3c7;
       color: #92400e;
     }
 
-    .badge-large.badge-in-warehouse {
+    .badge-large.badge-warning {
       background: #e0e7ff;
       color: #3730a3;
     }
 
-    .badge-large.badge-out-for-delivery {
-      background: #fce7f3;
-      color: #831843;
-    }
-
-    .badge-large.badge-delivered {
+    .badge-large.badge-success {
       background: #dcfce7;
       color: #166534;
+    }
+
+    .badge {
+      display: inline-flex;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .badge.badge-success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .badge.badge-warning {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .badge.badge-info {
+      background: #dbeafe;
+      color: #1e40af;
     }
 
     .detail-date {
@@ -529,6 +551,8 @@ export class GuideDetailsModalComponent {
   @Output() closeModal = new EventEmitter<void>();
   @Output() downloadPDFEvent = new EventEmitter<number>();
 
+  constructor(public translation: TranslationService) {}
+
   close(): void {
     this.closeModal.emit();
   }
@@ -537,28 +561,6 @@ export class GuideDetailsModalComponent {
     if (this.guide) {
       this.downloadPDFEvent.emit(this.guide.guide_id);
     }
-  }
-
-  getStatusClass(status: string): string {
-    const statusMap: { [key: string]: string } = {
-      'CREATED': 'badge-created',
-      'IN_ROUTE': 'badge-in-route',
-      'IN_WAREHOUSE': 'badge-in-warehouse',
-      'OUT_FOR_DELIVERY': 'badge-out-for-delivery',
-      'DELIVERED': 'badge-delivered'
-    };
-    return statusMap[status] || 'badge-created';
-  }
-
-  translateStatus(status: string): string {
-    const translations: { [key: string]: string } = {
-      'CREATED': 'Creada',
-      'IN_ROUTE': 'En ruta',
-      'IN_WAREHOUSE': 'En bodega',
-      'OUT_FOR_DELIVERY': 'En reparto',
-      'DELIVERED': 'Entregada'
-    };
-    return translations[status] || status;
   }
 
   formatDate(dateString: string): string {

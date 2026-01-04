@@ -1,6 +1,7 @@
 package bd
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -12,8 +13,8 @@ import (
 )
 
 var (
-	s3Client      *s3.Client
-	s3BucketName  string
+	s3Client     *s3.Client
+	s3BucketName string
 )
 
 // InitS3Client inicializa el cliente de S3 UNA SOLA VEZ
@@ -34,6 +35,11 @@ func InitS3Client(bucketName string) error {
 	return nil
 }
 
+// GetS3BucketName retorna el nombre del bucket configurado
+func GetS3BucketName() string {
+	return s3BucketName
+}
+
 // GetPresignedURL genera una URL pre-firmada para descargar un archivo de S3
 func GetPresignedURL(s3Key string, expirationMinutes int) (string, error) {
 	fmt.Printf("GetPresignedURL -> Bucket: %s, Key: %s, Expiration: %d min\n", s3BucketName, s3Key, expirationMinutes)
@@ -50,7 +56,7 @@ func GetPresignedURL(s3Key string, expirationMinutes int) (string, error) {
 	presignClient := s3.NewPresignClient(s3Client)
 
 	ctx := context.Background()
-	
+
 	result, err := presignClient.PresignGetObject(
 		ctx,
 		&s3.GetObjectInput{
@@ -111,6 +117,38 @@ func DownloadFileFromS3(s3Key string) ([]byte, string, error) {
 	fmt.Printf("Archivo descargado exitosamente, tamaño: %d bytes, tipo: %s\n", len(data), contentType)
 
 	return data, contentType, nil
+}
+
+// UploadFileToS3 sube un archivo a S3
+func UploadFileToS3(s3Key string, data []byte, contentType string) error {
+	fmt.Printf("UploadFileToS3 -> Bucket: %s, Key: %s, Size: %d bytes\n", s3BucketName, s3Key, len(data))
+
+	if s3Client == nil {
+		return fmt.Errorf("cliente S3 no inicializado")
+	}
+
+	if s3Key == "" {
+		return fmt.Errorf("s3Key vacío")
+	}
+
+	ctx := context.Background()
+
+	_, err := s3Client.PutObject(
+		ctx,
+		&s3.PutObjectInput{
+			Bucket:      aws.String(s3BucketName),
+			Key:         aws.String(s3Key),
+			Body:        bytes.NewReader(data),
+			ContentType: aws.String(contentType),
+		},
+	)
+
+	if err != nil {
+		return fmt.Errorf("error al subir archivo a S3: %v", err)
+	}
+
+	fmt.Printf("Archivo subido exitosamente a S3: %s\n", s3Key)
+	return nil
 }
 
 func min(a, b int) int {

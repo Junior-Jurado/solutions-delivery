@@ -41,8 +41,10 @@ func ConnStr(claves models.SecretRDSJson) string {
 	authToken = claves.Password
 	dbEndpoint = claves.Host
 	dbName = claves.DBName
+	
+	// CAMBIO IMPORTANTE: Agregar zona horaria de Colombia
 	return fmt.Sprintf(
-		"%s:%s@tcp(%s)/%s?allowCleartextPasswords=true&parseTime=true&loc=Local",
+		"%s:%s@tcp(%s)/%s?allowCleartextPasswords=true&parseTime=true&loc=America%%2FBogota",
 		dbUser, authToken, dbEndpoint, dbName,
 	)	
 }

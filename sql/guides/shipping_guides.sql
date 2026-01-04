@@ -5,7 +5,7 @@ CREATE TABLE shipping_guides (
      Información del servicio
   --------------------------------- */
   service_type ENUM('NORMAL','PRIORITY','EXPRESS') NOT NULL,
-  payment_method ENUM('CONTADO','CONTRAENTREGA') DEFAULT 'CONTADO',
+  payment_method ENUM('CASH','COD','CREDIT') DEFAULT 'CASH',
 
   /* ---------------------------------
      Información financiera

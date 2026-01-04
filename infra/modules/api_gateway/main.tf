@@ -175,3 +175,56 @@ resource "aws_apigatewayv2_route" "guides_status" {
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
+
+# -----------------------------------------
+# Cash Closes
+
+# POST /api/v1/cash-close - Generar cierre
+resource "aws_apigatewayv2_route" "cash_close_create" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "POST /api/v1/cash-close"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# GET /api/v1/cash-close - Listar cierres
+resource "aws_apigatewayv2_route" "cash_close_list" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/cash-close"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# GET /api/v1/cash-close/stats - Estadísticas
+resource "aws_apigatewayv2_route" "cash_close_stats" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/cash-close/stats"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# GET /api/v1/cash-close/{id} - Ver cierre específico
+resource "aws_apigatewayv2_route" "cash_close_by_id" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/cash-close/{id}"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# GET /api/v1/cash-close/{id}/pdf - Obtener PDF
+resource "aws_apigatewayv2_route" "cash_close_pdf" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/cash-close/{id}/pdf"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}

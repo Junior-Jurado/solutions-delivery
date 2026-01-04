@@ -23,6 +23,7 @@ resource "aws_s3_bucket_cors_configuration" "pdfs" {
 resource "aws_s3_bucket_lifecycle_configuration" "this" {
   bucket = aws_s3_bucket.pdfs.id
 
+  # regla para archivar guias PDFs
   rule {
     id     = "archive-old-pdfs"
     status = "Enabled"
@@ -36,32 +37,25 @@ resource "aws_s3_bucket_lifecycle_configuration" "this" {
       storage_class = "GLACIER"
     }
   }
+
+  # Regla para cierre de caja PDFs
+  rule {
+    id     = "archive-cash-closes"
+    status = "Enabled"
+    filter {
+      prefix = "cash-closes/"
+    }
+
+    transition {
+      days          = 180 # 6 meses antes de archivar
+      storage_class = "GLACIER"
+    }
+
+    expiration {
+      days = 2555 # 7 años (retención legal contable en Colombia)
+    }
+  }
 }
-
-# resource "aws_s3_bucket_public_access_block" "this" {
-#   bucket = aws_s3_bucket.pdfs.id
-
-#   block_public_acls       = false
-#   block_public_policy     = false
-#   ignore_public_acls      = false
-#   restrict_public_buckets = false
-# }
-
-
-# resource "aws_s3_bucket_policy" "public_pdf" {
-#   bucket = aws_s3_bucket.pdfs.id
-#   policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#       {
-#         Effect = "Allow",
-#         Principal = "*",
-#         Action = ["s3:GetObject"],
-#         Resource = "arn:aws:s3:::${aws_s3_bucket.pdfs.id}/*"
-#       }
-#     ]
-#   })
-# }
 
 resource "aws_iam_policy" "lambda_s3_put" {
   name        = "${var.name_prefix}-lambda-s3-policy"

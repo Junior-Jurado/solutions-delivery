@@ -351,12 +351,7 @@ export class AuthComponent {
             }
 
             const targetRoute = roleRouteMap[role] ?? '';
-            // Pequeño delay para que el usuario vea el mensaje
-            setTimeout(() => {
-                this.ngZone.run(() => {
-                    this.router.navigate(['/dashboard', targetRoute]);
-                });
-            }, 500);
+            this.router.navigate(['/dashboard', targetRoute]);
 
         } catch (error: any) {
             console.error('Error en login:', error);
