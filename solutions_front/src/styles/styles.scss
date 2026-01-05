@@ -1,13 +1,39 @@
+// ===============================
+// IMPORT GLOBAL STYLES
+// ===============================
+@use "colors";
+@use "variables";
+@use "mixins";
+@use "buttons";
+
+// ===============================
+// GLOBAL RESETS
+// ===============================
 html, body {
-  margin: 0 !important;
-  padding: 0 !important;
-  width: 100%;
+  margin: 0;
+  padding: 0;
   height: 100%;
+  font-family: variables.$font-primary;
+  color: colors.$text-primary;
+  background-color: colors.$bg-secondary;
 }
 
-/* styles.scss (global) */
-*,
-*::before,
-*::after {
+* {
   box-sizing: border-box;
+}
+
+// ===============================
+// UTILITY CLASSES
+// ===============================
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

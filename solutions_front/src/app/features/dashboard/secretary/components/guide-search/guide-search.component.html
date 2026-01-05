@@ -1,0 +1,146 @@
+<!-- Search Form -->
+<div class="search-form-container">
+  <form (ngSubmit)="onSearch()" class="search-form">
+    <input 
+      type="text" 
+      placeholder="Número de guía, nombre del cliente o ciudad..." 
+      [(ngModel)]="searchQuery"
+      name="searchQuery"
+      class="search-input"
+      [disabled]="isSearching"
+      (keyup.enter)="onSearch()">
+    <button 
+      type="submit" 
+      class="btn btn-primary btn-large"
+      [disabled]="isSearching || !isSearchValid()">
+      <svg 
+        *ngIf="!isSearching" 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="20" 
+        height="20" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.35-4.35"></path>
+      </svg>
+      <svg 
+        *ngIf="isSearching" 
+        class="spinner" 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="20" 
+        height="20" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round">
+        <line x1="12" y1="2" x2="12" y2="6"></line>
+        <line x1="12" y1="18" x2="12" y2="22"></line>
+        <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+        <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+        <line x1="2" y1="12" x2="6" y2="12"></line>
+        <line x1="18" y1="12" x2="22" y2="12"></line>
+        <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+        <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+      </svg>
+      {{ isSearching ? 'Buscando...' : 'Buscar' }}
+    </button>
+  </form>
+
+  <div *ngIf="searchQuery.length > 0 && searchQuery.length < 3" class="search-hint">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+    <span>Ingresa al menos 3 caracteres para buscar</span>
+  </div>
+</div>
+
+<!-- Search Results -->
+<div *ngIf="searchResults.length > 0" class="search-results">
+  <div *ngFor="let guide of searchResults" class="search-result">
+    <!-- Header -->
+    <div class="result-header">
+      <div class="result-id">Guía #{{ guide.guide_id }}</div>
+      <span class="badge" [ngClass]="getStatusBadgeClass(guide.current_status)">
+        {{ translateStatus(guide.current_status) }}
+      </span>
+    </div>
+
+    <!-- Details -->
+    <div class="result-details">
+      <div class="detail-item">
+        <strong>Remitente:</strong> 
+        <span>{{ guide.sender?.full_name || 'N/A' }}</span>
+      </div>
+      <div class="detail-item">
+        <strong>Destinatario:</strong> 
+        <span>{{ guide.receiver?.full_name || 'N/A' }}</span>
+      </div>
+      <div class="detail-item">
+        <strong>Origen:</strong> 
+        <span>{{ guide.origin_city_name }}</span>
+      </div>
+      <div class="detail-item">
+        <strong>Destino:</strong> 
+        <span>{{ guide.destination_city_name }}</span>
+      </div>
+      <div class="detail-item">
+        <strong>Creada:</strong> 
+        <span>{{ formatDate(guide.created_at) }}</span>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="result-history" *ngIf="guide.history && guide.history.length > 0">
+      <div class="history-title">Historial de estados:</div>
+      <div class="history-items">
+        <div *ngFor="let item of guide.history" class="history-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <span>{{ translateStatus(item.status) }} - {{ formatDate(item.updated_at) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="result-actions">
+      <button class="btn btn-outline" (click)="onViewDetails(guide.guide_id)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        Ver Detalles Completos
+      </button>
+      <button 
+        *ngIf="hasPDF(guide)" 
+        class="btn btn-primary"
+        (click)="onDownloadPDF(guide.guide_id)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        Descargar PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div *ngIf="!isSearching && searchResults.length === 0 && searchQuery.length >= 3" class="empty-results">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="11" cy="11" r="8"></circle>
+    <path d="m21 21-4.35-4.35"></path>
+  </svg>
+  <h3>No se encontraron resultados</h3>
+  <p>No hay guías que coincidan con "{{ searchQuery }}"</p>
+  <p class="hint">Intenta buscar por número de guía, nombre del cliente o ciudad</p>
+</div>

@@ -1,5 +1,5 @@
 // ===============================
-// Brand Colors
+// PRIMARY BRAND COLORS
 // ===============================
 $brand-blue: #3b82f6;
 $brand-blue-dark: #2563eb;
@@ -14,9 +14,11 @@ $brand-black-dark: #0f172a;
 $brand-black-light: #334155;
 
 // ===============================
-// Neutral Colors
+// NEUTRAL COLORS (Grays)
 // ===============================
 $white: #ffffff;
+$black: #000000;
+
 $gray-50: #f9fafb;
 $gray-100: #f3f4f6;
 $gray-200: #e5e7eb;
@@ -29,35 +31,68 @@ $gray-800: #1f2937;
 $gray-900: #111827;
 
 // ===============================
-// Semantic Colors
+// SEMANTIC COLORS
 // ===============================
 $success-color: #16a34a;
+$success-dark: #15803d;
 $success-light: #dcfce7;
+
 $warning-color: #ca8a04;
+$warning-dark: #a16207;
 $warning-light: #fef3c7;
+
 $error-color: #dc2626;
+$error-dark: #b91c1c;
 $error-light: #fee2e2;
+
 $info-color: #0284c7;
+$info-dark: #0369a1;
 $info-light: #e0f2fe;
 
 // ===============================
-// UI Colors (Aliases)
+// UI COMPONENT COLORS (Aliases)
 // ===============================
 $border-color: $gray-200;
+$border-color-light: $gray-100;
+$border-color-dark: $gray-300;
+
 $text-primary: $brand-black;
 $text-secondary: $gray-700;
 $text-muted: $gray-500;
+$text-disabled: $gray-400;
+$text-inverse: $white;
+
 $bg-primary: $white;
 $bg-secondary: $gray-50;
 $bg-light: $gray-100;
+$bg-dark: $gray-800;
+$bg-overlay: rgba(0, 0, 0, 0.5);
+
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 
 // ===============================
-// Export for use
+// STATUS BADGE COLORS
 // ===============================
-:export {
-  brandBlue: $brand-blue;
-  brandRed: $brand-red;
-  brandBlack: $brand-black;
-  successColor: $success-color;
-  warningColor: $warning-color;
-}
+$badge-created-bg: #e0e7ff;
+$badge-created-text: #4f46e5;
+
+$badge-in-route-bg: #dbeafe;
+$badge-in-route-text: #1e40af;
+
+$badge-in-warehouse-bg: #fef3c7;
+$badge-in-warehouse-text: #ca8a04;
+
+$badge-out-delivery-bg: #fef08a;
+$badge-out-delivery-text: #a16207;
+
+$badge-delivered-bg: #dcfce7;
+$badge-delivered-text: #16a34a;
+
+$badge-cancelled-bg: #fee2e2;
+$badge-cancelled-text: #dc2626;
+
+// NO INCLUIR :export aquí - solo si necesitas los colores en TypeScript

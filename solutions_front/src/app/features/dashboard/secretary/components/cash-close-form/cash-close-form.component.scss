@@ -1,0 +1,170 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+// ===============================
+// CASH CLOSE FORM
+// ===============================
+.cash-close-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: $spacing-md;
+
+    @include respond-to($breakpoint-sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    label {
+      font-size: $font-sm;
+      font-weight: $font-medium;
+      color: $text-secondary;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-xs;
+      }
+    }
+
+    .form-select {
+      padding: 0.75rem;
+      border: 1px solid $border-color;
+      border-radius: $radius-md;
+      font-size: $font-sm;
+      color: $text-primary;
+      background-color: $white;
+      cursor: pointer;
+      transition: all $transition-base;
+
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+      background-position: right 0.75rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 2.5rem;
+      appearance: none;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-xs;
+        padding: 0.625rem;
+      }
+
+      &:hover:not(:disabled) {
+        border-color: $brand-blue;
+      }
+
+      &:focus {
+        @include input-focus;
+      }
+
+      &:disabled {
+        background-color: $bg-light;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+  }
+}
+
+// ===============================
+// PERIOD INFO
+// ===============================
+.period-info {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: linear-gradient(135deg, $info-light 0%, rgba($info-color, 0.05) 100%);
+  border: 1px solid $info-color;
+  border-left: 4px solid $info-color;
+  border-radius: $radius-md;
+  animation: slideIn 0.3s ease-out;
+
+  @include respond-to($breakpoint-xs) {
+    padding: $spacing-sm;
+    gap: $spacing-sm;
+  }
+
+  .info-icon {
+    flex-shrink: 0;
+    color: $info-color;
+
+    svg {
+      display: block;
+    }
+  }
+
+  .info-text {
+    font-size: $font-sm;
+    color: $info-color;
+    line-height: 1.6;
+    font-weight: $font-medium;
+
+    @include respond-to($breakpoint-xs) {
+      font-size: $font-xs;
+    }
+
+    strong {
+      font-weight: $font-bold;
+      color: darken($info-color, 10%);
+    }
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ===============================
+// BUTTON STYLES
+// ===============================
+.btn-large {
+  width: 100%;
+  margin-top: $spacing-md;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ===============================
+// RESPONSIVE ADJUSTMENTS
+// ===============================
+@media (max-width: $breakpoint-sm) {
+  .cash-close-form {
+    gap: $spacing-md;
+
+    .form-row {
+      gap: $spacing-sm;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-xs) {
+  .cash-close-form {
+    gap: $spacing-sm;
+  }
+}

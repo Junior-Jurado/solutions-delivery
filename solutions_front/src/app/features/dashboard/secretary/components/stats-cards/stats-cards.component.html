@@ -1,0 +1,31 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="stats-loading">
+  <div class="loading-card" *ngFor="let item of [1, 2, 3]">
+    <div class="loading-shimmer"></div>
+  </div>
+</div>
+
+<!-- Stats Cards -->
+<div *ngIf="!isLoading" class="stats-grid">
+  <div *ngFor="let card of getStatCards()" class="stat-card" [attr.data-type]="card.type">
+    <div class="stat-header">
+      <svg 
+        xmlns="http://www.w3.org/2000/svg" 
+        width="20" 
+        height="20" 
+        viewBox="0 0 24 24" 
+        fill="none" 
+        stroke="currentColor" 
+        stroke-width="2" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        [innerHTML]="getIconSVG(card.icon)">
+      </svg>
+      <h3>{{ card.title }}</h3>
+    </div>
+    <div [ngClass]="getValueClass(card.type)">
+      {{ card.value | number }}
+    </div>
+    <div class="stat-label">{{ card.label }}</div>
+  </div>
+</div>

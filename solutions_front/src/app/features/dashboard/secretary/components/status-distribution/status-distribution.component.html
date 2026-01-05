@@ -1,0 +1,50 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="spinner"></div>
+  <p>Cargando distribución...</p>
+</div>
+
+<!-- Empty State -->
+<div *ngIf="!isLoading && !hasData()" class="empty-state">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="12" y1="20" x2="12" y2="10"></line>
+    <line x1="18" y1="20" x2="18" y2="4"></line>
+    <line x1="6" y1="20" x2="6" y2="16"></line>
+  </svg>
+  <h3>No hay datos disponibles</h3>
+  <p>Aún no hay guías registradas para mostrar la distribución</p>
+</div>
+
+<!-- Status Distribution -->
+<div *ngIf="!isLoading && hasData()" class="status-distribution">
+  <div *ngFor="let status of availableStatuses" class="status-item">
+    <div class="status-header">
+      <span class="badge" [ngClass]="getStatusBadgeClass(status.value)">
+        {{ status.label }}
+      </span>
+      <div class="status-stats">
+        <span class="status-count">{{ getStatusCount(status.value) }}</span>
+        <span class="status-percentage">({{ calculatePercentage(getStatusCount(status.value)) | number:'1.0-1' }}%)</span>
+      </div>
+    </div>
+    
+    <div class="status-bar">
+      <div 
+        class="status-fill" 
+        [ngClass]="getStatusBadgeClass(status.value)"
+        [style.width.%]="calculatePercentage(getStatusCount(status.value))">
+        <span class="fill-label" *ngIf="calculatePercentage(getStatusCount(status.value)) > 5">
+          {{ getStatusCount(status.value) }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Summary -->
+<div *ngIf="!isLoading && hasData()" class="distribution-summary">
+  <div class="summary-item">
+    <span class="summary-label">Total de guías:</span>
+    <span class="summary-value">{{ getTotalGuides() | number }}</span>
+  </div>
+</div>

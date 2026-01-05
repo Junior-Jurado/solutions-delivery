@@ -1,0 +1,326 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+// ===============================
+// LOADING STATE
+// ===============================
+.loading-container {
+  @include flex-center;
+  flex-direction: column;
+  padding: $spacing-3xl;
+  gap: $spacing-md;
+
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid $gray-200;
+    border-top-color: $brand-blue;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  p {
+    color: $text-muted;
+    font-size: $font-sm;
+  }
+}
+
+@keyframes spin {
+  to { 
+    transform: rotate(360deg); 
+  }
+}
+
+// ===============================
+// EMPTY STATE
+// ===============================
+.empty-state {
+  text-align: center;
+  padding: $spacing-3xl;
+  color: $text-muted;
+
+  svg {
+    color: $gray-300;
+    margin-bottom: $spacing-md;
+  }
+
+  h3 {
+    font-size: $font-lg;
+    font-weight: $font-semibold;
+    color: $text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  p {
+    font-size: $font-sm;
+  }
+}
+
+// ===============================
+// STATS GRID
+// ===============================
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  @include respond-to($breakpoint-lg) {
+    gap: $spacing-md;
+  }
+
+  @include respond-to($breakpoint-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ===============================
+// STAT CARD
+// ===============================
+.stat-card {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  transition: all $transition-base;
+  position: relative;
+  overflow: hidden;
+
+  @include respond-to($breakpoint-md) {
+    padding: $spacing-md;
+  }
+
+  @include respond-to($breakpoint-xs) {
+    padding: $spacing-md;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    transition: all $transition-base;
+  }
+
+  &.today::before {
+    background: linear-gradient(90deg, $brand-blue 0%, lighten($brand-blue, 15%) 100%);
+  }
+
+  &.month::before {
+    background: linear-gradient(90deg, $success-color 0%, lighten($success-color, 15%) 100%);
+  }
+
+  &.year::before {
+    background: linear-gradient(90deg, $warning-color 0%, lighten($warning-color, 15%) 100%);
+  }
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+    border-color: transparent;
+
+    .stat-icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+  }
+
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-lg;
+    @include flex-center;
+    margin-bottom: $spacing-md;
+    transition: transform $transition-base;
+
+    @include respond-to($breakpoint-xs) {
+      width: 48px;
+      height: 48px;
+    }
+
+    svg {
+      color: $white;
+    }
+  }
+
+  &.today .stat-icon {
+    background: linear-gradient(135deg, $brand-blue 0%, lighten($brand-blue, 10%) 100%);
+    box-shadow: 0 4px 12px rgba($brand-blue, 0.3);
+  }
+
+  &.month .stat-icon {
+    background: linear-gradient(135deg, $success-color 0%, lighten($success-color, 10%) 100%);
+    box-shadow: 0 4px 12px rgba($success-color, 0.3);
+  }
+
+  &.year .stat-icon {
+    background: linear-gradient(135deg, $warning-color 0%, lighten($warning-color, 10%) 100%);
+    box-shadow: 0 4px 12px rgba($warning-color, 0.3);
+  }
+
+  .stat-content {
+    .stat-header {
+      @include flex-between;
+      margin-bottom: $spacing-sm;
+      flex-wrap: wrap;
+      gap: $spacing-xs;
+
+      .stat-title {
+        font-size: $font-base;
+        font-weight: $font-semibold;
+        color: $text-secondary;
+        margin: 0;
+
+        @include respond-to($breakpoint-xs) {
+          font-size: $font-sm;
+        }
+      }
+
+      .stat-badge {
+        font-size: $font-xs;
+        padding: 0.25rem $spacing-sm;
+        border-radius: $radius-full;
+        font-weight: $font-medium;
+        white-space: nowrap;
+      }
+    }
+
+    &.today .stat-badge {
+      background: rgba($brand-blue, 0.1);
+      color: $brand-blue;
+    }
+
+    &.month .stat-badge {
+      background: rgba($success-color, 0.1);
+      color: $success-color;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: $font-bold;
+      margin-bottom: $spacing-xs;
+      line-height: 1.2;
+
+      @include respond-to($breakpoint-lg) {
+        font-size: 1.75rem;
+      }
+
+      @include respond-to($breakpoint-xs) {
+        font-size: 1.5rem;
+      }
+    }
+
+    .stat-label {
+      font-size: $font-sm;
+      color: $text-muted;
+      margin-bottom: $spacing-md;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-xs;
+      }
+    }
+
+    .stat-progress {
+      margin-top: $spacing-md;
+
+      .progress-bar {
+        height: 6px;
+        background: $bg-light;
+        border-radius: $radius-full;
+        overflow: hidden;
+        position: relative;
+
+        .progress-fill {
+          height: 100%;
+          border-radius: $radius-full;
+          transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+          animation: fillProgress 0.8s ease-out;
+
+          &.today-fill {
+            background: linear-gradient(90deg, $brand-blue 0%, lighten($brand-blue, 10%) 100%);
+          }
+
+          &.month-fill {
+            background: linear-gradient(90deg, $success-color 0%, lighten($success-color, 10%) 100%);
+          }
+        }
+      }
+    }
+
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      margin-top: $spacing-md;
+      font-size: $font-xs;
+      color: $text-muted;
+
+      svg {
+        color: $warning-color;
+      }
+    }
+  }
+
+  &.today .stat-value {
+    color: $brand-blue;
+  }
+
+  &.month .stat-value {
+    color: $success-color;
+  }
+
+  &.year .stat-value {
+    color: $warning-color;
+  }
+}
+
+@keyframes fillProgress {
+  from {
+    width: 0;
+  }
+}
+
+// ===============================
+// RESPONSIVE ADJUSTMENTS
+// ===============================
+@media (max-width: $breakpoint-md) {
+  .stats-grid {
+    gap: $spacing-md;
+  }
+
+  .stat-card {
+    .stat-content {
+      .stat-value {
+        font-size: 1.75rem;
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-xs) {
+  .stats-grid {
+    gap: $spacing-sm;
+  }
+
+  .stat-card {
+    padding: $spacing-md;
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: $spacing-sm;
+    }
+
+    .stat-content {
+      .stat-value {
+        font-size: 1.5rem;
+      }
+
+      .stat-label {
+        font-size: $font-xs;
+      }
+    }
+  }
+}

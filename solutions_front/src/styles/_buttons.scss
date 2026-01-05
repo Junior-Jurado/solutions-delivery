@@ -1,0 +1,73 @@
+@use "colors" as *;
+@use "variables" as *;
+
+.btn {
+  padding: 0.625rem 1.25rem;
+  border-radius: $radius-base;
+  font-size: $font-sm;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+
+  @media (max-width: 480px) {
+    padding: 0.5rem 1rem;
+    font-size: $font-xs;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &.btn-primary {
+    background: $brand-blue;
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: $brand-blue-dark;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &.btn-outline {
+    background: $white;
+    border-color: $border-color;
+    color: $text-primary;
+
+    &:hover {
+      background: $bg-light;
+      border-color: $brand-blue;
+      color: $brand-blue;
+    }
+  }
+
+  &.btn-large {
+    width: 100%;
+    padding: 0.875rem;
+    font-size: $font-base;
+
+    @media (max-width: 480px) {
+      padding: 0.75rem;
+      font-size: $font-sm;
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    
+    &:hover {
+      background: inherit;
+      border-color: inherit;
+      color: inherit;
+    }
+  }
+}

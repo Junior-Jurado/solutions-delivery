@@ -1,0 +1,238 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+// ===============================
+// STATS GRID
+// ===============================
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  @include respond-to($breakpoint-lg) {
+    gap: $spacing-md;
+  }
+
+  @include respond-to($breakpoint-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ===============================
+// STAT CARD
+// ===============================
+.stat-card {
+  background: $bg-primary;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: $spacing-lg;
+  transition: all $transition-base;
+  position: relative;
+  overflow: hidden;
+
+  @include respond-to($breakpoint-md) {
+    padding: $spacing-md;
+  }
+
+  @include respond-to($breakpoint-xs) {
+    padding: $spacing-md;
+  }
+
+  // Borde superior de color según tipo
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: $brand-blue;
+    transition: height $transition-base;
+  }
+
+  &[data-type="primary"]::before {
+    background: $brand-blue;
+  }
+
+  &[data-type="success"]::before {
+    background: $success-color;
+  }
+
+  &[data-type="warning"]::before {
+    background: $warning-color;
+  }
+
+  &[data-type="info"]::before {
+    background: $info-color;
+  }
+
+  &:hover {
+    box-shadow: $shadow-md;
+    transform: translateY(-2px);
+
+    &::before {
+      height: 6px;
+    }
+  }
+
+  .stat-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+
+    svg {
+      color: $brand-blue;
+      flex-shrink: 0;
+      transition: transform $transition-base;
+    }
+
+    h3 {
+      font-size: $font-base;
+      font-weight: $font-semibold;
+      color: $text-secondary;
+      margin: 0;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-sm;
+      }
+    }
+  }
+
+  &[data-type="primary"] .stat-header svg {
+    color: $brand-blue;
+  }
+
+  &[data-type="success"] .stat-header svg {
+    color: $success-color;
+  }
+
+  &[data-type="warning"] .stat-header svg {
+    color: $warning-color;
+  }
+
+  &[data-type="info"] .stat-header svg {
+    color: $info-color;
+  }
+
+  &:hover .stat-header svg {
+    transform: scale(1.1);
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: $font-bold;
+    margin-bottom: $spacing-sm;
+    line-height: 1.2;
+
+    @include respond-to($breakpoint-xs) {
+      font-size: 1.75rem;
+    }
+
+    &.primary {
+      color: $brand-blue;
+    }
+
+    &.success {
+      color: $success-color;
+    }
+
+    &.warning {
+      color: $warning-color;
+    }
+
+    &.info {
+      color: $info-color;
+    }
+  }
+
+  .stat-label {
+    font-size: $font-sm;
+    color: $text-muted;
+    line-height: 1.5;
+
+    @include respond-to($breakpoint-xs) {
+      font-size: $font-xs;
+    }
+  }
+}
+
+// ===============================
+// LOADING STATE
+// ===============================
+.stats-loading {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  @include respond-to($breakpoint-lg) {
+    gap: $spacing-md;
+  }
+
+  @include respond-to($breakpoint-md) {
+    grid-template-columns: 1fr;
+  }
+
+  .loading-card {
+    background: $bg-primary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    padding: $spacing-lg;
+    height: 140px;
+    position: relative;
+    overflow: hidden;
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-md;
+      height: 120px;
+    }
+  }
+
+  .loading-shimmer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba($brand-blue, 0.05) 50%,
+      transparent 100%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+// ===============================
+// RESPONSIVE ADJUSTMENTS
+// ===============================
+@media (max-width: $breakpoint-md) {
+  .stats-grid,
+  .stats-loading {
+    gap: $spacing-md;
+  }
+}
+
+@media (max-width: $breakpoint-xs) {
+  .stats-grid,
+  .stats-loading {
+    gap: $spacing-sm;
+  }
+
+  .stat-card {
+    padding: $spacing-md;
+  }
+}

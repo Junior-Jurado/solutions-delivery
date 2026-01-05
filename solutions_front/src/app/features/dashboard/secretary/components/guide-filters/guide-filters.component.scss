@@ -1,0 +1,243 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+// ===============================
+// FILTERS CONTAINER
+// ===============================
+.filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+// ===============================
+// FILTERS GRID
+// ===============================
+.filters-grid {
+  display: grid;
+  gap: $spacing-md;
+  align-items: end;
+
+  // Mobile first: todo en columnas
+  grid-template-columns: 1fr;
+
+  // Tablet: 2 columnas
+  @media (min-width: $breakpoint-sm) {
+    grid-template-columns: repeat(2, 1fr);
+    
+    .filter-actions {
+      grid-column: span 2;
+    }
+  }
+
+  // Desktop: layout optimizado
+  @media (min-width: $breakpoint-lg) {
+    grid-template-columns: 
+      minmax(150px, 0.8fr)  /* Estado */
+      minmax(150px, 0.8fr)  /* Ciudad */
+      minmax(180px, 1.2fr)  /* Fecha desde */
+      minmax(180px, 1.2fr)  /* Fecha hasta */
+      auto                   /* Botones */;
+    
+    .filter-actions {
+      grid-column: auto;
+    }
+  }
+
+  // Pantallas muy grandes
+  @media (min-width: $breakpoint-xl) {
+    grid-template-columns: 
+      minmax(160px, 0.7fr)
+      minmax(160px, 0.7fr)
+      minmax(200px, 1.3fr)
+      minmax(200px, 1.3fr)
+      auto;
+  }
+}
+
+// ===============================
+// FILTER FIELD
+// ===============================
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  .filter-label {
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $text-secondary;
+
+    @include respond-to($breakpoint-xs) {
+      font-size: $font-xs;
+    }
+  }
+
+  .filter-select {
+    padding: 0.75rem;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-size: $font-sm;
+    color: $text-primary;
+    background-color: $white;
+    cursor: pointer;
+    transition: all $transition-base;
+
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    appearance: none;
+
+    @include respond-to($breakpoint-xs) {
+      font-size: $font-xs;
+      padding: 0.625rem;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: $brand-blue;
+    }
+
+    &:focus {
+      @include input-focus;
+    }
+
+    &:disabled {
+      background-color: $bg-light;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}
+
+// ===============================
+// DATE INPUT
+// ===============================
+.date-input-wrapper {
+  position: relative;
+  width: 100%;
+
+  .date-input {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-size: $font-sm;
+    color: $text-primary;
+    transition: all $transition-base;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+
+    @include respond-to($breakpoint-xs) {
+      font-size: $font-xs;
+      padding: 0.625rem 2.25rem 0.625rem 0.625rem;
+    }
+
+    &::placeholder {
+      color: $text-disabled;
+      font-family: $font-primary;
+      letter-spacing: normal;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: $brand-blue;
+    }
+
+    &:focus {
+      @include input-focus;
+    }
+
+    &:disabled {
+      background-color: $bg-light;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  .date-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: $text-disabled;
+    pointer-events: none;
+  }
+}
+
+// ===============================
+// FILTER ACTIONS
+// ===============================
+.filter-actions {
+  display: flex;
+  gap: $spacing-sm;
+
+  @media (max-width: $breakpoint-sm - 1) {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+    }
+  }
+
+  @media (min-width: $breakpoint-sm) {
+    justify-content: flex-end;
+  }
+
+  @media (min-width: $breakpoint-lg) {
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: $spacing-xs;
+
+    .btn {
+      min-width: 100px;
+    }
+  }
+}
+
+// ===============================
+// ACTIVE FILTERS INDICATOR
+// ===============================
+.active-filters-indicator {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: $info-light;
+  border: 1px solid $info-color;
+  border-radius: $radius-md;
+  font-size: $font-sm;
+  color: $info-color;
+
+  @include respond-to($breakpoint-xs) {
+    font-size: $font-xs;
+    padding: $spacing-xs $spacing-sm;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  span {
+    line-height: 1.5;
+  }
+}
+
+// ===============================
+// VALIDATION STATES
+// ===============================
+.date-input-wrapper.invalid {
+  .date-input {
+    border-color: $error-color;
+
+    &:focus {
+      border-color: $error-color;
+      box-shadow: 0 0 0 3px rgba($error-color, 0.1);
+    }
+  }
+
+  .date-icon {
+    color: $error-color;
+  }
+}

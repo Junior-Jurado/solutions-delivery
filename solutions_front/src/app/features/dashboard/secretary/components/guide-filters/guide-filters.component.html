@@ -1,0 +1,159 @@
+<div class="filters-container">
+  <div class="filters-grid">
+    <!-- Estado -->
+    <div class="filter-field">
+      <label for="statusFilter" class="filter-label">Estado</label>
+      <select 
+        id="statusFilter"
+        [(ngModel)]="selectedStatus"
+        [disabled]="isLoading"
+        class="filter-select">
+        <option value="">Todos</option>
+        <option *ngFor="let status of availableStatuses" [value]="status.value">
+          {{ status.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Ciudad -->
+    <div class="filter-field">
+      <label for="cityFilter" class="filter-label">Ciudad</label>
+      <select 
+        id="cityFilter"
+        [(ngModel)]="selectedCity"
+        [disabled]="isLoading"
+        class="filter-select">
+        <option value="">Todas</option>
+        <option *ngFor="let city of cities" [value]="city.id">
+          {{ city.name }}, {{ city.department_name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Fecha Desde -->
+    <div class="filter-field">
+      <label for="dateFrom" class="filter-label">Desde</label>
+      <div class="date-input-wrapper">
+        <input 
+          id="dateFrom"
+          type="text" 
+          [value]="displayDateFrom"
+          (input)="onDateFromChange($event)"
+          placeholder="dd/mm/aaaa"
+          maxlength="10"
+          [disabled]="isLoading"
+          class="date-input">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="16" 
+          height="16" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          class="date-icon">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Fecha Hasta -->
+    <div class="filter-field">
+      <label for="dateTo" class="filter-label">Hasta</label>
+      <div class="date-input-wrapper">
+        <input 
+          id="dateTo"
+          type="text" 
+          [value]="displayDateTo"
+          (input)="onDateToChange($event)"
+          placeholder="dd/mm/aaaa"
+          maxlength="10"
+          [disabled]="isLoading"
+          class="date-input">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="16" 
+          height="16" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          class="date-icon">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="filter-actions">
+      <button 
+        type="button"
+        class="btn btn-primary" 
+        (click)="applyFilters()"
+        [disabled]="isLoading || !canApplyFilters()">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="16" 
+          height="16" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+        </svg>
+        Filtrar
+      </button>
+      <button 
+        type="button"
+        class="btn btn-outline" 
+        (click)="clearFilters()"
+        [disabled]="isLoading || !hasActiveFilters()">
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="16" 
+          height="16" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  <!-- Indicador de filtros activos -->
+  <div *ngIf="hasActiveFilters()" class="active-filters-indicator">
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="16" 
+      height="16" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      stroke-width="2" 
+      stroke-linecap="round" 
+      stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"></circle>
+      <line x1="12" y1="16" x2="12" y2="12"></line>
+      <line x1="12" y1="8" x2="12.01" y2="8"></line>
+    </svg>
+    <span>Hay filtros activos. Presiona "Filtrar" para aplicar los cambios.</span>
+  </div>
+</div>

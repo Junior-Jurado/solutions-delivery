@@ -1,0 +1,306 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+// ===============================
+// SEARCH FORM CONTAINER
+// ===============================
+.search-form-container {
+  margin-bottom: $spacing-lg;
+}
+
+.search-form {
+  display: flex;
+  gap: $spacing-md;
+
+  @include respond-to($breakpoint-sm) {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .search-input {
+    flex: 1;
+    padding: 0.625rem;
+    border: 1px solid $border-color;
+    border-radius: $radius-base;
+    font-size: $font-sm;
+    transition: all $transition-base;
+
+    @include respond-to($breakpoint-xs) {
+      font-size: $font-xs;
+      padding: $spacing-sm;
+    }
+
+    &:focus {
+      @include input-focus;
+    }
+
+    &::placeholder {
+      color: $text-disabled;
+    }
+
+    &:disabled {
+      background-color: $bg-light;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+
+  .btn-large {
+    @include respond-to($breakpoint-sm) {
+      width: 100%;
+    }
+  }
+}
+
+.search-hint {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  margin-top: $spacing-sm;
+  background: $warning-light;
+  border: 1px solid $warning-color;
+  border-left: 4px solid $warning-color;
+  border-radius: $radius-base;
+  font-size: $font-sm;
+  color: darken($warning-color, 10%);
+
+  svg {
+    flex-shrink: 0;
+    color: $warning-color;
+  }
+}
+
+// ===============================
+// SEARCH RESULTS
+// ===============================
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.search-result {
+  padding: $spacing-lg;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background: $white;
+  transition: all $transition-base;
+
+  @include respond-to($breakpoint-xs) {
+    padding: $spacing-md;
+  }
+
+  &:hover {
+    box-shadow: $shadow-md;
+    border-color: $brand-blue;
+  }
+
+  .result-header {
+    @include flex-between;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-md;
+    border-bottom: 1px solid $border-color;
+    gap: $spacing-sm;
+
+    @include respond-to($breakpoint-xs) {
+      flex-wrap: wrap;
+    }
+
+    .result-id {
+      font-weight: $font-semibold;
+      font-size: $font-lg;
+      color: $text-primary;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-base;
+      }
+    }
+  }
+
+  .result-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+
+    @include respond-to($breakpoint-sm) {
+      grid-template-columns: 1fr;
+    }
+
+    .detail-item {
+      font-size: $font-sm;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-xs;
+      }
+
+      strong {
+        font-weight: $font-semibold;
+        color: $text-secondary;
+      }
+
+      span {
+        color: $text-primary;
+      }
+    }
+  }
+
+  .result-history {
+    margin: $spacing-lg 0;
+    padding: $spacing-md;
+    background: $bg-light;
+    border-radius: $radius-base;
+    border-left: 4px solid $brand-blue;
+
+    .history-title {
+      font-weight: $font-semibold;
+      color: $text-secondary;
+      margin-bottom: $spacing-sm;
+      font-size: $font-sm;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-xs;
+      }
+    }
+
+    .history-items {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      font-size: $font-sm;
+      color: $text-muted;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-xs;
+      }
+
+      svg {
+        flex-shrink: 0;
+        color: $success-color;
+      }
+    }
+  }
+
+  .result-actions {
+    display: flex;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+
+    @include respond-to($breakpoint-sm) {
+      flex-direction: column;
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// ===============================
+// EMPTY RESULTS
+// ===============================
+.empty-results {
+  text-align: center;
+  padding: $spacing-3xl;
+  color: $text-muted;
+
+  svg {
+    color: $gray-300;
+    margin-bottom: $spacing-md;
+  }
+
+  h3 {
+    font-size: $font-lg;
+    font-weight: $font-semibold;
+    color: $text-primary;
+    margin-bottom: $spacing-sm;
+  }
+
+  p {
+    font-size: $font-sm;
+    margin-bottom: $spacing-xs;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .hint {
+    color: $text-disabled;
+    font-size: $font-xs;
+  }
+}
+
+// ===============================
+// BADGE STYLES
+// ===============================
+.badge {
+  display: inline-block;
+  padding: 0.25rem $spacing-sm;
+  border-radius: $radius-full;
+  font-size: $font-xs;
+  font-weight: $font-medium;
+  white-space: nowrap;
+
+  &.badge-created {
+    background: $badge-created-bg;
+    color: $badge-created-text;
+  }
+
+  &.badge-in-route {
+    background: $badge-in-route-bg;
+    color: $badge-in-route-text;
+  }
+
+  &.badge-warning {
+    background: $warning-light;
+    color: $warning-color;
+  }
+
+  &.badge-out-delivery {
+    background: $badge-out-delivery-bg;
+    color: $badge-out-delivery-text;
+  }
+
+  &.badge-success {
+    background: $success-light;
+    color: $success-color;
+  }
+
+  &.badge-cancelled {
+    background: $badge-cancelled-bg;
+    color: $badge-cancelled-text;
+  }
+
+  &.badge-default {
+    background: $bg-light;
+    color: $text-muted;
+  }
+}
+
+// ===============================
+// SPINNER
+// ===============================
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

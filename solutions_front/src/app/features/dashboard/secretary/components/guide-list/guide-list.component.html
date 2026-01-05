@@ -1,0 +1,111 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="spinner"></div>
+  <p>Cargando guías...</p>
+</div>
+
+<!-- Empty State -->
+<div *ngIf="!isLoading && guides.length === 0" class="empty-state">
+  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+    <polyline points="14 2 14 8 20 8"></polyline>
+  </svg>
+  <h3>No se encontraron guías</h3>
+  <p>No hay guías que coincidan con los filtros seleccionados</p>
+</div>
+
+<!-- Guides List -->
+<div *ngIf="!isLoading && guides.length > 0" class="guides-list">
+  <div *ngFor="let guide of guides" class="guide-item">
+    <!-- Header -->
+    <div class="guide-header">
+      <div>
+        <div class="guide-id">Guía #{{ guide.guide_id }}</div>
+        <div class="guide-date">{{ formatDate(guide.created_at) }}</div>
+      </div>
+      <span class="badge" [ngClass]="getStatusBadgeClass(guide.current_status)">
+        {{ translateStatus(guide.current_status) }}
+      </span>
+    </div>
+    
+    <!-- Details -->
+    <div class="guide-details">
+      <div class="detail-item">
+        <div class="detail-label">Origen:</div>
+        <div class="detail-value">{{ guide.origin_city_name }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Destino:</div>
+        <div class="detail-value">{{ guide.destination_city_name }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Tipo de servicio:</div>
+        <div class="detail-value">{{ translateServiceType(guide.service_type) }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Método de pago:</div>
+        <div class="detail-value">{{ translatePaymentMethod(guide.payment_method) }}</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-label">Valor:</div>
+        <div class="detail-value">${{ guide.price.toLocaleString() }}</div>
+      </div>
+    </div>
+    
+    <!-- Actions -->
+    <div class="guide-actions">
+      <select 
+        class="status-select" 
+        [value]="guide.current_status"
+        (change)="onStatusChange(guide.guide_id, $event)">
+        <option value="">Cambiar estado</option>
+        <option *ngFor="let status of availableStatuses" [value]="status.value">
+          {{ status.label }}
+        </option>
+      </select>
+      <button class="btn btn-outline" (click)="onViewDetails(guide.guide_id)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+        Ver Detalles
+      </button>
+      <button 
+        *ngIf="guide.pdf_url" 
+        class="btn btn-outline"
+        (click)="onDownloadPDF(guide.guide_id)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+        PDF
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Pagination -->
+<div *ngIf="!isLoading && guides.length > 0" class="pagination">
+  <button 
+    class="btn btn-outline" 
+    (click)="onPreviousPage()" 
+    [disabled]="currentPage === 0">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="15 18 9 12 15 6"></polyline>
+    </svg>
+    Anterior
+  </button>
+  <span class="pagination-info">
+    Página {{ currentPage + 1 }} de {{ getTotalPages() }}
+  </span>
+  <button 
+    class="btn btn-outline" 
+    (click)="onNextPage()" 
+    [disabled]="currentPage >= getTotalPages() - 1">
+    Siguiente
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </button>
+</div>

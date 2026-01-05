@@ -84,6 +84,15 @@ resource "aws_apigatewayv2_route" "auth_role" {
 # -----------------------------------------
 
 ## Locations
+resource "aws_apigatewayv2_route" "locations_departments" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/locations/departments"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
 resource "aws_apigatewayv2_route" "locations_cities" {
   api_id    = aws_apigatewayv2_api.api.id
   route_key = "GET /api/v1/locations/cities"

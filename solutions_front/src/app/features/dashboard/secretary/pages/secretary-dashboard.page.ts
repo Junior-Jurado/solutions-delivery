@@ -1,30 +1,38 @@
-import { Component, OnInit, ChangeDetectorRef } from "@angular/core";
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from "@angular/forms";
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+
+// Services
 import { 
     GuideService, 
-    CreateGuideResponse, 
     ShippingGuide,
     GuideStatus,
     GuideStatsResponse,
-    GuidesListResponse,
-    GuideFilters,
     PaymentMethod,
     ServiceType
 } from "@core/services/guide.service";
-import { AuthService } from "@core/services/auth.service";
 import { LocationService, City } from "@core/services/location.service";
-import { CitySelectorComponent } from "@shared/components/city-selector.component";
-import { GuideDetailsModalComponent } from "@shared/components/guide-details-modal.component";
-import { CommonModule } from "@angular/common";
+import { 
+    CashClose, 
+    CashCloseRequest, 
+    CashCloseService, 
+    CashCloseStatsResponse, 
+    PeriodType 
+} from "@core/services/cash-close.service";
 import { ToastService } from "@shared/services/toast.service";
-import { CashClose, CashCloseRequest, CashCloseService, CashCloseStatsResponse, PeriodType } from "@core/services/cash-close.service";
 
-interface DailyStats {
-    day: string;
-    created: number;
-    processed: number;
-}
+// Components
+import { GuideFormComponent } from '../components/guide-form/guide-form.component';
+import { GuideListComponent } from "../components/guide-list/guide-list.component";
+import { GuideFiltersComponent, GuideFilterValues } from "../components/guide-filters/guide-filters.component";
+import { StatsCardsComponent } from "../components/stats-cards/stats-cards.component";
+import { GuideDetailsModalComponent } from "@shared/components/guide-details-modal.component";
+import { CashCloseFormComponent, CashCloseFormData } from "../components/cash-close-form/cash-close-form.component";
+import { CashCloseListComponent } from "../components/cash-close-list/cash-close-list.component";
+import { GuideSearchComponent } from "../components/guide-search/guide-search.component";
+import { StatusDistributionComponent } from "../components/status-distribution/status-distribution.component";
+import { CashCloseStatsComponent } from "../components/cash-close-stats/cash-close-stats.component";
 
 @Component({
     selector: 'app-secretary-dashboard',
@@ -32,64 +40,63 @@ interface DailyStats {
     templateUrl: './secretary-dashboard.page.html',
     styleUrls: ['./secretary-dashboard.page.scss'],
     imports: [
-        ReactiveFormsModule, 
-        CommonModule, 
-        FormsModule, 
-        CitySelectorComponent,
-        GuideDetailsModalComponent
+        CommonModule,
+        FormsModule,
+        GuideFormComponent,
+        GuideListComponent,
+        GuideFiltersComponent,
+        GuideSearchComponent,
+        StatsCardsComponent,
+        StatusDistributionComponent,
+        GuideDetailsModalComponent,
+        CashCloseFormComponent,
+        CashCloseListComponent,
+        CashCloseStatsComponent
     ]
 })
 export class SecretaryDashboardPage implements OnInit {
-    // Navegación de tabs
+    @ViewChild(GuideFormComponent) guideFormComponent!: GuideFormComponent;
+
+    // ==========================================
+    // NAVIGATION
+    // ==========================================
     activeTab: string = 'create-guide';
-    
-    // Formulario de guía
-    guideForm: FormGroup;
-    isSubmitting: boolean = false;
+
+    // ==========================================
+    // USER
+    // ==========================================
     currentUserId: string = '';
-    
-    // Datos de ciudades seleccionadas
-    selectedSenderCity: City | null = null;
-    selectedReceiverCity: City | null = null;
-    
-    // Búsqueda y rastreo
-    trackingSearch: string = '';
-    searchResults: ShippingGuide[] = [];
-    isSearching: boolean = false;
-    
-    // Gestión de guías
-    guides: ShippingGuide[] = []; 
+
+    // ==========================================
+    // GUIDES MANAGEMENT
+    // ==========================================
+    guides: ShippingGuide[] = [];
     isLoadingGuides: boolean = false;
     totalGuides: number = 0;
     currentPage: number = 0;
     pageSize: number = 20;
-    
-    // Filtros
+
+    // Filters
     filterCities: City[] = [];
     selectedStatusFilter: GuideStatus | '' = '';
     selectedCityFilter: number | '' = '';
     dateFromFilter: string = '';
     dateToFilter: string = '';
-    
-    // Para manejo visual de fechas
-    displayDateFrom: string = '';
-    displayDateTo: string = '';
-    
-    // Estadísticas
+
+    // ==========================================
+    // SEARCH & TRACKING
+    // ==========================================
+    trackingSearch: string = '';
+    searchResults: ShippingGuide[] = [];
+    isSearching: boolean = false;
+
+    // ==========================================
+    // STATISTICS
+    // ==========================================
     stats: GuideStatsResponse | null = null;
     isLoadingStats: boolean = false;
-    
-    // Modal de detalles
-    selectedGuideForDetails: ShippingGuide | null = null;
-    isDetailsModalOpen: boolean = false;
-    
-    // Opciones de formulario
-    serviceTypes: string[] = ['Contado', 'Contra Entrega', 'Crédito'];
-    priorities: string[] = ['Normal', 'Express', 'Urgente'];
-    insuranceOptions: string[] = ['No', 'Básico', 'Completo'];
-    documentTypes: string[] = ['CC', 'CE', 'NIT', 'TI', 'PAS'];
-    
-    // Estados disponibles para actualización
+
+    // Estados disponibles para Status Distribution
     availableStatuses: { value: GuideStatus; label: string }[] = [
         { value: 'CREATED', label: 'Creada' },
         { value: 'IN_ROUTE', label: 'En ruta' },
@@ -98,54 +105,39 @@ export class SecretaryDashboardPage implements OnInit {
         { value: 'DELIVERED', label: 'Entregada' }
     ];
 
-    // Cierre de Caja
-    selectedPeriodType: PeriodType = 'DAILY';
-    selectedYear: number = new Date().getFullYear();
-    selectedMonth: number = new Date().getMonth() + 1;
-    selectedDay: number = new Date().getDate();
+    // ==========================================
+    // MODAL
+    // ==========================================
+    selectedGuideForDetails: ShippingGuide | null = null;
+    isDetailsModalOpen: boolean = false;
+
+    // ==========================================
+    // CASH CLOSE
+    // ==========================================
     isGeneratingClose: boolean = false;
-    
     cashCloses: CashClose[] = [];
     isLoadingCloses: boolean = false;
     totalCloses: number = 0;
     currentClosePage: number = 0;
     closePageSize: number = 10;
-    
     cashCloseStats: CashCloseStatsResponse | null = null;
     isLoadingCloseStats: boolean = false;
 
-    // Datos para los selectores
-    years: number[] = [];
-    months: { value: number; label: string }[] = [
-        { value: 1, label: 'Enero' },
-        { value: 2, label: 'Febrero' },
-        { value: 3, label: 'Marzo' },
-        { value: 4, label: 'Abril' },
-        { value: 5, label: 'Mayo' },
-        { value: 6, label: 'Junio' },
-        { value: 7, label: 'Julio' },
-        { value: 8, label: 'Agosto' },
-        { value: 9, label: 'Septiembre' },
-        { value: 10, label: 'Octubre' },
-        { value: 11, label: 'Noviembre' },
-        { value: 12, label: 'Diciembre' }
-    ];
-    days: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
-
+    // ==========================================
+    // CONSTRUCTOR
+    // ==========================================
     constructor(
-        private fb: FormBuilder,
         private router: Router,
         private guideService: GuideService,
-        private authService: AuthService,
         private locationService: LocationService,
-        private cdr: ChangeDetectorRef,
         private cashCloseService: CashCloseService,
-        private toast: ToastService
-    ){
-        this.guideForm = this.initializeForm();
-        this.initializeYears();
-    }
+        private toast: ToastService,
+        private cdr: ChangeDetectorRef
+    ) {}
 
+    // ==========================================
+    // LIFECYCLE
+    // ==========================================
     ngOnInit(): void {
         this.loadCurrentUser();
         this.loadCities();
@@ -153,58 +145,9 @@ export class SecretaryDashboardPage implements OnInit {
         this.loadStats();
     }
 
-    /**
-     * Inicializa el array de años (últimos 5 años + próximo año)
-     */
-    private initializeYears(): void {
-        const currentYear = new Date().getFullYear();
-        this.years = [];
-        for (let i = currentYear - 5; i <= currentYear + 1; i++) {
-            this.years.push(i);
-        }
-    }
-
-    /**
-     * Inicializa el formulario de guía
-     */
-    private initializeForm(): FormGroup {
-        return this.fb.group({
-            // Remitente
-            senderName: ['', Validators.required],
-            senderDocType: ['CC', Validators.required],
-            senderDoc: ['', Validators.required],
-            senderPhone: ['', Validators.required],
-            senderEmail: ['', Validators.email],
-            senderAddress: ['', Validators.required],
-            senderCity: ['', Validators.required],
-            senderCityName: [''],
-            
-            // Destinatario
-            receiverName: ['', Validators.required],
-            receiverDocType: ['CC', Validators.required],
-            receiverDoc: ['', Validators.required],
-            receiverPhone: ['', Validators.required],
-            receiverEmail: ['', Validators.email],
-            receiverAddress: ['', Validators.required],
-            receiverCity: ['', Validators.required],
-            receiverCityName: [''],
-            
-            // Paquete
-            serviceType: ['Contado', Validators.required],
-            weight: ['', [Validators.required, Validators.min(0.1)]],
-            declaredValue: ['', [Validators.required, Validators.min(0)]],
-            pieces: [1, [Validators.required, Validators.min(1)]],
-            dimensions: ['20x15x10'],
-            priority: ['normal'],
-            insurance: ['no'],
-            content: [''],
-            observations: ['']
-        });
-    }
-
-    /**
-     * Carga el ID del usuario actual desde el token
-     */
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
     private loadCurrentUser(): void {
         const idToken = sessionStorage.getItem('idToken');
         if (idToken) {
@@ -221,9 +164,6 @@ export class SecretaryDashboardPage implements OnInit {
         }
     }
 
-    /**
-     * Carga la lista de ciudades para filtros
-     */
     private loadCities(): void {
         this.locationService.getCities().subscribe({
             next: (cities) => {
@@ -232,68 +172,178 @@ export class SecretaryDashboardPage implements OnInit {
             },
             error: (error) => {
                 console.error('Error al cargar ciudades:', error);
+                this.toast.error('Error al cargar las ciudades');
             }
         });
     }
 
-    /**
-     * Carga la lista de guías con filtros
-     */
+    // ==========================================
+    // TAB NAVIGATION
+    // ==========================================
+    setActiveTab(tab: string): void {
+        this.activeTab = tab;
+
+        if (tab === 'manage-guides') {
+            this.loadGuides();
+        } else if (tab === 'reports') {
+            this.loadStats();
+        } else if (tab === 'cash-close') {
+            this.loadCashCloses();
+            this.loadCashCloseStats();
+        }
+    }
+
+    // ==========================================
+    // GUIDE FORM HANDLERS
+    // ==========================================
+    async handleGuideFormSubmit(formData: any): Promise<void> {
+        this.guideFormComponent.setSubmitting(true);
+
+        try {
+            const guideRequest = this.guideService.buildGuideRequest(formData, this.currentUserId);
+            const response = await this.guideService.createGuide(guideRequest);
+
+            this.toast.success(`¡Guía creada exitosamente!\nNúmero: ${response.guide_number}`);
+
+            if (response.guide_id) {
+                await this.guideService.downloadGuidePDF(response.guide_id);
+            }
+
+            this.guideFormComponent.resetForm();
+            this.setActiveTab('manage-guides');
+
+        } catch (error: any) {
+            this.toast.error(error.message || 'Error al crear la guía');
+        } finally {
+            this.guideFormComponent.setSubmitting(false);
+        }
+    }
+
+    // ==========================================
+    // GUIDE LIST HANDLERS
+    // ==========================================
     async loadGuides(): Promise<void> {
         this.isLoadingGuides = true;
-        this.guides = []; 
+        this.guides = [];
         this.cdr.detectChanges();
 
-        const filters: GuideFilters = {
+        const filters: any = {
             limit: this.pageSize,
             offset: this.currentPage * this.pageSize
         };
 
-        if (this.selectedStatusFilter) {
-            filters.status = this.selectedStatusFilter;
-            console.log('Filtro de estado aplicado:', filters.status);
-        }
-
-        if (this.selectedCityFilter) {
-            filters.destination_city_id = Number(this.selectedCityFilter);
-        }
-
-        if (this.dateFromFilter) {
-            filters.date_from = this.dateFromFilter;
-        }
-
-        if (this.dateToFilter) {
-            filters.date_to = this.dateToFilter;
-        }
+        if (this.selectedStatusFilter) filters.status = this.selectedStatusFilter;
+        if (this.selectedCityFilter) filters.destination_city_id = Number(this.selectedCityFilter);
+        if (this.dateFromFilter) filters.date_from = this.dateFromFilter;
+        if (this.dateToFilter) filters.date_to = this.dateToFilter;
 
         try {
-            const response: GuidesListResponse = await this.guideService.listGuides(filters);
-            
+            const response = await this.guideService.listGuides(filters);
             this.guides = Array.isArray(response.guides) ? response.guides : [];
             this.totalGuides = response.total || 0;
-            
+
             console.log('Guías cargadas:', this.guides.length, 'de', this.totalGuides);
-            
-            if (this.guides.length === 0 && this.totalGuides === 0) {
-                const filterApplied = this.selectedStatusFilter || this.selectedCityFilter || this.dateFromFilter || this.dateToFilter;
-                if (filterApplied) {
-                    this.toast.info('No se encontraron guías con los filtros seleccionados');
-                }
-            }
         } catch (error: any) {
             console.error('Error al cargar guías:', error);
-            this.guides = []; 
+            this.guides = [];
             this.totalGuides = 0;
-            this.toast.error('Error al cargar las guías: ' + (error.message || 'Error desconocido'));
+            this.toast.error('Error al cargar las guías');
         } finally {
             this.isLoadingGuides = false;
             this.cdr.detectChanges();
         }
     }
 
-    /**
-     * Carga las estadísticas de guías
-     */
+    async handleStatusUpdate(event: { guideId: number; newStatus: GuideStatus }): Promise<void> {
+        try {
+            await this.guideService.updateGuideStatus(event.guideId, event.newStatus);
+
+            const guide = this.guides.find(g => g.guide_id === event.guideId);
+            if (guide) {
+                guide.current_status = event.newStatus;
+            }
+
+            this.toast.success('Estado actualizado correctamente');
+            await this.loadStats();
+
+        } catch (error) {
+            console.error('Error al actualizar estado:', error);
+            this.toast.error('Error al actualizar el estado');
+        }
+    }
+
+    handlePageChange(direction: 'prev' | 'next'): void {
+        if (direction === 'prev' && this.currentPage > 0) {
+            this.currentPage--;
+            this.loadGuides();
+        } else if (direction === 'next' && this.currentPage < this.getTotalPages() - 1) {
+            this.currentPage++;
+            this.loadGuides();
+        }
+    }
+
+    getTotalPages(): number {
+        return Math.ceil(this.totalGuides / this.pageSize);
+    }
+
+    // ==========================================
+    // FILTERS HANDLERS
+    // ==========================================
+    async handleFiltersApplied(filters: GuideFilterValues): Promise<void> {
+        this.selectedStatusFilter = filters.status;
+        this.selectedCityFilter = filters.cityId;
+        this.dateFromFilter = filters.dateFrom;
+        this.dateToFilter = filters.dateTo;
+
+        this.currentPage = 0;
+        await this.loadGuides();
+    }
+
+    async handleFiltersClear(): Promise<void> {
+        this.selectedStatusFilter = '';
+        this.selectedCityFilter = '';
+        this.dateFromFilter = '';
+        this.dateToFilter = '';
+
+        this.currentPage = 0;
+        await this.loadGuides();
+    }
+
+    // ==========================================
+    // SEARCH & TRACKING
+    // ==========================================
+    async handleSearch(query: string): Promise<void> {
+        if (!query || query.length < 3) {
+            this.toast.error('Ingrese al menos 3 caracteres para buscar');
+            return;
+        }
+
+        this.trackingSearch = query;
+        this.isSearching = true;
+        this.searchResults = [];
+
+        try {
+            const response = await this.guideService.searchGuides(query);
+            this.searchResults = Array.isArray(response.guides) ? response.guides : [];
+
+            if (this.searchResults.length === 0) {
+                this.toast.info(`No se encontraron resultados para "${query}"`);
+            } else {
+                this.toast.success(`Se encontraron ${this.searchResults.length} resultado(s)`);
+            }
+        } catch (error: any) {
+            console.error('Error en búsqueda:', error);
+            this.searchResults = [];
+            this.toast.error('Error al buscar guías');
+        } finally {
+            this.isSearching = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    // ==========================================
+    // STATISTICS
+    // ==========================================
     async loadStats(): Promise<void> {
         this.isLoadingStats = true;
         this.cdr.detectChanges();
@@ -310,280 +360,15 @@ export class SecretaryDashboardPage implements OnInit {
         }
     }
 
-    /**
-     * Cambia de tab
-     */
-    setActiveTab(tab: string): void {
-        this.activeTab = tab;
-        
-        if (tab === 'manage-guides') {
-            this.loadGuides();
-        } else if (tab === 'reports') {
-            this.loadStats();
-        } else if (tab === 'cash-close') {
-            this.loadCashCloses();
-            this.loadCashCloseStats();
-        }
+    calculatePercentage(count: number): number {
+        if (!this.stats) return 0;
+        const total = Object.values(this.stats.by_status).reduce((sum, val) => sum + val, 0);
+        return total > 0 ? (count / total) * 100 : 0;
     }
 
-    /**
-     * Descarga el PDF de una guía
-     */
-    async downloadGuidePDF(guideId: number): Promise<void> {
-        try {
-            await this.guideService.downloadGuidePDF(guideId);
-        } catch (error) {
-            console.error('Error al descargar PDF:', error);
-            this.toast.error('Error al descargar el PDF de la guía');
-        }
-    }
-
-    /**
-     * Maneja la creación de una nueva guía
-     */
-    async handleCreateGuide(): Promise<void> {
-        if (!this.guideForm.valid) {
-            this.markFormGroupTouched(this.guideForm);
-            this.toast.error('Por favor complete todos los campos requeridos');
-            return;
-        }
-
-        if (this.isSubmitting) {
-            return;
-        }
-
-        this.isSubmitting = true;
-
-        try {
-            const guideRequest = this.guideService.buildGuideRequest(
-                this.guideForm.value,
-                this.currentUserId
-            );
-
-            console.log('Enviando guía:', guideRequest);
-
-            const response: CreateGuideResponse = await this.guideService.createGuide(guideRequest);
-
-            console.log('Respuesta del servidor:', response);
-
-            this.toast.success(`¡Guía creada exitosamente!\n\nNúmero de guía: ${response.guide_number}\nID: ${response.guide_id}\n\nEl PDF se descargará automáticamente.`);
-
-            if (response.guide_id) {
-                await this.guideService.downloadGuidePDF(response.guide_id);
-            }
-
-            this.guideForm.reset(this.getDefaultFormValues());
-            this.selectedSenderCity = null;
-            this.selectedReceiverCity = null;
-
-            this.setActiveTab('manage-guides');
-
-        } catch (error: any) {
-            console.error('Error al crear la guía:', error);
-            
-            let errorMessage = 'Error al crear la guía. Por favor intente nuevamente.';
-            
-            if (error.message) {
-                errorMessage = error.message;
-            }
-
-            this.toast.error(errorMessage);
-        } finally {
-            this.isSubmitting = false;
-            this.cdr.detectChanges();
-        }
-    }
-
-    /**
-     * Actualiza el estado de una guía
-     */
-    async handleUpdateStatus(guideId: number, newStatus: GuideStatus): Promise<void> {
-        if (!newStatus) {
-            return;
-        }
-
-        try {
-            const response = await this.guideService.updateGuideStatus(guideId, newStatus);
-            
-            const guide = this.guides.find(g => g.guide_id === guideId);
-            if (guide) {
-                guide.current_status = newStatus;
-                this.cdr.detectChanges();
-            }
-
-            this.toast.success(`Estado actualizado correctamente a: ${this.guideService.translateStatus(newStatus)}`);
-            
-            await this.loadStats();
-            
-        } catch (error) {
-            console.error('Error al actualizar estado:', error);
-            this.toast.error('Error al actualizar el estado de la guía');
-        }
-    }
-
-    /**
-     * Busca y rastrea envíos
-     */
-    async handleSearchTracking(): Promise<void> {
-        if (!this.trackingSearch || this.trackingSearch.length < 3) {
-            this.toast.error('Ingrese al menos 3 caracteres para buscar');
-            return;
-        }
-
-        this.isSearching = true;
-        this.searchResults = []; 
-
-        try {
-            const response = await this.guideService.searchGuides(this.trackingSearch);
-            
-            this.searchResults = Array.isArray(response.guides) ? response.guides : [];
-            
-            console.log('Resultados de búsqueda:', this.searchResults.length);
-
-            if (this.searchResults.length === 0) {
-                this.toast.info(`No se encontraron resultados para "${this.trackingSearch}"`);
-            } else {
-                this.toast.success(`Se encontraron ${this.searchResults.length} resultado(s)`);
-            }
-        } catch (error: any) {
-            console.error('Error en búsqueda:', error);
-            this.searchResults = []; 
-            this.toast.error('Error al buscar guías: ' + (error.message || 'Error desconocido'));
-        } finally {
-            this.isSearching = false; 
-            this.cdr.detectChanges();
-        }
-    }
-
-    /**
-     * Aplica filtros a la lista de guías
-     */
-    async applyFilters(): Promise<void> {
-        this.currentPage = 0;
-        await this.loadGuides();
-    }
-
-    /**
-     * Limpia todos los filtros
-     */
-    async clearFilters(): Promise<void> {
-        try {
-            // Limpiar todos los filtros
-            this.selectedStatusFilter = '';
-            this.selectedCityFilter = '';
-            this.dateFromFilter = '';
-            this.dateToFilter = '';
-            this.displayDateFrom = '';
-            this.displayDateTo = '';
-            this.currentPage = 0;
-            
-            // Forzar detección de cambios
-            this.cdr.detectChanges();
-            
-            // Recargar las guías
-            await this.loadGuides();
-            
-            console.log('Filtros limpiados exitosamente');
-        } catch (error) {
-            console.error('Error al limpiar filtros:', error);
-            this.toast.error('Error al limpiar los filtros');
-            this.isLoadingGuides = false;
-            this.cdr.detectChanges();
-        }
-    }
-
-    /**
-     * Convierte fecha de dd/mm/yyyy a yyyy-mm-dd
-     */
-    formatDateForAPI(displayDate: string): string {
-        if (!displayDate || displayDate.length !== 10) return '';
-        
-        const parts = displayDate.split('/');
-        if (parts.length !== 3) return '';
-        
-        const day = parts[0].padStart(2, '0');
-        const month = parts[1].padStart(2, '0');
-        const year = parts[2];
-        
-        // Validación básica
-        const dayNum = parseInt(day);
-        const monthNum = parseInt(month);
-        const yearNum = parseInt(year);
-        
-        if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12 || yearNum < 2000) {
-            return '';
-        }
-        
-        return `${year}-${month}-${day}`;
-    }
-
-    /**
-     * Maneja el cambio en el input de fecha desde
-     */
-    onDateFromChange(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        let value = input.value.replace(/\D/g, '');
-        
-        if (value.length > 8) {
-            value = value.substring(0, 8);
-        }
-        
-        let formatted = '';
-        if (value.length >= 1) {
-            formatted = value.substring(0, 2);
-        }
-        if (value.length >= 3) {
-            formatted += '/' + value.substring(2, 4);
-        }
-        if (value.length >= 5) {
-            formatted += '/' + value.substring(4, 8);
-        }
-        
-        this.displayDateFrom = formatted;
-        
-        if (value.length === 8) {
-            this.dateFromFilter = this.formatDateForAPI(formatted);
-            console.log('Fecha desde (API):', this.dateFromFilter);
-        } else {
-            this.dateFromFilter = '';
-        }
-    }
-
-    /**
-     * Maneja el cambio en el input de fecha hasta
-     */
-    onDateToChange(event: Event): void {
-        const input = event.target as HTMLInputElement;
-        let value = input.value.replace(/\D/g, '');
-        
-        if (value.length > 8) {
-            value = value.substring(0, 8);
-        }
-        
-        let formatted = '';
-        if (value.length >= 1) {
-            formatted = value.substring(0, 2);
-        }
-        if (value.length >= 3) {
-            formatted += '/' + value.substring(2, 4);
-        }
-        if (value.length >= 5) {
-            formatted += '/' + value.substring(4, 8);
-        }
-        
-        this.displayDateTo = formatted;
-        
-        if (value.length === 8) {
-            this.dateToFilter = this.formatDateForAPI(formatted);
-            console.log('Fecha hasta (API):', this.dateToFilter);
-        } else {
-            this.dateToFilter = '';
-        }
-    }
-
-    /**
-     * Ver detalles de una guía (abre el modal)
-     */
+    // ==========================================
+    // MODAL HANDLERS
+    // ==========================================
     async viewDetails(guideId: number): Promise<void> {
         try {
             const response = await this.guideService.getGuideById(guideId);
@@ -596,265 +381,65 @@ export class SecretaryDashboardPage implements OnInit {
         }
     }
 
-    /**
-     * Cierra el modal de detalles
-     */
     closeDetailsModal(): void {
         this.isDetailsModalOpen = false;
         this.selectedGuideForDetails = null;
         this.cdr.detectChanges();
     }
 
-    /**
-     * Descarga el PDF desde el modal
-     */
     async downloadPDFFromModal(guideId: number): Promise<void> {
         await this.downloadGuidePDF(guideId);
     }
 
-    /**
-     * Maneja la selección de ciudad del remitente
-     */
-    onSenderCitySelected(city: City): void {
-        console.log('Ciudad remitente seleccionada:', city);
-        this.selectedSenderCity = city;
-        this.guideForm.patchValue({
-            senderCityName: city.name
-        });
-    }
-
-    /**
-     * Maneja la selección de ciudad del destinatario
-     */
-    onReceiverCitySelected(city: City): void {
-        console.log('Ciudad destinatario seleccionada:', city);
-        this.selectedReceiverCity = city;
-        this.guideForm.patchValue({
-            receiverCityName: city.name
-        });
-    }
-
-    /**
-     * Verifica si un campo tiene error
-     */
-    hasError(fieldName: string): boolean {
-        const field = this.guideForm.get(fieldName);
-        return !!(field && field.invalid && field.touched);
-    }
-
-    /**
-     * Obtiene el mensaje de error para un campo
-     */
-    getErrorMessage(fieldName: string): string {
-        const field = this.guideForm.get(fieldName);
-        
-        if (field?.hasError('required')) {
-            return 'Este campo es requerido';
-        }
-        
-        if (field?.hasError('email')) {
-            return 'Ingrese un email válido';
-        }
-        
-        if (field?.hasError('min')) {
-            return 'El valor debe ser mayor a 0';
-        }
-        
-        return '';
-    }
-
-    /**
-     * Obtiene la clase CSS para el badge de estado
-     */
-    getStatusBadgeClass(status: GuideStatus): string {
-        return this.guideService.getStatusBadgeClass(status);
-    }
-
-    /**
-     * Traduce el estado a español
-     */
-    translateStatus(status: GuideStatus): string {
-        return this.guideService.translateStatus(status);
-    }
-
-    /**
-     * Formatea una fecha
-     */
-    formatDate(dateString: string): string {
-        const date = new Date(dateString);
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        if (date.toDateString() === today.toDateString()) {
-            return `Hoy ${date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
-        } else if (date.toDateString() === yesterday.toDateString()) {
-            return `Ayer ${date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
-        } else {
-            return date.toLocaleDateString('es-CO', { 
-                day: '2-digit', 
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+    // ==========================================
+    // PDF DOWNLOADS
+    // ==========================================
+    async downloadGuidePDF(guideId: number): Promise<void> {
+        try {
+            await this.guideService.downloadGuidePDF(guideId);
+        } catch (error) {
+            console.error('Error al descargar PDF:', error);
+            this.toast.error('Error al descargar el PDF de la guía');
         }
     }
 
-    /**
-     * Cerrar sesión
-     */
-    handleLogout(): void {
-        sessionStorage.clear();
-        this.router.navigate(['/auth']);
+    async downloadClosePDF(closeId: number): Promise<void> {
+        try {
+            await this.cashCloseService.downloadCashClosePDF(closeId);
+        } catch (error) {
+            console.error('Error al descargar PDF:', error);
+            this.toast.error('Error al descargar el PDF del cierre');
+        }
     }
 
-    /**
-     * Marca todos los controles como touched
-     */
-    private markFormGroupTouched(formGroup: FormGroup): void {
-        Object.keys(formGroup.controls).forEach(key => {
-            const control = formGroup.get(key);
-            control?.markAsTouched();
-
-            if (control instanceof FormGroup) {
-                this.markFormGroupTouched(control);
-            }
-        });
-    }
-
-    /**
-     * Obtiene los valores por defecto del formulario
-     */
-    private getDefaultFormValues(): any {
-        return {
-            senderDocType: 'CC',
-            receiverDocType: 'CC',
-            serviceType: 'Contado',
-            pieces: 1,
-            dimensions: '20x15x10',
-            priority: 'normal',
-            insurance: 'no',
-            senderCityName: '',
-            receiverCityName: ''
+    // ==========================================
+    // CASH CLOSE
+    // ==========================================
+    async handleCashCloseGenerate(formData: CashCloseFormData): Promise<void> {
+        const request: CashCloseRequest = {
+            period_type: formData.periodType,
+            year: formData.year
         };
-    }
 
-    /**
-     * Navega a la página anterior
-     */
-    previousPage(): void {
-        if (this.currentPage > 0) {
-            this.currentPage--;
-            this.loadGuides();
-        }
-    }
-
-    /**
-     * Navega a la página siguiente
-     */
-    nextPage(): void {
-        const totalPages = Math.ceil(this.totalGuides / this.pageSize);
-        if (this.currentPage < totalPages - 1) {
-            this.currentPage++;
-            this.loadGuides();
-        }
-    }
-
-    /**
-     * Obtiene el número total de páginas
-     */
-    getTotalPages(): number {
-        return Math.ceil(this.totalGuides / this.pageSize);
-    }
-
-    /**
-     * Calcula el porcentaje para barras de progreso
-     */
-    calculatePercentage(count: number): number {
-        if (!this.stats) return 0;
-        
-        const total = Object.values(this.stats.by_status).reduce((sum, val) => sum + val, 0);
-        return total > 0 ? (count / total) * 100 : 0;
-    }
-
-    /**
-     * Traduce el método de pago a español
-     */
-    translatePaymentMethod(method: PaymentMethod): string {
-        return this.guideService.translatePaymentMethod(method);
-    }
-
-    /**
-     * Traduce el tipo de servicio a español
-     */
-    translateServiceType(serviceType: ServiceType): string {
-        return this.guideService.translateServiceType(serviceType);
-    }
-
-    /**
-     * Genera un nuevo cierre de caja
-     */
-    async handleGenerateCashClose(): Promise<void> {
-        if (this.isGeneratingClose) return;
-
-        // Validaciones según el tipo de período
-        if (this.selectedPeriodType === 'DAILY' && (!this.selectedYear || !this.selectedMonth || !this.selectedDay)) {
-            this.toast.error('Por favor seleccione año, mes y día para el cierre diario');
-            return;
-        }
-
-        if (this.selectedPeriodType === 'WEEKLY' && (!this.selectedYear || !this.selectedMonth || !this.selectedDay)) {
-            this.toast.error('Por favor seleccione año, mes y día de inicio para el cierre semanal');
-            return;
-        }
-
-        if (this.selectedPeriodType === 'MONTHLY' && (!this.selectedYear || !this.selectedMonth)) {
-            this.toast.error('Por favor seleccione año y mes para el cierre mensual');
-            return;
-        }
-
-        if (this.selectedPeriodType === 'YEARLY' && !this.selectedYear) {
-            this.toast.error('Por favor seleccione el año para el cierre anual');
-            return;
-        }
+        if (formData.month) request.month = formData.month;
+        if (formData.day) request.day = formData.day;
+        if (formData.week) request.week = formData.week;
 
         this.isGeneratingClose = true;
 
         try {
-            const request: CashCloseRequest = {
-                period_type: this.selectedPeriodType,
-                year: Number(this.selectedYear)
-            };
-
-            // Agregar campos según el tipo de período
-            if (this.selectedPeriodType === 'DAILY') {
-                request.month = Number(this.selectedMonth);
-                request.day = Number(this.selectedDay);
-            } else if (this.selectedPeriodType === 'WEEKLY') {
-                // Calcular número de semana del año
-                const weekNumber = this.getWeekNumber(
-                    Number(this.selectedYear),
-                    Number(this.selectedMonth),
-                    Number(this.selectedDay)
-                );
-                request.week = weekNumber;
-            } else if (this.selectedPeriodType === 'MONTHLY') {
-                request.month = Number(this.selectedMonth);
-            }
-            // YEARLY solo necesita year (ya está asignado arriba)
-
-            console.log('Request para cierre:', request);
-
             const response = await this.cashCloseService.generateCashClose(request);
 
-            this.toast.success(`¡Cierre de caja generado exitosamente!\n\nTotal: $${response.close.total_amount.toLocaleString()}\nGuías: ${response.close.total_guides}`);
+            this.toast.success(
+                `¡Cierre de caja generado exitosamente!\n\n` +
+                `Total: $${response.close.total_amount.toLocaleString()}\n` +
+                `Guías: ${response.close.total_guides}`
+            );
 
-            // Descargar PDF automáticamente si está disponible
             if (response.close.pdf_url) {
                 await this.cashCloseService.downloadCashClosePDF(response.close.close_id);
             }
 
-            // Recargar la lista de cierres
             await this.loadCashCloses();
             await this.loadCashCloseStats();
 
@@ -867,32 +452,6 @@ export class SecretaryDashboardPage implements OnInit {
         }
     }
 
-    /**
-     * Calcula el número de semana del año (ISO 8601)
-     * La semana 1 es la primera semana con al menos 4 días en el año
-     */
-    private getWeekNumber(year: number, month: number, day: number): number {
-        const date = new Date(year, month - 1, day);
-        
-        // Copiar la fecha para no modificar la original
-        const tempDate = new Date(date.getTime());
-        
-        // Ajustar al jueves de la semana actual (ISO 8601)
-        // Los jueves siempre están en la semana correcta
-        tempDate.setDate(tempDate.getDate() + 4 - (tempDate.getDay() || 7));
-        
-        // Obtener el primer día del año
-        const yearStart = new Date(tempDate.getFullYear(), 0, 1);
-        
-        // Calcular el número de semana
-        const weekNumber = Math.ceil((((tempDate.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
-        
-        return weekNumber;
-    }
-
-    /**
-     * Carga la lista de cierres de caja
-     */
     async loadCashCloses(): Promise<void> {
         this.isLoadingCloses = true;
         this.cdr.detectChanges();
@@ -916,9 +475,6 @@ export class SecretaryDashboardPage implements OnInit {
         }
     }
 
-    /**
-     * Carga las estadísticas de cierres
-     */
     async loadCashCloseStats(): Promise<void> {
         this.isLoadingCloseStats = true;
         this.cdr.detectChanges();
@@ -935,62 +491,63 @@ export class SecretaryDashboardPage implements OnInit {
         }
     }
 
-    /**
-     * Descarga el PDF de un cierre
-     */
-    async downloadClosePDF(closeId: number): Promise<void> {
-        try {
-            await this.cashCloseService.downloadCashClosePDF(closeId);
-        } catch (error) {
-            console.error('Error al descargar PDF:', error);
-            this.toast.error('Error al descargar el PDF del cierre');
-        }
-    }
-
-    /**
-     * Traduce el tipo de período
-     */
-    translatePeriodType(periodType: PeriodType): string {
-        return this.cashCloseService.translatePeriodType(periodType);
-    }
-
-    /**
-     * Formatea una fecha de cierre
-     */
-    formatCloseDate(dateString: string): string {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-CO', {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-        });
-    }
-
-    /**
-     * Página anterior de cierres
-     */
-    previousClosePage(): void {
-        if (this.currentClosePage > 0) {
+    handleClosePageChange(direction: 'prev' | 'next'): void {
+        if (direction === 'prev' && this.currentClosePage > 0) {
             this.currentClosePage--;
             this.loadCashCloses();
+        } else if (direction === 'next') {
+            const totalPages = Math.ceil(this.totalCloses / this.closePageSize);
+            if (this.currentClosePage < totalPages - 1) {
+                this.currentClosePage++;
+                this.loadCashCloses();
+            }
         }
     }
 
-    /**
-     * Página siguiente de cierres
-     */
-    nextClosePage(): void {
-        const totalPages = Math.ceil(this.totalCloses / this.closePageSize);
-        if (this.currentClosePage < totalPages - 1) {
-            this.currentClosePage++;
-            this.loadCashCloses();
+    // ==========================================
+    // UTILITY METHODS (Translations & Formats)
+    // ==========================================
+    getStatusBadgeClass(status: GuideStatus): string {
+        return this.guideService.getStatusBadgeClass(status);
+    }
+
+    translateStatus(status: GuideStatus): string {
+        return this.guideService.translateStatus(status);
+    }
+
+    translatePaymentMethod(method: PaymentMethod): string {
+        return this.guideService.translatePaymentMethod(method);
+    }
+
+    translateServiceType(serviceType: ServiceType): string {
+        return this.guideService.translateServiceType(serviceType);
+    }
+
+    formatDate(dateString: string): string {
+        const date = new Date(dateString);
+        const today = new Date();
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+
+        if (date.toDateString() === today.toDateString()) {
+            return `Hoy ${date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
+        } else if (date.toDateString() === yesterday.toDateString()) {
+            return `Ayer ${date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
+        } else {
+            return date.toLocaleDateString('es-CO', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
     }
 
-    /**
-     * Total de páginas de cierres
-     */
-    getTotalClosePages(): number {
-        return Math.ceil(this.totalCloses / this.closePageSize);
+    // ==========================================
+    // AUTH
+    // ==========================================
+    handleLogout(): void {
+        sessionStorage.clear();
+        this.router.navigate(['/auth']);
     }
 }
