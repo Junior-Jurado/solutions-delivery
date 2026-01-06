@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { CitySelectorComponent } from '@shared/components/city-selector.component';
 import { City } from '@core/services/location.service';
 import { CreateGuideResponse } from '@core/services/guide.service';
+import { IconComponent } from '@shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-guide-form',
@@ -13,7 +14,8 @@ import { CreateGuideResponse } from '@core/services/guide.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    CitySelectorComponent
+    CitySelectorComponent,
+    IconComponent
   ]
 })
 export class GuideFormComponent {

@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GuideStatus } from '@core/services/guide.service';
+import { IconComponent } from '@shared/components/icon/icon.component';
 
 export interface StatusCount {
   [key: string]: number;
@@ -16,7 +17,7 @@ export interface StatusItem {
   standalone: true,
   templateUrl: './status-distribution.component.html',
   styleUrls: ['./status-distribution.component.scss'],
-  imports: [CommonModule]
+  imports: [CommonModule, IconComponent]
 })
 export class StatusDistributionComponent {
   @Input() statusCounts: StatusCount = {};

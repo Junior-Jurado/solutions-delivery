@@ -8,19 +8,17 @@ import {
     GuideService, 
     ShippingGuide,
     GuideStatus,
-    GuideStatsResponse,
-    PaymentMethod,
-    ServiceType
+    GuideStatsResponse
 } from "@core/services/guide.service";
 import { LocationService, City } from "@core/services/location.service";
 import { 
     CashClose, 
     CashCloseRequest, 
     CashCloseService, 
-    CashCloseStatsResponse, 
-    PeriodType 
+    CashCloseStatsResponse
 } from "@core/services/cash-close.service";
 import { ToastService } from "@shared/services/toast.service";
+import { TranslationService } from "@shared/services/translation.service";
 
 // Components
 import { GuideFormComponent } from '../components/guide-form/guide-form.component';
@@ -33,6 +31,7 @@ import { CashCloseListComponent } from "../components/cash-close-list/cash-close
 import { GuideSearchComponent } from "../components/guide-search/guide-search.component";
 import { StatusDistributionComponent } from "../components/status-distribution/status-distribution.component";
 import { CashCloseStatsComponent } from "../components/cash-close-stats/cash-close-stats.component";
+import { IconComponent } from "@shared/components/icon/icon.component";
 
 @Component({
     selector: 'app-secretary-dashboard',
@@ -51,7 +50,8 @@ import { CashCloseStatsComponent } from "../components/cash-close-stats/cash-clo
         GuideDetailsModalComponent,
         CashCloseFormComponent,
         CashCloseListComponent,
-        CashCloseStatsComponent
+        CashCloseStatsComponent,
+        IconComponent
     ]
 })
 export class SecretaryDashboardPage implements OnInit {
@@ -131,6 +131,7 @@ export class SecretaryDashboardPage implements OnInit {
         private guideService: GuideService,
         private locationService: LocationService,
         private cashCloseService: CashCloseService,
+        private translationService: TranslationService,
         private toast: ToastService,
         private cdr: ChangeDetectorRef
     ) {}
@@ -505,49 +506,10 @@ export class SecretaryDashboardPage implements OnInit {
     }
 
     // ==========================================
-    // UTILITY METHODS (Translations & Formats)
-    // ==========================================
-    getStatusBadgeClass(status: GuideStatus): string {
-        return this.guideService.getStatusBadgeClass(status);
-    }
-
-    translateStatus(status: GuideStatus): string {
-        return this.guideService.translateStatus(status);
-    }
-
-    translatePaymentMethod(method: PaymentMethod): string {
-        return this.guideService.translatePaymentMethod(method);
-    }
-
-    translateServiceType(serviceType: ServiceType): string {
-        return this.guideService.translateServiceType(serviceType);
-    }
-
-    formatDate(dateString: string): string {
-        const date = new Date(dateString);
-        const today = new Date();
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        if (date.toDateString() === today.toDateString()) {
-            return `Hoy ${date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
-        } else if (date.toDateString() === yesterday.toDateString()) {
-            return `Ayer ${date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}`;
-        } else {
-            return date.toLocaleDateString('es-CO', {
-                day: '2-digit',
-                month: 'short',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
-    }
-
-    // ==========================================
     // AUTH
     // ==========================================
     handleLogout(): void {
         sessionStorage.clear();
-        this.router.navigate(['/auth']);
+        this.router.navigate(['/dashboard']);
     }
 }

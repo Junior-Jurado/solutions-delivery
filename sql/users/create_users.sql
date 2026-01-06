@@ -11,6 +11,6 @@ CREATE TABLE users (
   created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT pk_users PRIMARY KEY (user_uuid),
   CONSTRAINT uq_users_email UNIQUE (email),
-  CONSTRAINT uq_users_number_document UNIQUE (number_document),
-  CONSTRAINT uq_users_phone UNIQUE (phone)
+  -- CONSTRAINT uq_users_phone UNIQUE (phone),
+  CONSTRAINT uq_users_number_document UNIQUE (number_document)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

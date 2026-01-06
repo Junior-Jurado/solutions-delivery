@@ -3,10 +3,7 @@
     <!-- ===== REMITENTE ===== -->
     <div class="form-section">
       <div class="section-header">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
-        </svg>
+        <app-icon category="common" name="user-circle" size="20px" color="#3b82f6"></app-icon>
         <h3>Información del Remitente</h3>
       </div>
 
@@ -91,10 +88,7 @@
     <!-- ===== DESTINATARIO ===== -->
     <div class="form-section">
       <div class="section-header destination">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-          <circle cx="12" cy="10" r="3"></circle>
-        </svg>
+        <app-icon category="common" name="map-pin" size="20px" color="#ef4444"></app-icon>
         <h3>Información del Destinatario</h3>
       </div>
 
@@ -180,12 +174,7 @@
   <!-- ===== INFORMACIÓN DEL PAQUETE ===== -->
   <div class="form-section full-width">
     <div class="section-header">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"></line>
-        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
-        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-        <line x1="12" y1="22.08" x2="12" y2="12"></line>
-      </svg>
+      <app-icon category="common" name="box" size="20px" color="#3b82f6"></app-icon>
       <h3>Información del Paquete</h3>
     </div>
 
@@ -272,27 +261,13 @@
     type="submit" 
     class="btn btn-primary btn-large" 
     [disabled]="!guideForm.valid || isSubmitting">
-    <svg 
+    <app-icon 
       *ngIf="isSubmitting" 
-      class="spinner" 
-      xmlns="http://www.w3.org/2000/svg" 
-      width="20" 
-      height="20" 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      stroke-width="2" 
-      stroke-linecap="round" 
-      stroke-linejoin="round">
-      <line x1="12" y1="2" x2="12" y2="6"></line>
-      <line x1="12" y1="18" x2="12" y2="22"></line>
-      <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-      <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-      <line x1="2" y1="12" x2="6" y2="12"></line>
-      <line x1="18" y1="12" x2="22" y2="12"></line>
-      <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-      <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-    </svg>
+      category="common" 
+      name="loader" 
+      size="20px"
+      customClass="spinner">
+    </app-icon>
     {{ isSubmitting ? 'Creando guía...' : 'Crear Guía de Envío' }}
   </button>
 </form>

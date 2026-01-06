@@ -40,16 +40,12 @@
   padding: $spacing-3xl;
   color: $text-muted;
 
-  svg {
-    color: $gray-300;
-    margin-bottom: $spacing-md;
-  }
-
   h3 {
     font-size: $font-lg;
     font-weight: $font-semibold;
     color: $text-primary;
     margin-bottom: $spacing-sm;
+    margin-top: $spacing-md;
   }
 
   p {

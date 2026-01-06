@@ -178,15 +178,17 @@ export interface GuideStatsResponse {
     by_status: Record<string, number>;
 }
 
+
 @Injectable({ providedIn: 'root' })
 export class GuideService {
     private readonly BASE_URL = `${environment.apiBaseUrl}/guides`;
 
     constructor(private http: HttpClient) {}
 
-    /**
-     * Crea una nueva guía de envío
-     */
+    // ==========================================
+    // API METHODS
+    // ==========================================
+
     async createGuide(guideData: CreateGuideRequest): Promise<CreateGuideResponse> {
         const headers = this.getHeaders();
 
@@ -213,9 +215,6 @@ export class GuideService {
         }
     }
 
-    /**
-     * Obtiene lista de guías con filtros
-     */
     async listGuides(filters?: GuideFilters): Promise<GuidesListResponse> {
         const headers = this.getHeaders();
         
@@ -243,9 +242,6 @@ export class GuideService {
         }
     }
 
-    /**
-     * Obtiene una guía por su ID con toda su información
-     */
     async getGuideById(guideId: number): Promise<GuideDetailResponse> {
         const headers = this.getHeaders();
 
@@ -262,9 +258,6 @@ export class GuideService {
         }
     }
 
-    /**
-     * Actualiza el estado de una guía
-     */
     async updateGuideStatus(guideId: number, newStatus: GuideStatus): Promise<UpdateStatusResponse> {
         const headers = this.getHeaders();
         
@@ -286,9 +279,6 @@ export class GuideService {
         }
     }
 
-    /**
-     * Obtiene estadísticas de guías
-     */
     async getGuideStats(): Promise<GuideStatsResponse> {
         const headers = this.getHeaders();
 
@@ -305,9 +295,6 @@ export class GuideService {
         }
     }
 
-    /**
-     * Busca guías por término de búsqueda
-     */
     async searchGuides(searchTerm: string): Promise<GuidesListResponse> {
         if (searchTerm.length < 3) {
             return {
@@ -334,9 +321,28 @@ export class GuideService {
         }
     }
 
-    /**
-     * Construye el objeto de request desde los datos del formulario
-     */
+    async downloadGuidePDF(guideId: number): Promise<void> {
+        const headers = this.getHeaders();
+
+        try {
+            const response = await firstValueFrom(
+                this.http.get<{ url: string; expires_in: number; message: string }>(
+                    `${this.BASE_URL}/${guideId}/pdf`,
+                    { headers }
+                )
+            );
+
+            window.open(response.url, '_blank');
+        } catch (error) {
+            console.error('Error al obtener URL de descarga:', error);
+            throw new Error('Error al descargar el PDF');
+        }
+    }
+
+    // ==========================================
+    // BUILDER METHODS
+    // ==========================================
+
     buildGuideRequest(formValue: any, userId: string): CreateGuideRequest {
         const dimensions = this.parseDimensions(formValue.dimensions || '20x15x10');
 
@@ -363,7 +369,7 @@ export class GuideService {
                 full_name: formValue.senderName,
                 document_type: formValue.senderDocType || 'CC',
                 document_number: formValue.senderDoc,
-                phone: this.formatPhone(formValue.senderPhone),
+                phone: this.cleanPhone(formValue.senderPhone),
                 email: formValue.senderEmail || '',
                 address: formValue.senderAddress,
                 city_id: this.getCityId(formValue.senderCity),
@@ -374,7 +380,7 @@ export class GuideService {
                 full_name: formValue.receiverName,
                 document_type: formValue.receiverDocType || 'CC',
                 document_number: formValue.receiverDoc,
-                phone: this.formatPhone(formValue.receiverPhone),
+                phone: this.cleanPhone(formValue.receiverPhone),
                 email: formValue.receiverEmail || '',
                 address: formValue.receiverAddress,
                 city_id: this.getCityId(formValue.receiverCity),
@@ -394,44 +400,9 @@ export class GuideService {
         };
     }
 
-    /**
-     * Descarga el PDF de una guía obteniendo una URL pre-firmada del backend
-     */
-    async downloadGuidePDF(guideId: number): Promise<void> {
-        const headers = this.getHeaders();
-
-        try {
-            // Obtener la URL pre-firmada del backend
-            const response = await firstValueFrom(
-                this.http.get<{ url: string; expires_in: number; message: string }>(
-                    `${this.BASE_URL}/${guideId}/pdf`,
-                    { headers }
-                )
-            );
-
-            // Abrir la URL pre-firmada en una nueva pestaña
-            window.open(response.url, '_blank');
-        } catch (error) {
-            console.error('Error al obtener URL de descarga:', error);
-            throw new Error('Error al descargar el PDF');
-        }
-    }
-
-    
-
-    /**
-     * Obtiene la clase CSS para el badge de estado
-     */
-    getStatusBadgeClass(status: GuideStatus): string {
-        const classes: Record<GuideStatus, string> = {
-            'CREATED': 'badge-default',
-            'IN_ROUTE': 'badge-secondary',
-            'IN_WAREHOUSE': 'badge-warning',
-            'OUT_FOR_DELIVERY': 'badge-secondary',
-            'DELIVERED': 'badge-success'
-        };
-        return classes[status] || 'badge-default';
-    }
+    // ==========================================
+    // PRIVATE HELPER METHODS
+    // ==========================================
 
     private parseDimensions(dimensionsStr: string): { length: number; width: number; height: number } {
         const parts = dimensionsStr.split('x').map(d => parseFloat(d.trim()));
@@ -443,7 +414,7 @@ export class GuideService {
         };
     }
 
-    private formatPhone(phone: string): string {
+    private cleanPhone(phone: string): string {
         if (!phone) return '';
         return phone.replace(/\D/g, '');
     }
@@ -478,6 +449,26 @@ export class GuideService {
         return Math.round(price);
     }
 
+    private mapServiceType(serviceType: string): ServiceType {
+        const mapping: Record<string, ServiceType> = {
+            'Contado': 'NORMAL',
+            'Contra Entrega': 'NORMAL',
+            'Crédito': 'NORMAL',
+            'Express': 'PRIORITY',
+            'Urgente': 'EXPRESS'
+        };
+        return mapping[serviceType] || 'NORMAL';
+    }
+
+    private mapPaymentMethod(serviceType: string): PaymentMethod {
+        const mapping: Record<string, PaymentMethod> = {
+            'Contado': 'CASH',
+            'Contra Entrega': 'COD',
+            'Crédito': 'CREDIT'
+        };
+        return mapping[serviceType] || 'CASH';
+    }
+
     private getHeaders(): HttpHeaders {
         const idToken = sessionStorage.getItem('idToken');
         
@@ -490,67 +481,4 @@ export class GuideService {
             'Content-Type': 'application/json'
         });
     }
-
-    /**
-     * Traduce el método de pago a español
-     */
-    translatePaymentMethod(method: PaymentMethod): string {
-        const translations: Record<PaymentMethod, string> = {
-            'CASH': 'Contado',
-            'COD': 'Contraentrega',
-            'CREDIT': 'Crédito'
-        };
-        return translations[method] || method;
-    }
-
-    /**
-     * Traduce el tipo de servicio a español
-     */
-    translateServiceType(serviceType: ServiceType): string {
-        const translations: Record<ServiceType, string> = {
-            'NORMAL': 'Normal',
-            'PRIORITY': 'Prioritario',
-            'EXPRESS': 'Express'
-        };
-        return translations[serviceType] || serviceType;
-    }
-
-    /**
-     * Traduce el estado a texto legible en español
-     */
-    translateStatus(status: GuideStatus): string {
-        const translations: Record<GuideStatus, string> = {
-            'CREATED': 'Creada',
-            'IN_ROUTE': 'En ruta',
-            'IN_WAREHOUSE': 'En bodega',
-            'OUT_FOR_DELIVERY': 'En reparto',
-            'DELIVERED': 'Entregada'
-        };
-        return translations[status] || status;
-    }
-
-    // Métodos privados de utilidad - ACTUALIZADOS para enviar en inglés
-    private mapServiceType(serviceType: string): ServiceType {
-        // Ahora estos mapeos son solo internos del frontend
-        // El backend espera los valores en inglés
-        const mapping: Record<string, ServiceType> = {
-            'Contado': 'NORMAL',
-            'Contra Entrega': 'NORMAL',
-            'Crédito': 'NORMAL',
-            'Express': 'PRIORITY',
-            'Urgente': 'EXPRESS'
-        };
-        return mapping[serviceType] || 'NORMAL';
-    }
-
-    private mapPaymentMethod(serviceType: string): PaymentMethod {
-        // Mapeamos lo que el usuario selecciona a los valores en inglés
-        const mapping: Record<string, PaymentMethod> = {
-            'Contado': 'CASH',
-            'Contra Entrega': 'COD',
-            'Crédito': 'CREDIT'
-        };
-        return mapping[serviceType] || 'CASH';
-    }
-    
 }
