@@ -29,11 +29,11 @@ export const DASHBOARD_ROUTES: Routes = [
 
             // Roles
             {
-                path: 'user',
+                path: 'client',
                 canActivate: [RoleGuard],
-                data: { roles: ['USER'] },
+                data: { roles: ['CLIENT'] },
                 loadComponent: () =>
-                    import('../user/pages/user-dashboard.page').then(m => m.UserDashboardComponent)
+                    import('../client/pages/client-dashboard.page').then(m => m.ClientDashboardPage)
             },
 
             // {

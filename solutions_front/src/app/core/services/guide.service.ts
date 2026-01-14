@@ -433,22 +433,6 @@ export class GuideService {
         return 0;
     }
 
-    private calculatePrice(formValue: any): number {
-        const weight = parseFloat(formValue.weight) || 0;
-        const basePrice = 15000;
-        const pricePerKg = 3000;
-        
-        let price = basePrice + (weight * pricePerKg);
-
-        if (formValue.priority === 'express') {
-            price *= 1.5;
-        } else if (formValue.priority === 'urgente') {
-            price *= 2;
-        }
-
-        return Math.round(price);
-    }
-
     private mapServiceType(serviceType: string): ServiceType {
         const mapping: Record<string, ServiceType> = {
             'Contado': 'NORMAL',
@@ -480,5 +464,31 @@ export class GuideService {
             'Authorization': `Bearer ${idToken}`,
             'Content-Type': 'application/json'
         });
+    }
+
+    // ==========================================
+    // PUBLIC HELPER METHODS
+    // ==========================================
+
+    /**
+     * Calcula el precio de una guía basado en peso y prioridad
+     * Este método es público para permitir calcular el precio antes de crear la guía
+     * IMPORTANTE: Esta lógica debe coincidir con la del backend
+     */
+    calculatePrice(formValue: any): number {
+        const weight = parseFloat(formValue.weight) || 0;
+        const basePrice = 15000;
+        const pricePerKg = 3000;
+        
+        let price = basePrice + (weight * pricePerKg);
+
+        // Aplicar multiplicadores según prioridad
+        if (formValue.priority === 'express') {
+            price *= 1.5;
+        } else if (formValue.priority === 'urgente') {
+            price *= 2;
+        }
+
+        return Math.round(price);
     }
 }

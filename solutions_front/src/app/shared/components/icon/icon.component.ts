@@ -39,6 +39,7 @@ export class IconComponent implements OnInit {
   @Input() size: string = '20px';
   @Input() color?: string;
   @Input() customClass?: string;
+  @Input() preserveColors: boolean = false;
 
   icon$!: Observable<SafeHtml>;
 
@@ -50,6 +51,6 @@ export class IconComponent implements OnInit {
       return;
     }
 
-    this.icon$ = this.iconService.getIcon(this.category, this.name);
+    this.icon$ = this.iconService.getIcon(this.category, this.name, this.preserveColors);
   }
 }

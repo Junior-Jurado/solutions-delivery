@@ -26,8 +26,6 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	}
 	
 	switch {
-	case strings.HasPrefix(path, "/user"):
-		return ProcesoUsers(body, path, method, userUUID, id, request)
 
 	case strings.HasPrefix(path, "/guides"):
 		return ProcesoGuias(body, path, method, userUUID, idn, request)
@@ -40,12 +38,15 @@ func Manejadores(path string, method string, body string, headers map[string]str
 
 	case strings.HasPrefix(path, "/cash-close"):
 		return ProccessCashClose(body, path, method, userUUID, idn, request) 
+	
+	case strings.HasPrefix(path, "/client"):
+		return ProccessClient(body, path, method, userUUID, id, request)
+	
+	default:
+		return 400, "Method Invalid"
+
 	}
 
-	
-	
-
-	return 400, "Method Invalid"
 }
 
 func validateAuthorization(path string, method string, request events.APIGatewayV2HTTPRequest) (bool, int, string) {
@@ -73,10 +74,6 @@ func validateAuthorization(path string, method string, request events.APIGateway
 	}
 
 	return true, 200, userUUID
-}
-
-func ProcesoUsers(body string, path  string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
-	return 400, "Method Invalid"
 }
 
 func ProcesoGuias(body string, path  string, method string, user string, id int, request events.APIGatewayV2HTTPRequest) (int, string) {
@@ -216,5 +213,43 @@ func ProccessCashClose(body string, path string, method string, user string, id 
 		
 		default:
 			return 400, "Method Invalid"
+	}
+}
+
+func ProccessClient(body string, path string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
+	fmt.Printf("ProccessClient -> Path:%s, Method: %s\n", path, method)
+
+	switch {
+	
+	// GET /client/profile - Obtener perfil del cliente
+	case path == "/client/profile" && method == "GET":
+		return routers.GetClientProfile(user)
+
+	// PUT /client/profile
+	case path == "/client/profile" && method == "PUT":
+		return routers.UpdateClientProfile(body, user)
+	
+	// GET /client/guides/active - Obtener guías activas del cliente
+	case path == "/client/guides/active" && method == "GET":
+		return routers.GetClientActiveGuides(user)
+	
+	// GET /client/guides/history - Obtener histórico de guías del cliente
+	case path == "/client/guides/history" && method == "GET":
+		return routers.GetClientGuideHistory(request, user)
+	
+	// GET /client/guides/track/{guideNumber} - Rastrear guía por número
+	case strings.HasPrefix(path, "/client/guides/track/") && method == "GET":
+		guideNumber := strings.TrimPrefix(path, "/client/guides/track/")
+		if guideNumber == "" {
+			return 400, `{"error": "Number of guide required"}`
+		}
+		return routers.TrackGuideByNumber(guideNumber, user)
+	
+	// GET client/stats - Obtener estadísticas del cliente
+	case path == "/client/stats" && method == "GET":
+		return routers.GetClientStats(user)
+		
+	default:
+		return 400, "Method Invalid"
 	}
 }

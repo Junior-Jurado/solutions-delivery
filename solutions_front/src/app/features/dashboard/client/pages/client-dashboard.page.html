@@ -1,0 +1,474 @@
+<div class="client-dashboard">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="logo-section">
+        <div class="logo-icon">
+          <app-icon category="common" name="package" size="28px"></app-icon>
+        </div>
+        <h1 class="logo-text">Soluciones</h1>
+      </div>
+
+      <div class="user-section">
+        <div class="user-info">
+          <app-icon category="common" name="user-circle" size="24px"></app-icon>
+          <span class="user-name">{{ currentUser?.full_name || 'Usuario' }}</span>
+        </div>
+        <button class="btn-logout" (click)="logout()">
+          <app-icon category="common" name="log-out" size="20px"></app-icon>
+          <span *ngIf="!isMobile">Cerrar Sesión</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <div class="dashboard-container">
+      <!-- Navigation Tabs -->
+      <nav class="dashboard-tabs">
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'tracking'"
+          (click)="setActiveTab('tracking')">
+          <app-icon category="common" name="search" size="20px"></app-icon>
+          <span>Rastrear Guía</span>
+        </button>
+        
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'my-guides'"
+          (click)="setActiveTab('my-guides')">
+          <app-icon category="common" name="clipboard-list" size="20px"></app-icon>
+          <span>Mis Guías</span>
+        </button>
+        
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'history'"
+          (click)="setActiveTab('history')">
+          <app-icon category="common" name="clock" size="20px"></app-icon>
+          <span>Histórico</span>
+        </button>
+        
+        <button 
+          class="tab-button"
+          [class.active]="activeTab === 'create'"
+          (click)="setActiveTab('create')">
+          <app-icon category="common" name="plus-circle" size="20px"></app-icon>
+          <span>Crear Guía</span>
+        </button>
+      </nav>
+
+      <!-- Tab Content -->
+      <div class="tab-content">
+        <!-- TRACKING TAB -->
+        <div class="tab-panel" *ngIf="activeTab === 'tracking'">
+          <div class="tracking-section">
+            <div class="tracking-card">
+              <div class="card-header">
+                <app-icon category="common" name="search" size="24px"></app-icon>
+                <h2>Rastrear tu Envío</h2>
+              </div>
+
+              <div class="tracking-form">
+                <div class="form-group">
+                  <label for="trackingInput">Número de Guía</label>
+                  <input 
+                    id="trackingInput"
+                    type="text" 
+                    [(ngModel)]="trackingNumber"
+                    placeholder="Ej: EE123456789CO"
+                    (keyup.enter)="trackGuide()"
+                    class="tracking-input"
+                    [disabled]="isTracking">
+                </div>
+
+                <button 
+                  class="btn btn-primary btn-track"
+                  (click)="trackGuide()"
+                  [disabled]="isTracking || !trackingNumber.trim()">
+                  <app-icon 
+                    *ngIf="!isTracking"
+                    category="common" 
+                    name="search" 
+                    size="20px">
+                  </app-icon>
+                  <app-icon 
+                    *ngIf="isTracking"
+                    category="common" 
+                    name="loader" 
+                    size="20px"
+                    customClass="spinner">
+                  </app-icon>
+                  <span>{{ isTracking ? 'Rastreando...' : 'Rastrear Guía' }}</span>
+                </button>
+
+                <p class="error-message" *ngIf="trackingError">{{ trackingError }}</p>
+              </div>
+            </div>
+
+            <!-- Tracking Result -->
+            <div class="tracking-result" *ngIf="trackingResult">
+              <div class="result-header">
+                <app-icon category="common" name="package" size="24px"></app-icon>
+                <h3>Información del Envío</h3>
+                <button class="btn-close" (click)="clearTracking()">
+                  <app-icon category="common" name="x" size="20px"></app-icon>
+                </button>
+              </div>
+
+              <div class="result-content">
+                <div class="result-row">
+                  <span class="label">Número de Guía:</span>
+                  <span class="value">{{ trackingResult.guide_id }}</span>
+                </div>
+
+                <div class="result-row">
+                  <span class="label">Estado:</span>
+                  <span class="status-badge" [ngClass]="getStatusClass(trackingResult.current_status)">
+                    {{ getStatusText(trackingResult.current_status) }}
+                  </span>
+                </div>
+
+                <div class="result-row">
+                  <span class="label">Remitente:</span>
+                  <span class="value">{{ trackingResult.sender?.full_name || 'N/A' }}</span>
+                </div>
+
+                <div class="result-row">
+                  <span class="label">Destinatario:</span>
+                  <span class="value">{{ trackingResult.receiver?.full_name || 'N/A' }}</span>
+                </div>
+
+                <div class="result-row">
+                  <span class="label">Origen:</span>
+                  <span class="value location">
+                    <app-icon category="common" name="map-pin" size="16px"></app-icon>
+                    {{ trackingResult.origin_city_name }}
+                  </span>
+                </div>
+
+                <div class="result-row">
+                  <span class="label">Destino:</span>
+                  <span class="value location">
+                    <app-icon category="common" name="map-pin" size="16px"></app-icon>
+                    {{ trackingResult.destination_city_name }}
+                  </span>
+                </div>
+
+                <div class="result-row">
+                  <span class="label">Última Actualización:</span>
+                  <span class="value">{{ formatDate(trackingResult.updated_at) }}</span>
+                </div>
+
+                <button class="btn btn-secondary btn-details" (click)="viewGuideDetail(trackingResult.guide_id)">
+                  <app-icon category="common" name="eye" size="18px"></app-icon>
+                  <span>Ver Detalles Completos</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MY GUIDES TAB -->
+        <div class="tab-panel" *ngIf="activeTab === 'my-guides'">
+          <div class="guides-section">
+            <div class="section-header">
+              <h2>Mis Guías Activas</h2>
+              <p class="subtitle">Guías donde apareces como remitente o destinatario</p>
+              <button class="btn-refresh" (click)="refreshMyGuides()" [disabled]="loadingMyGuides">
+                <app-icon category="common" name="refresh-cw" size="18px"></app-icon>
+                <span>Actualizar</span>
+              </button>
+            </div>
+
+            <div class="loading-spinner" *ngIf="loadingMyGuides">
+              <app-icon category="common" name="loader" size="32px" customClass="spinner"></app-icon>
+              <p>Cargando guías...</p>
+            </div>
+
+            <div class="guides-grid" *ngIf="!loadingMyGuides && myGuides.length > 0">
+              <div class="guide-card" *ngFor="let guide of myGuides">
+                <div class="guide-card-header">
+                  <span class="guide-number">#{{ guide.guide_id }}</span>
+                  <span class="status-badge" [ngClass]="getStatusClass(guide.current_status)">
+                    {{ getStatusText(guide.current_status) }}
+                  </span>
+                </div>
+
+                <div class="guide-card-body">
+                  <div class="guide-info-row">
+                    <app-icon category="common" name="calendar" size="16px"></app-icon>
+                    <span>{{ formatDate(guide.created_at) }}</span>
+                  </div>
+
+                  <div class="guide-route">
+                    <div class="route-point">
+                      <app-icon category="common" name="circle" size="12px"></app-icon>
+                      <span>{{ guide.origin_city_name }}</span>
+                    </div>
+                    <div class="route-line"></div>
+                    <div class="route-point">
+                      <app-icon category="common" name="map-pin" size="12px"></app-icon>
+                      <span>{{ guide.destination_city_name }}</span>
+                    </div>
+                  </div>
+
+                  <div class="guide-details">
+                    <div class="detail-item">
+                      <span class="detail-label">Remitente:</span>
+                      <span class="detail-value">{{ guide.sender?.full_name || 'N/A' }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Destinatario:</span>
+                      <span class="detail-value">{{ guide.receiver?.full_name || 'N/A' }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Peso:</span>
+                      <span class="detail-value">{{ guide.package?.weight_kg || 0 }} kg</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Precio:</span>
+                      <span class="detail-value price">\${{ formatPrice(guide.price) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="guide-card-footer">
+                  <button class="btn btn-secondary btn-sm" (click)="viewGuideDetail(guide.guide_id)">
+                    <app-icon category="common" name="eye" size="16px"></app-icon>
+                    <span>Ver Detalles</span>
+                  </button>
+                  <button class="btn btn-outline btn-sm" (click)="downloadGuidePDF(guide.guide_id)" *ngIf="guide.pdf_url">
+                    <app-icon category="common" name="download" size="16px"></app-icon>
+                    <span>PDF</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="empty-state" *ngIf="!loadingMyGuides && myGuides.length === 0">
+              <app-icon category="common" name="inbox" size="64px"></app-icon>
+              <h3>No tienes guías activas</h3>
+              <p>Crea una nueva guía para comenzar</p>
+              <button class="btn btn-primary" (click)="setActiveTab('create')">
+                <app-icon category="common" name="plus-circle" size="20px"></app-icon>
+                <span>Crear Primera Guía</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORY TAB -->
+        <div class="tab-panel" *ngIf="activeTab === 'history'">
+          <div class="history-section">
+            <div class="section-header">
+              <h2>Histórico de Guías</h2>
+              <p class="subtitle">Registro completo de tus envíos anteriores</p>
+            </div>
+
+            <div class="loading-spinner" *ngIf="loadingHistory">
+              <app-icon category="common" name="loader" size="32px" customClass="spinner"></app-icon>
+              <p>Cargando histórico...</p>
+            </div>
+
+            <div class="history-table" *ngIf="!loadingHistory && guidesHistory.length > 0">
+              <table>
+                <thead>
+                  <tr>
+                    <th>No. Guía</th>
+                    <th>Fecha Envío</th>
+                    <th>Origen</th>
+                    <th>Destino</th>
+                    <th>Estado</th>
+                    <th>Precio</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let guide of guidesHistory">
+                    <td class="guide-number-cell">#{{ guide.guide_id }}</td>
+                    <td>{{ formatDate(guide.created_at) }}</td>
+                    <td>{{ guide.origin_city_name }}</td>
+                    <td>{{ guide.destination_city_name }}</td>
+                    <td>
+                      <span class="status-badge" [ngClass]="getStatusClass(guide.current_status)">
+                        {{ getStatusText(guide.current_status) }}
+                      </span>
+                    </td>
+                    <td class="price-cell">\${{ formatPrice(guide.price) }}</td>
+                    <td class="actions-cell">
+                      <button class="btn-icon" (click)="viewGuideDetail(guide.guide_id)" title="Ver detalles">
+                        <app-icon category="common" name="eye" size="16px"></app-icon>
+                      </button>
+                      <button class="btn-icon" (click)="downloadGuidePDF(guide.guide_id)" *ngIf="guide.pdf_url" title="Descargar PDF">
+                        <app-icon category="common" name="download" size="16px"></app-icon>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="empty-state" *ngIf="!loadingHistory && guidesHistory.length === 0">
+              <app-icon category="common" name="archive" size="64px"></app-icon>
+              <h3>No hay registros en el histórico</h3>
+              <p>Aquí aparecerán tus guías entregadas</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CREATE GUIDE TAB -->
+        <div class="tab-panel" *ngIf="activeTab === 'create'">
+          <div class="create-section">
+            <div class="section-header">
+              <h2>Crear Nueva Guía</h2>
+              <p>Complete el formulario para generar una guía de envío</p>
+            </div>
+
+            <app-guide-form
+              [currentUserId]="userId"
+              (formSubmit)="onGuideFormSubmit($event)">
+            </app-guide-form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Guide Preview Modal -->
+  <div class="modal-overlay" *ngIf="showGuidePreview" (click)="cancelGuideCreation()">
+    <div class="modal-content preview-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Confirmar Creación de Guía</h2>
+        <button class="btn-close" (click)="cancelGuideCreation()">
+          <app-icon category="common" name="x" size="24px"></app-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="warning-banner">
+          <app-icon category="common" name="alert-triangle" size="24px"></app-icon>
+          <p><strong>Importante:</strong> Una vez creada, la guía no se puede cancelar. Verifique la información antes de continuar.</p>
+        </div>
+
+        <!-- PRECIO CALCULADO - DESTACADO -->
+        <div class="price-banner" *ngIf="guidePreviewData">
+          <div class="price-label">
+            <app-icon category="common" name="dollar-sign" size="24px"></app-icon>
+            <span>Precio del Envío</span>
+          </div>
+          <div class="price-amount">
+            ${{ formatPrice(guidePreviewData.calculatedPrice) }}
+          </div>
+          <div class="price-details">
+            Peso: {{ guidePreviewData.weight }} kg • 
+            Prioridad: {{ guidePreviewData.priority }}
+          </div>
+        </div>
+
+        <div class="preview-content" *ngIf="guidePreviewData">
+          <div class="preview-section">
+            <h3>
+              <app-icon category="common" name="user-circle" size="20px"></app-icon>
+              Remitente
+            </h3>
+            <div class="preview-details">
+              <div class="preview-row">
+                <span class="label">Nombre:</span>
+                <span class="value">{{ guidePreviewData.senderName }}</span>
+              </div>
+              <div class="preview-row">
+                <span class="label">Ciudad:</span>
+                <span class="value">{{ guidePreviewData.senderCity }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-section">
+            <h3>
+              <app-icon category="common" name="map-pin" size="20px"></app-icon>
+              Destinatario
+            </h3>
+            <div class="preview-details">
+              <div class="preview-row">
+                <span class="label">Nombre:</span>
+                <span class="value">{{ guidePreviewData.receiverName }}</span>
+              </div>
+              <div class="preview-row">
+                <span class="label">Ciudad:</span>
+                <span class="value">{{ guidePreviewData.receiverCity }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="preview-section">
+            <h3>
+              <app-icon category="common" name="box" size="20px"></app-icon>
+              Información del Paquete
+            </h3>
+            <div class="preview-details">
+              <div class="preview-row">
+                <span class="label">Peso:</span>
+                <span class="value">{{ guidePreviewData.weight }} kg</span>
+              </div>
+              <div class="preview-row">
+                <span class="label">Valor Declarado:</span>
+                <span class="value">\${{ formatPrice(guidePreviewData.declaredValue) }}</span>
+              </div>
+              <div class="preview-row">
+                <span class="label">Tipo de Servicio:</span>
+                <span class="value">{{ guidePreviewData.serviceType }}</span>
+              </div>
+              <div class="preview-row">
+                <span class="label">Prioridad:</span>
+                <span class="value">{{ guidePreviewData.priority }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cancelGuideCreation()" [disabled]="isCreatingGuide">
+          <span>Cancelar</span>
+        </button>
+        <button class="btn btn-primary" (click)="confirmGuideCreation()" [disabled]="isCreatingGuide">
+          <app-icon 
+            *ngIf="isCreatingGuide"
+            category="common" 
+            name="loader" 
+            size="20px"
+            customClass="spinner">
+          </app-icon>
+          <app-icon 
+            *ngIf="!isCreatingGuide"
+            category="common" 
+            name="check-circle" 
+            size="20px">
+          </app-icon>
+          <span>{{ isCreatingGuide ? 'Creando...' : 'Confirmar y Crear Guía' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Guide Details Modal -->
+  <app-guide-details-modal
+    [guide]="selectedGuide"
+    [isOpen]="showDetailsModal"
+    (closeModal)="closeDetailsModal()"
+    (downloadPDFEvent)="downloadGuidePDF($event)">
+  </app-guide-details-modal>
+
+  <!-- Footer -->
+  <footer class="dashboard-footer">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <app-icon category="common" name="package" size="24px"></app-icon>
+      </div>
+      <p>© 2024 Soluciones. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>

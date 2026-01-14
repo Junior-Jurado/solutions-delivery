@@ -332,7 +332,7 @@ func GetAllCashCloses(limit, offset int) ([]models.CashClose, int, error) {
 
 // GetCashCloseStats gets close statistics
 func GetCashCloseStats() (models.CashCloseStatsResponse, error) {
-	fmt.Println("GetCashCloseStats")
+	fmt.Println("Bd: GetCashCloseStats")
 
 	var stats models.CashCloseStatsResponse
 	stats.ByPaymentMethod = make(map[string]float64)

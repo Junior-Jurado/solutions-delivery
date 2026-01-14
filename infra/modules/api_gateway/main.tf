@@ -237,3 +237,66 @@ resource "aws_apigatewayv2_route" "cash_close_pdf" {
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
+
+# -----------------------------------------
+# Client
+
+// GET /api/v1/client/profile - Obtener perfil del cliente
+resource "aws_apigatewayv2_route" "get_client_profile" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/client/profile"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// PUT /api/v1/client/profile - Actualizar perfil del cliente
+resource "aws_apigatewayv2_route" "put_client_profile" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "PUT /api/v1/client/profile"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /client/guides/active - Obtener guías activas
+resource "aws_apigatewayv2_route" "get_guides_active" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/client/guides/active"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /client/guides/history
+resource "aws_apigatewayv2_route" "get_guides_history" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/client/guides/history"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /client/guides/track/{guideNumber} - Rastrear guía por número
+resource "aws_apigatewayv2_route" "get_guides_track" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/client/guides/track/{guideNumber}"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /client/guides/stats
+resource "aws_apigatewayv2_route" "get_guides_stats" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/client/guides/stats"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id 
+}
