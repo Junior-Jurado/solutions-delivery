@@ -1,0 +1,160 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="onOverlayClick()">
+  <div class="modal-content preview-modal" (click)="$event.stopPropagation()">
+    <!-- HEADER -->
+    <div class="modal-header">
+      <h2>{{ title }}</h2>
+      <button class="btn-close" (click)="onCancel()" [disabled]="isCreating">
+        <app-icon category="common" name="x" size="24px"></app-icon>
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body" *ngIf="guideData">
+      <!-- Warning Banner -->
+      <div class="warning-banner">
+        <app-icon category="common" name="alert-triangle" size="24px"></app-icon>
+        <p><strong>Importante:</strong> {{ warningMessage }}</p>
+      </div>
+
+      <!-- Price Banner -->
+      <div class="price-banner">
+        <div class="price-label">
+          <app-icon category="common" name="dollar-sign" size="24px"></app-icon>
+          <span>Precio del Envío</span>
+        </div>
+        <div class="price-amount">
+          ${{ formatPrice(guideData.calculatedPrice) }}
+        </div>
+        <div class="price-details">
+          Peso: {{ guideData.weight }} kg | Tipo: {{ guideData.serviceType }}
+        </div>
+      </div>
+
+      <!-- Preview Content -->
+      <div class="preview-content">
+        <!-- Remitente -->
+        <div class="preview-section">
+          <h3>
+            <app-icon category="common" name="user-circle" size="20px"></app-icon>
+            Remitente
+          </h3>
+          <div class="preview-details">
+            <div class="preview-row">
+              <span class="label">Nombre:</span>
+              <span class="value">{{ guideData.senderName }}</span>
+            </div>
+            <div class="preview-row" *ngIf="guideData.senderDoc">
+              <span class="label">Documento:</span>
+              <span class="value">{{ guideData.senderDoc }}</span>
+            </div>
+            <div class="preview-row">
+              <span class="label">Ciudad:</span>
+              <span class="value">{{ guideData.senderCity }}</span>
+            </div>
+            <div class="preview-row">
+              <span class="label">Dirección:</span>
+              <span class="value">{{ guideData.senderAddress }}</span>
+            </div>
+            <div class="preview-row">
+              <span class="label">Teléfono:</span>
+              <span class="value">{{ guideData.senderPhone }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Destinatario -->
+        <div class="preview-section">
+          <h3>
+            <app-icon category="common" name="map-pin" size="20px"></app-icon>
+            Destinatario
+          </h3>
+          <div class="preview-details">
+            <div class="preview-row">
+              <span class="label">Nombre:</span>
+              <span class="value">{{ guideData.receiverName }}</span>
+            </div>
+            <div class="preview-row" *ngIf="guideData.receiverDoc">
+              <span class="label">Documento:</span>
+              <span class="value">{{ guideData.receiverDoc }}</span>
+            </div>
+            <div class="preview-row">
+              <span class="label">Ciudad:</span>
+              <span class="value">{{ guideData.receiverCity }}</span>
+            </div>
+            <div class="preview-row">
+              <span class="label">Dirección:</span>
+              <span class="value">{{ guideData.receiverAddress }}</span>
+            </div>
+            <div class="preview-row">
+              <span class="label">Teléfono:</span>
+              <span class="value">{{ guideData.receiverPhone }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Paquete -->
+        <div class="preview-section">
+          <h3>
+            <app-icon category="common" name="box" size="20px"></app-icon>
+            Información del Paquete
+          </h3>
+          <div class="preview-details">
+            <div class="preview-row">
+              <span class="label">Peso:</span>
+              <span class="value">{{ guideData.weight }} kg</span>
+            </div>
+            <div class="preview-row">
+              <span class="label">Valor Declarado:</span>
+              <span class="value">\${{ formatPrice(guideData.declaredValue) }}</span>
+            </div>
+            <div class="preview-row">
+              <span class="label">Tipo de Servicio:</span>
+              <span class="value">{{ guideData.serviceType }}</span>
+            </div>
+            <div class="preview-row" *ngIf="guideData.pieces && guideData.pieces > 1">
+              <span class="label">Piezas:</span>
+              <span class="value">{{ guideData.pieces }}</span>
+            </div>
+            <div class="preview-row" *ngIf="guideData.dimensions">
+              <span class="label">Dimensiones:</span>
+              <span class="value">{{ guideData.dimensions }} cm</span>
+            </div>
+            <div class="preview-row" *ngIf="guideData.content">
+              <span class="label">Contenido:</span>
+              <span class="value">{{ guideData.content }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="modal-footer">
+      <button 
+        class="btn btn-secondary" 
+        (click)="onCancel()" 
+        [disabled]="isCreating">
+        <span>{{ cancelButtonText }}</span>
+      </button>
+      <button 
+        class="btn btn-primary" 
+        (click)="onConfirm()" 
+        [disabled]="isCreating">
+        <app-icon 
+          *ngIf="isCreating"
+          category="common" 
+          name="loader" 
+          size="20px"
+          customClass="spinner">
+        </app-icon>
+        <app-icon 
+          *ngIf="!isCreating"
+          category="common" 
+          name="check-circle" 
+          size="20px">
+        </app-icon>
+        <span>{{ isCreating ? 'Creando...' : confirmButtonText }}</span>
+      </button>
+    </div>
+  </div>
+</div>

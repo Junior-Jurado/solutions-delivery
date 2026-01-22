@@ -13,20 +13,35 @@ import { TranslationService } from '@shared/services/translation.service';
 import { DeviceDetectionService } from '@shared/services/device-detection.service';
 
 // Components
-import { GuideFormComponent } from '@features/dashboard/secretary/components/guide-form/guide-form.component';
 import { IconComponent } from '@shared/components/icon/icon.component';
+import { GuidePreviewData, GuidePreviewModalComponent } from '@shared/components/guide-preview-modal/guide-preview-modal.component';
+import { GuideFormComponent } from '@features/dashboard/secretary/components/guide-form/guide-form.component';
 import { GuideDetailsModalComponent } from '@shared/components/guide-details-modal.component';
+import { TrackingComponent } from '../components/tracking/tracking.component';
+import { MyGuidesComponent } from '../components/my-guides/my-guides.component';
+import { HistoryComponent } from '../components/history/history.component';
+import { QuoteComponent, QuoteData } from '../components/quote/quote.component';
+import { DashboardHeaderComponent } from '../components/dashboard-header/dashboard-header.component';
+import { DashboardFooterComponent } from '../components/dashboard-footer/dashboard-footer.component';
 
 interface GuidePreview {
   senderName: string;
   senderCity: string;
+  senderAddress: string;
+  senderPhone: string;
+  senderDoc: string;
   receiverName: string;
   receiverCity: string;
+  receiverAddress: string;
+  receiverPhone: string;
+  receiverDoc: string;
   weight: number;
+  pieces: number;
   declaredValue: number;
   serviceType: string;
-  priority: string;
-  calculatedPrice: number; // ← NUEVO: Precio calculado
+  calculatedPrice: number;
+  dimensions: string;
+  content: string;
 }
 
 @Component({
@@ -39,7 +54,14 @@ interface GuidePreview {
     FormsModule,
     GuideFormComponent,
     IconComponent,
-    GuideDetailsModalComponent
+    GuideDetailsModalComponent,
+    TrackingComponent,
+    MyGuidesComponent,
+    HistoryComponent,
+    QuoteComponent,
+    DashboardHeaderComponent,
+    DashboardFooterComponent,
+    GuidePreviewModalComponent
   ]
 })
 export class ClientDashboardPage implements OnInit, OnDestroy {
@@ -50,10 +72,9 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   userId: string = '';
 
   // Active tab
-  activeTab: 'tracking' | 'my-guides' | 'history' | 'create' = 'tracking';
+  activeTab: 'tracking' | 'my-guides' | 'history' | 'quote' | 'create' = 'tracking';
   
   // Tracking
-  trackingNumber: string = '';
   trackingResult: ShippingGuide | null = null;
   isTracking: boolean = false;
   trackingError: string = '';
@@ -65,6 +86,19 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   // History
   guidesHistory: ShippingGuide[] = [];
   loadingHistory: boolean = false;
+
+  // Quote
+  quoteData: QuoteData = {
+    serviceType: '',
+    weight: 0,
+    declaredValue: 0,
+    pieces: 1,
+    dimensions: '20x15x10',
+    insurance: 'no',
+    content: '',
+    observations: ''
+  };
+  quoteResult: number | null = null;
 
   // Create Guide
   showGuidePreview: boolean = false;
@@ -119,7 +153,7 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
     try {
       this.currentUser = await this.clientService.getProfile();
       this.userId = this.currentUser.user_id;
-      this.cdr.detectChanges(); // Forzar detección de cambios
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Error loading profile:', error);
       this.toastService.error('Error al cargar el perfil de usuario');
@@ -129,7 +163,7 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   /**
    * Cambia la pestaña activa
    */
-  setActiveTab(tab: 'tracking' | 'my-guides' | 'history' | 'create'): void {
+  setActiveTab(tab: 'tracking' | 'my-guides' | 'history' | 'quote' | 'create'): void {
     this.activeTab = tab;
 
     if (tab === 'my-guides' && this.myGuides.length === 0) {
@@ -146,21 +180,15 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   /**
    * Realiza el rastreo de una guía
    */
-  async trackGuide(): Promise<void> {
-    if (!this.trackingNumber.trim()) {
-      this.trackingError = 'Por favor ingrese un número de guía';
-      return;
-    }
-
+  async trackGuide(trackingNumber: string): Promise<void> {
     this.isTracking = true;
     this.trackingError = '';
     this.trackingResult = null;
-    this.cdr.detectChanges(); // Actualizar UI antes de la llamada
+    this.cdr.detectChanges();
 
     try {
-      const guide = await this.clientService.trackGuide(this.trackingNumber.trim());
+      const guide = await this.clientService.trackGuide(trackingNumber);
       
-      // ⭐ VALIDACIÓN DE SEGURIDAD: Verificar que el usuario tiene permiso para ver esta guía
       const canViewGuide = this.validateGuideAccess(guide);
       
       if (!canViewGuide) {
@@ -172,14 +200,14 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
         this.toastService.success('Guía encontrada exitosamente');
       }
       
-      this.cdr.detectChanges(); // Actualizar UI después de recibir datos
+      this.cdr.detectChanges();
     } catch (error: any) {
       this.trackingError = 'No se encontró la guía. Verifique el número e intente nuevamente.';
       this.toastService.error('Guía no encontrada');
       this.cdr.detectChanges();
     } finally {
       this.isTracking = false;
-      this.cdr.detectChanges(); // Actualizar UI final
+      this.cdr.detectChanges();
     }
   }
 
@@ -189,18 +217,14 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   private validateGuideAccess(guide: ShippingGuide): boolean {
     if (!this.currentUser) return false;
 
-    // El usuario puede ver la guía si:
-    // 1. Es el creador
     if (guide.created_by === this.userId) {
       return true;
     }
 
-    // 2. Su documento coincide con el del remitente
     if (guide.sender?.document_number === this.currentUser.document_number) {
       return true;
     }
 
-    // 3. Su documento coincide con el del destinatario
     if (guide.receiver?.document_number === this.currentUser.document_number) {
       return true;
     }
@@ -212,7 +236,6 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
    * Limpia el resultado del rastreo
    */
   clearTracking(): void {
-    this.trackingNumber = '';
     this.trackingResult = null;
     this.trackingError = '';
   }
@@ -226,17 +249,17 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
    */
   private async loadMyGuides(): Promise<void> {
     this.loadingMyGuides = true;
-    this.cdr.detectChanges(); // Mostrar loader
+    this.cdr.detectChanges();
 
     try {
       this.myGuides = await this.clientService.getActiveGuides();
-      this.cdr.detectChanges(); // Actualizar con datos
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Error loading guides:', error);
       this.toastService.error('Error al cargar las guías');
     } finally {
       this.loadingMyGuides = false;
-      this.cdr.detectChanges(); // Ocultar loader
+      this.cdr.detectChanges();
     }
   }
 
@@ -257,18 +280,79 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
    */
   private async loadGuidesHistory(): Promise<void> {
     this.loadingHistory = true;
-    this.cdr.detectChanges(); // Mostrar loader
+    this.cdr.detectChanges();
 
     try {
       this.guidesHistory = await this.clientService.getGuideHistory();
-      this.cdr.detectChanges(); // Actualizar con datos
+      this.cdr.detectChanges();
     } catch (error) {
       console.error('Error loading history:', error);
       this.toastService.error('Error al cargar el histórico');
     } finally {
       this.loadingHistory = false;
-      this.cdr.detectChanges(); // Ocultar loader
+      this.cdr.detectChanges();
     }
+  }
+
+  // ==========================================
+  // QUOTE (COTIZACIÓN)
+  // ==========================================
+
+  /**
+   * Calcula la cotización del envío usando el método del GuideService
+   */
+  calculateQuote(quoteData: QuoteData): void {
+    if (!quoteData.weight || quoteData.weight <= 0) {
+      this.toastService.error('Por favor ingrese un peso válido');
+      return;
+    }
+
+    if (!quoteData.serviceType) {
+      this.toastService.error('Por favor seleccione un tipo de servicio');
+      return;
+    }
+
+    const formValue = {
+      weight: quoteData.weight,
+      declaredValue: quoteData.declaredValue,
+      serviceType: quoteData.serviceType,
+      pieces: quoteData.pieces,
+      dimensions: quoteData.dimensions,
+      insurance: quoteData.insurance,
+      content: quoteData.content,
+      observations: quoteData.observations
+    };
+
+    this.quoteResult = this.guideService.calculatePrice(formValue);
+    
+    this.toastService.success('Cotización calculada exitosamente');
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Reinicia el formulario de cotización
+   */
+  resetQuote(): void {
+    this.quoteData = {
+      serviceType: '',
+      weight: 0,
+      declaredValue: 0,
+      pieces: 1,
+      dimensions: '20x15x10',
+      insurance: 'no',
+      content: '',
+      observations: ''
+    };
+    this.quoteResult = null;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Navega al tab de crear guía con los datos de la cotización
+   */
+  proceedToCreateGuide(): void {
+    this.toastService.info('Redirigiendo al formulario de creación...');
+    this.setActiveTab('create');
   }
 
   // ==========================================
@@ -276,69 +360,78 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   // ==========================================
 
   /**
-   * Maneja el envío del formulario de creación de guía
+   * Cuando el formulario se envía
    */
   onGuideFormSubmit(formData: any): void {
-    // Calcular el precio usando el método del GuideService
     const calculatedPrice = this.guideService.calculatePrice(formData);
     
     this.pendingGuideData = formData;
+    
     this.guidePreviewData = {
+      // Remitente
       senderName: formData.senderName,
       senderCity: formData.senderCityName,
+      senderAddress: formData.senderAddress,
+      senderPhone: formData.senderPhone,
+      senderDoc: `${formData.senderDocType} ${formData.senderDoc}`,
+      
+      // Destinatario
       receiverName: formData.receiverName,
       receiverCity: formData.receiverCityName,
+      receiverAddress: formData.receiverAddress,
+      receiverPhone: formData.receiverPhone,
+      receiverDoc: `${formData.receiverDocType} ${formData.receiverDoc}`,
+      
+      // Paquete
       weight: formData.weight,
       declaredValue: formData.declaredValue,
       serviceType: formData.serviceType,
-      priority: formData.priority,
+      pieces: formData.pieces,
+      dimensions: formData.dimensions,
+      content: formData.content,
+      
+      // Precio
       calculatedPrice: calculatedPrice
     };
+    
     this.showGuidePreview = true;
   }
 
   /**
-   * Confirma la creación de la guía
+   * Cuando se confirma la creación
    */
   async confirmGuideCreation(): Promise<void> {
     if (!this.pendingGuideData || !this.userId) return;
 
     this.isCreatingGuide = true;
-    this.cdr.detectChanges(); // Mostrar estado de creación
+    this.cdr.detectChanges();
 
     try {
-      // Construir el request usando el builder del GuideService
-      const guideRequest: CreateGuideRequest = this.guideService.buildGuideRequest(
+      const guideRequest = this.guideService.buildGuideRequest(
         this.pendingGuideData,
         this.userId
       );
 
-      // Crear la guía
       const response = await this.guideService.createGuide(guideRequest);
 
-      // Mostrar mensaje de éxito (3 segundos)
       this.toastService.success(
         `Guía creada exitosamente. Número: ${response.guide_number}`,
         3000
       );
 
-      // Limpiar el modal
       this.showGuidePreview = false;
       this.pendingGuideData = null;
       this.guidePreviewData = null;
-      this.cdr.detectChanges();
 
-      // Cambiar a "Mis Guías" y recargar
       this.setActiveTab('my-guides');
       await this.loadMyGuides();
 
     } catch (error: any) {
       console.error('Error creating guide:', error);
-      const errorMessage = error.message || 'Error al crear la guía. Por favor intente nuevamente.';
-      this.toastService.error(errorMessage);
+      this.toastService.error(error.message || 'Error al crear la guía');
     } finally {
       this.isCreatingGuide = false;
-      this.cdr.detectChanges(); // Ocultar estado de creación
+      this.cdr.detectChanges();
     }
   }
 
@@ -391,33 +484,9 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   }
 
   // ==========================================
-  // STATUS HELPERS
+  // HELPERS
   // ==========================================
 
-  /**
-   * Obtiene la clase CSS según el estado de la guía
-   */
-  getStatusClass(status: string): string {
-    return this.translationService.getStatusBadgeClass(status as any);
-  }
-
-  /**
-   * Traduce el estado de la guía
-   */
-  getStatusText(status: string): string {
-    return this.translationService.translateGuideStatus(status as any);
-  }
-
-  /**
-   * Formatea una fecha de manera relativa
-   */
-  formatDate(dateString: string): string {
-    return this.translationService.formatRelativeDate(dateString);
-  }
-
-  /**
-   * Formatea un precio
-   */
   formatPrice(price: number): string {
     return this.translationService.formatCurrency(price);
   }

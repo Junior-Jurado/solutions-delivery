@@ -1,0 +1,419 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.quote-section {
+  .section-header {
+    margin-bottom: $spacing-xl;
+    text-align: center;
+
+    h2 {
+      margin: 0 0 $spacing-sm 0;
+      font-size: $font-2xl;
+      color: $text-primary;
+      font-weight: $font-bold;
+    }
+
+    .subtitle {
+      margin: 0 0 $spacing-md 0;
+      color: $text-secondary;
+      font-size: $font-base;
+    }
+  }
+
+  .quote-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: $spacing-xl;
+    margin-top: $spacing-xl;
+    align-items: start;
+
+    @include respond-to($breakpoint-lg) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// ===== CARD COMÚN =====
+.quote-form-card,
+.quote-result-card {
+  background: white;
+  border: 2px solid $border-color;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  transition: all $transition-base;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.quote-card-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg $spacing-xl;
+  background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
+  border-bottom: 2px solid $border-color;
+  color: $brand-blue;
+
+  h3 {
+    margin: 0;
+    font-size: $font-lg;
+    color: $text-primary;
+    font-weight: $font-bold;
+  }
+
+  &.success {
+    background: linear-gradient(135deg, $success-light 0%, lighten($success-light, 5%) 100%);
+    border-bottom-color: $success-color;
+    color: $success-color;
+
+    h3 {
+      color: $success-dark;
+    }
+  }
+}
+
+// ===== FORMULARIO DE COTIZACIÓN =====
+.quote-form {
+  padding: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.quote-form-row {
+  display: grid;
+  gap: $spacing-md;
+
+  &.three-cols {
+    grid-template-columns: repeat(3, 1fr);
+
+    @include respond-to($breakpoint-md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include respond-to($breakpoint-sm) {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+.quote-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $text-primary;
+
+    app-icon {
+      color: $brand-blue;
+    }
+  }
+
+  input,
+  select {
+    padding: $spacing-sm $spacing-md;
+    border: 2px solid $border-color;
+    border-radius: $radius-base;
+    font-size: $font-sm;
+    transition: all $transition-base;
+    background: white;
+    font-family: inherit;
+    width: 100%;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: $brand-blue;
+      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+    }
+
+    &::placeholder {
+      color: $text-disabled;
+    }
+  }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $spacing-sm center;
+    background-size: 16px;
+    padding-right: $spacing-xl;
+  }
+}
+
+.quote-input-hint {
+  font-size: $font-xs;
+  color: $text-secondary;
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.btn-quote-calculate {
+  margin-top: $spacing-md;
+  padding: $spacing-md $spacing-xl;
+  font-size: $font-base;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+}
+
+// ===== ÁREA DE RESULTADO =====
+.quote-result-area {
+  position: sticky;
+  top: $spacing-xl;
+}
+
+.quote-result-body {
+  padding: $spacing-xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.quote-price-display {
+  text-align: center;
+  padding: $spacing-xl;
+  background: linear-gradient(135deg, $success-light 0%, lighten($success-light, 5%) 100%);
+  border: 3px solid $success-color;
+  border-radius: $radius-lg;
+
+  .quote-price-label {
+    display: block;
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $success-dark;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: $spacing-sm;
+  }
+
+  .quote-price-amount {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: $font-bold;
+    color: $success-dark;
+    line-height: 1;
+
+    @include respond-to($breakpoint-sm) {
+      font-size: 2rem;
+    }
+  }
+}
+
+// ===== DESGLOSE =====
+.quote-breakdown {
+  background: $bg-secondary;
+  border-radius: $radius-base;
+  padding: $spacing-lg;
+
+  h4 {
+    margin: 0 0 $spacing-md 0;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $text-primary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.quote-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-xs 0;
+
+  .quote-breakdown-label {
+    font-size: $font-sm;
+    color: $text-secondary;
+  }
+
+  .quote-breakdown-value {
+    font-size: $font-sm;
+    font-weight: $font-semibold;
+    color: $text-primary;
+  }
+
+  &.total {
+    margin-top: $spacing-sm;
+    padding-top: $spacing-md;
+    border-top: 2px solid $border-color;
+
+    .quote-breakdown-label {
+      font-weight: $font-bold;
+      color: $text-primary;
+    }
+
+    .quote-breakdown-value {
+      font-size: $font-lg;
+      color: $success-color;
+    }
+  }
+}
+
+.quote-breakdown-divider {
+  height: 1px;
+  background: $border-color;
+  margin: $spacing-sm 0;
+}
+
+// ===== RESUMEN =====
+.quote-summary {
+  background: $bg-secondary;
+  border-radius: $radius-base;
+  padding: $spacing-lg;
+
+  h4 {
+    margin: 0 0 $spacing-md 0;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $text-primary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.quote-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-xs $spacing-md;
+
+  @include respond-to($breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.quote-summary-item {
+  display: flex;
+  justify-content: space-between;
+  padding: $spacing-xs 0;
+  font-size: $font-sm;
+
+  .label {
+    color: $text-secondary;
+  }
+
+  .value {
+    font-weight: $font-semibold;
+    color: $text-primary;
+  }
+}
+
+// ===== AVISO INFO =====
+.quote-info-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: rgba($brand-blue, 0.05);
+  border-radius: $radius-base;
+  font-size: $font-xs;
+  color: $text-secondary;
+
+  app-icon {
+    color: $brand-blue;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+// ===== ACCIONES RESULTADO =====
+.quote-result-actions {
+  display: flex;
+  gap: $spacing-md;
+
+  @include respond-to($breakpoint-sm) {
+    flex-direction: column;
+  }
+
+  button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-sm;
+  }
+}
+
+// ===== PLACEHOLDER =====
+.quote-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 450px;
+  background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
+  border: 2px dashed $border-color;
+  border-radius: $radius-lg;
+}
+
+.quote-placeholder-content {
+  text-align: center;
+  padding: $spacing-2xl;
+  max-width: 320px;
+
+  > app-icon {
+    color: $text-disabled;
+    margin-bottom: $spacing-lg;
+  }
+
+  h3 {
+    margin: 0 0 $spacing-sm 0;
+    font-size: $font-xl;
+    color: $text-primary;
+    font-weight: $font-bold;
+  }
+
+  p {
+    margin: 0 0 $spacing-xl 0;
+    color: $text-secondary;
+    font-size: $font-base;
+  }
+}
+
+.quote-pricing-info {
+  text-align: left;
+  background: white;
+  padding: $spacing-lg;
+  border-radius: $radius-base;
+  border: 1px solid $border-color;
+
+  h4 {
+    margin: 0 0 $spacing-md 0;
+    font-size: $font-sm;
+    font-weight: $font-bold;
+    color: $text-primary;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: $font-sm;
+      color: $text-secondary;
+
+      app-icon {
+        color: $success-color;
+      }
+    }
+  }
+}

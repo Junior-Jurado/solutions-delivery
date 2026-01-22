@@ -1,0 +1,85 @@
+<div class="guides-section">
+  <div class="section-header">
+    <h2>Mis Guías Activas</h2>
+    <p class="subtitle">Guías donde apareces como remitente o destinatario</p>
+    <button class="btn-refresh" (click)="onRefresh()" [disabled]="loading">
+      <app-icon category="common" name="refresh-cw" size="18px"></app-icon>
+      <span>Actualizar</span>
+    </button>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <app-icon category="common" name="loader" size="32px" customClass="spinner"></app-icon>
+    <p>Cargando guías...</p>
+  </div>
+
+  <div class="guides-grid" *ngIf="!loading && guides.length > 0">
+    <div class="guide-card" *ngFor="let guide of guides">
+      <div class="guide-card-header">
+        <span class="guide-number">#{{ guide.guide_id }}</span>
+        <span class="status-badge" [ngClass]="getStatusClass(guide.current_status)">
+          {{ getStatusText(guide.current_status) }}
+        </span>
+      </div>
+
+      <div class="guide-card-body">
+        <div class="guide-info-row">
+          <app-icon category="common" name="calendar" size="16px"></app-icon>
+          <span>{{ formatDate(guide.created_at) }}</span>
+        </div>
+
+        <div class="guide-route">
+          <div class="route-point">
+            <app-icon category="common" name="circle" size="12px"></app-icon>
+            <span>{{ guide.origin_city_name }}</span>
+          </div>
+          <div class="route-line"></div>
+          <div class="route-point">
+            <app-icon category="common" name="map-pin" size="12px"></app-icon>
+            <span>{{ guide.destination_city_name }}</span>
+          </div>
+        </div>
+
+        <div class="guide-details">
+          <div class="detail-item">
+            <span class="detail-label">Remitente:</span>
+            <span class="detail-value">{{ guide.sender?.full_name || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Destinatario:</span>
+            <span class="detail-value">{{ guide.receiver?.full_name || 'N/A' }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Peso:</span>
+            <span class="detail-value">{{ guide.package?.weight_kg || 0 }} kg</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Precio:</span>
+            <span class="detail-value price">\${{ formatPrice(guide.price) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-card-footer">
+        <button class="btn btn-secondary btn-sm" (click)="onViewDetails(guide.guide_id)">
+          <app-icon category="common" name="eye" size="16px"></app-icon>
+          <span>Ver Detalles</span>
+        </button>
+        <button class="btn btn-outline btn-sm" (click)="onDownloadPDF(guide.guide_id)" *ngIf="guide.pdf_url">
+          <app-icon category="common" name="download" size="16px"></app-icon>
+          <span>PDF</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && guides.length === 0">
+    <app-icon category="common" name="inbox" size="64px"></app-icon>
+    <h3>No tienes guías activas</h3>
+    <p>Crea una nueva guía para comenzar</p>
+    <button class="btn btn-primary" (click)="onCreateGuide()">
+      <app-icon category="common" name="plus-circle" size="20px"></app-icon>
+      <span>Crear Primera Guía</span>
+    </button>
+  </div>
+</div>

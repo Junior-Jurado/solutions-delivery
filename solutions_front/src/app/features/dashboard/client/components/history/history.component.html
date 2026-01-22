@@ -1,0 +1,55 @@
+<div class="history-section">
+  <div class="section-header">
+    <h2>Histórico de Guías</h2>
+    <p class="subtitle">Registro completo de tus envíos anteriores</p>
+  </div>
+
+  <div class="loading-spinner" *ngIf="loading">
+    <app-icon category="common" name="loader" size="32px" customClass="spinner"></app-icon>
+    <p>Cargando histórico...</p>
+  </div>
+
+  <div class="history-table" *ngIf="!loading && guides.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>No. Guía</th>
+          <th>Fecha Envío</th>
+          <th>Origen</th>
+          <th>Destino</th>
+          <th>Estado</th>
+          <th>Precio</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let guide of guides">
+          <td class="guide-number-cell">#{{ guide.guide_id }}</td>
+          <td>{{ formatDate(guide.created_at) }}</td>
+          <td>{{ guide.origin_city_name }}</td>
+          <td>{{ guide.destination_city_name }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(guide.current_status)">
+              {{ getStatusText(guide.current_status) }}
+            </span>
+          </td>
+          <td class="price-cell">\${{ formatPrice(guide.price) }}</td>
+          <td class="actions-cell">
+            <button class="btn-icon" (click)="onViewDetails(guide.guide_id)" title="Ver detalles">
+              <app-icon category="common" name="eye" size="16px"></app-icon>
+            </button>
+            <button class="btn-icon" (click)="onDownloadPDF(guide.guide_id)" *ngIf="guide.pdf_url" title="Descargar PDF">
+              <app-icon category="common" name="download" size="16px"></app-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && guides.length === 0">
+    <app-icon category="common" name="archive" size="64px"></app-icon>
+    <h3>No hay registros en el histórico</h3>
+    <p>Aquí aparecerán tus guías entregadas</p>
+  </div>
+</div>

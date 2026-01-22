@@ -1,0 +1,141 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.history-section {
+  .section-header {
+    margin-bottom: $spacing-xl;
+    text-align: center;
+
+    h2 {
+      margin: 0 0 $spacing-sm 0;
+      font-size: $font-2xl;
+      color: $text-primary;
+      font-weight: $font-bold;
+    }
+
+    .subtitle {
+      margin: 0 0 $spacing-md 0;
+      color: $text-secondary;
+      font-size: $font-base;
+    }
+  }
+
+  .loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-3xl;
+    gap: $spacing-md;
+    color: $brand-blue;
+
+    p {
+      margin: 0;
+      color: $text-secondary;
+      font-size: $font-sm;
+    }
+  }
+
+  .history-table {
+    overflow-x: auto;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
+
+        th {
+          padding: $spacing-md $spacing-lg;
+          text-align: left;
+          font-size: $font-sm;
+          font-weight: $font-semibold;
+          color: $text-primary;
+          border-bottom: 2px solid $border-color;
+          white-space: nowrap;
+        }
+      }
+
+      tbody {
+        tr {
+          transition: all $transition-base;
+
+          &:hover {
+            background: $bg-secondary;
+          }
+
+          &:not(:last-child) {
+            border-bottom: 1px solid $border-color;
+          }
+        }
+
+        td {
+          padding: $spacing-md $spacing-lg;
+          font-size: $font-sm;
+          color: $text-primary;
+
+          &.guide-number-cell {
+            font-weight: $font-semibold;
+            color: $brand-blue;
+          }
+
+          &.price-cell {
+            font-weight: $font-semibold;
+            color: $success-color;
+          }
+
+          &.actions-cell {
+            display: flex;
+            gap: $spacing-xs;
+          }
+        }
+      }
+    }
+
+    .btn-icon {
+      padding: $spacing-xs;
+      background: transparent;
+      border: 1px solid $border-color;
+      border-radius: $radius-base;
+      cursor: pointer;
+      transition: all $transition-base;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      &:hover {
+        background: $brand-blue;
+        border-color: $brand-blue;
+        color: white;
+      }
+    }
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-3xl;
+    text-align: center;
+    gap: $spacing-lg;
+    color: $text-disabled;
+
+    h3 {
+      margin: 0;
+      font-size: $font-xl;
+      color: $text-primary;
+      font-weight: $font-bold;
+    }
+
+    p {
+      margin: 0;
+      color: $text-secondary;
+      font-size: $font-base;
+    }
+  }
+}

@@ -1,0 +1,118 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.dashboard-header {
+  background: linear-gradient(135deg, $brand-blue-dark 0%, $brand-blue 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 $spacing-lg;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+
+    @include respond-to($breakpoint-md) {
+      padding: 0 $spacing-md;
+      height: 60px;
+    }
+  }
+
+  .logo-section {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    .logo-icon {
+      background: rgba(255, 255, 255, 0.2);
+      padding: $spacing-sm;
+      border-radius: $radius-lg;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(10px);
+      color: white;
+    }
+
+    .logo-text {
+      color: white;
+      font-size: $font-xl;
+      font-weight: $font-bold;
+      margin: 0;
+      letter-spacing: -0.5px;
+
+      @include respond-to($breakpoint-sm) {
+        font-size: $font-lg;
+      }
+    }
+  }
+
+  .user-section {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+
+    @include respond-to($breakpoint-sm) {
+      gap: $spacing-md;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      padding: $spacing-sm $spacing-md;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: $radius-full;
+      backdrop-filter: blur(10px);
+      color: white;
+
+      @include respond-to($breakpoint-sm) {
+        padding: $spacing-xs $spacing-sm;
+      }
+
+      .user-name {
+        color: white;
+        font-weight: $font-medium;
+        font-size: $font-sm;
+
+        @include respond-to($breakpoint-sm) {
+          display: none;
+        }
+      }
+    }
+
+    .btn-logout {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      padding: $spacing-sm $spacing-md;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: $radius-base;
+      color: white;
+      font-weight: $font-medium;
+      font-size: $font-sm;
+      cursor: pointer;
+      transition: all $transition-base;
+
+      @include respond-to($breakpoint-sm) {
+        padding: $spacing-sm;
+      }
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}

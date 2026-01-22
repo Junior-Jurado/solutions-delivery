@@ -21,6 +21,7 @@ import { ToastService } from "@shared/services/toast.service";
 import { TranslationService } from "@shared/services/translation.service";
 
 // Components
+import { GuidePreviewModalComponent, GuidePreviewData } from "@shared/components/guide-preview-modal/guide-preview-modal.component";
 import { GuideFormComponent } from '../components/guide-form/guide-form.component';
 import { GuideListComponent } from "../components/guide-list/guide-list.component";
 import { GuideFiltersComponent, GuideFilterValues } from "../components/guide-filters/guide-filters.component";
@@ -32,6 +33,25 @@ import { GuideSearchComponent } from "../components/guide-search/guide-search.co
 import { StatusDistributionComponent } from "../components/status-distribution/status-distribution.component";
 import { CashCloseStatsComponent } from "../components/cash-close-stats/cash-close-stats.component";
 import { IconComponent } from "@shared/components/icon/icon.component";
+
+interface GuidePreview {
+  senderName: string;
+  senderCity: string;
+  senderAddress: string;
+  senderPhone: string;
+  senderDoc: string;
+  receiverName: string;
+  receiverCity: string;
+  receiverAddress: string;
+  receiverPhone: string;
+  receiverDoc: string;
+  weight: number;
+  declaredValue: number;
+  serviceType: string;
+  pieces: number;
+  dimensions: string;
+  calculatedPrice: number;
+}
 
 @Component({
     selector: 'app-secretary-dashboard',
@@ -51,7 +71,8 @@ import { IconComponent } from "@shared/components/icon/icon.component";
         CashCloseFormComponent,
         CashCloseListComponent,
         CashCloseStatsComponent,
-        IconComponent
+        IconComponent,
+        GuidePreviewModalComponent
     ]
 })
 export class SecretaryDashboardPage implements OnInit {
@@ -104,6 +125,14 @@ export class SecretaryDashboardPage implements OnInit {
         { value: 'OUT_FOR_DELIVERY', label: 'En reparto' },
         { value: 'DELIVERED', label: 'Entregada' }
     ];
+
+    // ==========================================
+    // GUIDE PREVIEW MODAL
+    // ==========================================
+    showGuidePreview: boolean = false;
+    guidePreviewData: GuidePreview | null = null;
+    pendingGuideData: any = null;
+    isCreatingGuide: boolean = false;
 
     // ==========================================
     // MODAL
@@ -195,29 +224,106 @@ export class SecretaryDashboardPage implements OnInit {
     }
 
     // ==========================================
-    // GUIDE FORM HANDLERS
+    // GUIDE FORM HANDLERS 
     // ==========================================
-    async handleGuideFormSubmit(formData: any): Promise<void> {
+    handleGuideFormSubmit(formData: any): void {
+        // Calculamos el precio
+        const calculatedPrice = this.guideService.calculatePrice(formData);
+        
+        // Guardamos los datos pendientes
+        this.pendingGuideData = formData;
+        
+        // Preparamos los datos para el preview
+        this.guidePreviewData = {
+            // Remitente
+            senderName: formData.senderName,
+            senderCity: formData.senderCityName,
+            senderAddress: formData.senderAddress,
+            senderPhone: formData.senderPhone,
+            senderDoc: `${formData.senderDocType} ${formData.senderDoc}`,
+      
+            // Destinatario
+            receiverName: formData.receiverName,
+            receiverCity: formData.receiverCityName,
+            receiverAddress: formData.receiverAddress,
+            receiverPhone: formData.receiverPhone,
+            receiverDoc: `${formData.receiverDocType} ${formData.receiverDoc}`,
+      
+            // Paquete
+            weight: formData.weight,
+            declaredValue: formData.declaredValue,
+            serviceType: formData.serviceType,
+            pieces: formData.pieces || 1,
+            dimensions: formData.dimensions || '',
+
+            // Precio
+            calculatedPrice: calculatedPrice
+        };
+        
+        // Mostramos el modal de confirmación
+        this.showGuidePreview = true;
+        this.cdr.detectChanges();
+    }
+
+    /**
+     * Confirma y crea la guía
+     */
+    async confirmGuideCreation(): Promise<void> {
+        if (!this.pendingGuideData) return;
+
+        this.isCreatingGuide = true;
         this.guideFormComponent.setSubmitting(true);
+        this.cdr.detectChanges();
 
         try {
-            const guideRequest = this.guideService.buildGuideRequest(formData, this.currentUserId);
+            const guideRequest = this.guideService.buildGuideRequest(
+                this.pendingGuideData, 
+                this.currentUserId
+            );
+            
             const response = await this.guideService.createGuide(guideRequest);
 
-            this.toast.success(`¡Guía creada exitosamente!\nNúmero: ${response.guide_number}`);
+            this.toast.success(
+                `¡Guía creada exitosamente!\nNúmero: ${response.guide_number}`,
+                3000
+            );
 
+            // Descargar PDF automáticamente
             if (response.guide_id) {
                 await this.guideService.downloadGuidePDF(response.guide_id);
             }
 
+            // Cerrar modal y limpiar
+            this.showGuidePreview = false;
+            this.pendingGuideData = null;
+            this.guidePreviewData = null;
+            
+            // Resetear formulario
             this.guideFormComponent.resetForm();
+            
+            // Cambiar a la pestaña de gestión y recargar
             this.setActiveTab('manage-guides');
+            await this.loadGuides();
 
         } catch (error: any) {
+            console.error('Error creating guide:', error);
             this.toast.error(error.message || 'Error al crear la guía');
         } finally {
+            this.isCreatingGuide = false;
             this.guideFormComponent.setSubmitting(false);
+            this.cdr.detectChanges();
         }
+    }
+
+    /**
+     * Cancela la creación de la guía
+     */
+    cancelGuideCreation(): void {
+        this.showGuidePreview = false;
+        this.pendingGuideData = null;
+        this.guidePreviewData = null;
+        this.guideFormComponent.setSubmitting(false);
+        this.cdr.detectChanges();
     }
 
     // ==========================================
@@ -414,6 +520,13 @@ export class SecretaryDashboardPage implements OnInit {
     }
 
     // ==========================================
+    // HELPERS
+    // ==========================================
+    formatPrice(price: number): string {
+        return this.translationService.formatCurrency(price);
+    }
+
+    // ==========================================
     // CASH CLOSE
     // ==========================================
     async handleCashCloseGenerate(formData: CashCloseFormData): Promise<void> {
@@ -513,3 +626,4 @@ export class SecretaryDashboardPage implements OnInit {
         this.router.navigate(['/dashboard']);
     }
 }
+

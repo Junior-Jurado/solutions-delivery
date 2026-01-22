@@ -9,122 +9,6 @@
   background: linear-gradient(135deg, $gray-50 0%, $gray-200 100%);
 }
 
-// ===== HEADER =====
-.dashboard-header {
-  background: linear-gradient(135deg, $brand-blue-dark 0%, $brand-blue 100%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-
-  .header-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 $spacing-lg;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 70px;
-
-    @include respond-to($breakpoint-md) {
-      padding: 0 $spacing-md;
-      height: 60px;
-    }
-  }
-
-  .logo-section {
-    display: flex;
-    align-items: center;
-    gap: $spacing-md;
-
-    .logo-icon {
-      background: rgba(255, 255, 255, 0.2);
-      padding: $spacing-sm;
-      border-radius: $radius-lg;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(10px);
-      color: white;
-    }
-
-    .logo-text {
-      color: white;
-      font-size: $font-xl;
-      font-weight: $font-bold;
-      margin: 0;
-      letter-spacing: -0.5px;
-
-      @include respond-to($breakpoint-sm) {
-        font-size: $font-lg;
-      }
-    }
-  }
-
-  .user-section {
-    display: flex;
-    align-items: center;
-    gap: $spacing-lg;
-
-    @include respond-to($breakpoint-sm) {
-      gap: $spacing-md;
-    }
-
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: $spacing-sm;
-      padding: $spacing-sm $spacing-md;
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: $radius-full;
-      backdrop-filter: blur(10px);
-      color: white;
-
-      @include respond-to($breakpoint-sm) {
-        padding: $spacing-xs $spacing-sm;
-      }
-
-      .user-name {
-        color: white;
-        font-weight: $font-medium;
-        font-size: $font-sm;
-
-        @include respond-to($breakpoint-sm) {
-          display: none;
-        }
-      }
-    }
-
-    .btn-logout {
-      display: flex;
-      align-items: center;
-      gap: $spacing-sm;
-      padding: $spacing-sm $spacing-md;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: $radius-base;
-      color: white;
-      font-weight: $font-medium;
-      font-size: $font-sm;
-      cursor: pointer;
-      transition: all $transition-base;
-
-      @include respond-to($breakpoint-sm) {
-        padding: $spacing-sm;
-      }
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-1px);
-      }
-
-      &:active {
-        transform: translateY(0);
-      }
-    }
-  }
-}
-
 // ===== MAIN CONTENT =====
 .dashboard-main {
   flex: 1;
@@ -222,470 +106,61 @@
   }
 }
 
-// ===== TRACKING SECTION =====
-.tracking-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $spacing-xl;
-
-  @include respond-to($breakpoint-lg) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.tracking-card {
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: $spacing-md;
-    margin-bottom: $spacing-lg;
-    padding-bottom: $spacing-md;
-    border-bottom: 2px solid $border-color;
-    color: $brand-blue;
+// ===== CREATE GUIDE SECTION =====
+.create-section {
+  .section-header {
+    margin-bottom: $spacing-xl;
+    text-align: center;
 
     h2 {
-      margin: 0;
-      font-size: $font-xl;
+      margin: 0 0 $spacing-sm 0;
+      font-size: $font-2xl;
       color: $text-primary;
       font-weight: $font-bold;
     }
-  }
 
-  .tracking-form {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-md;
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-sm;
-
-      label {
-        font-size: $font-sm;
-        font-weight: $font-medium;
-        color: $text-primary;
-      }
-
-      .tracking-input {
-        padding: $spacing-md;
-        border: 2px solid $border-color;
-        border-radius: $radius-base;
-        font-size: $font-base;
-        transition: all $transition-base;
-
-        &:focus {
-          @include input-focus;
-        }
-
-        &::placeholder {
-          color: $text-disabled;
-        }
-
-        &:disabled {
-          background: $bg-secondary;
-          cursor: not-allowed;
-        }
-      }
-    }
-
-    .btn-track {
-      width: 100%;
-      padding: $spacing-md;
-      font-size: $font-base;
-    }
-
-    .error-message {
-      color: $error-color;
-      font-size: $font-sm;
-      padding: $spacing-sm;
-      background: rgba($error-color, 0.1);
-      border-radius: $radius-base;
-      display: flex;
-      align-items: center;
-      gap: $spacing-sm;
-
-      &::before {
-        content: "⚠";
-        font-size: $font-lg;
-      }
-    }
-  }
-}
-
-.tracking-result {
-  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  border: 2px solid $brand-blue;
-  border-radius: $radius-lg;
-  padding: $spacing-lg;
-  animation: slideInRight 0.3s ease-in-out;
-
-  .result-header {
-    display: flex;
-    align-items: center;
-    gap: $spacing-md;
-    margin-bottom: $spacing-lg;
-    padding-bottom: $spacing-md;
-    border-bottom: 2px solid rgba($brand-blue, 0.2);
-    color: $brand-blue;
-
-    h3 {
-      flex: 1;
+    p {
       margin: 0;
-      font-size: $font-lg;
-      color: $brand-blue;
-      font-weight: $font-bold;
-    }
-
-    .btn-close {
-      padding: $spacing-xs;
-      background: transparent;
-      border: none;
-      border-radius: $radius-base;
-      cursor: pointer;
-      transition: all $transition-base;
       color: $text-secondary;
-
-      &:hover {
-        background: rgba($brand-blue, 0.1);
-        color: $brand-blue;
-      }
-    }
-  }
-
-  .result-content {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-md;
-
-    .result-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: $spacing-sm 0;
-
-      .label {
-        font-size: $font-sm;
-        color: $text-secondary;
-        font-weight: $font-medium;
-      }
-
-      .value {
-        font-size: $font-sm;
-        color: $text-primary;
-        font-weight: $font-semibold;
-
-        &.location {
-          display: flex;
-          align-items: center;
-          gap: $spacing-xs;
-          color: $brand-blue;
-        }
-      }
-    }
-
-    .btn-details {
-      width: 100%;
-      margin-top: $spacing-md;
-    }
-  }
-}
-
-// ===== SECTION HEADERS =====
-.section-header {
-  margin-bottom: $spacing-xl;
-  text-align: center;
-  position: relative;
-
-  h2 {
-    margin: 0 0 $spacing-sm 0;
-    font-size: $font-2xl;
-    color: $text-primary;
-    font-weight: $font-bold;
-  }
-
-  .subtitle {
-    margin: 0 0 $spacing-md 0;
-    color: $text-secondary;
-    font-size: $font-base;
-  }
-
-  .btn-refresh {
-    position: absolute;
-    right: 0;
-    top: 0;
-    display: flex;
-    align-items: center;
-    gap: $spacing-xs;
-    padding: $spacing-xs $spacing-md;
-    background: $bg-secondary;
-    border: 1px solid $border-color;
-    border-radius: $radius-base;
-    color: $text-primary;
-    font-size: $font-sm;
-    cursor: pointer;
-    transition: all $transition-base;
-
-    @include respond-to($breakpoint-md) {
-      position: static;
-      margin-top: $spacing-md;
-    }
-
-    &:hover:not(:disabled) {
-      background: $brand-blue;
-      color: white;
-      border-color: $brand-blue;
-    }
-
-    &:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-  }
-}
-
-// ===== GUIDES GRID =====
-.loading-spinner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: $spacing-3xl;
-  gap: $spacing-md;
-  color: $brand-blue;
-
-  p {
-    margin: 0;
-    color: $text-secondary;
-    font-size: $font-sm;
-  }
-}
-
-.guides-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: $spacing-lg;
-
-  @include respond-to($breakpoint-sm) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.guide-card {
-  background: white;
-  border: 2px solid $border-color;
-  border-radius: $radius-lg;
-  overflow: hidden;
-  transition: all $transition-base;
-
-  &:hover {
-    border-color: $brand-blue;
-    box-shadow: 0 8px 24px rgba($brand-blue, 0.15);
-    transform: translateY(-4px);
-  }
-
-  .guide-card-header {
-    padding: $spacing-md $spacing-lg;
-    background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid $border-color;
-
-    .guide-number {
-      font-weight: $font-bold;
       font-size: $font-base;
-      color: $brand-blue;
-    }
-  }
-
-  .guide-card-body {
-    padding: $spacing-lg;
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-md;
-
-    .guide-info-row {
-      display: flex;
-      align-items: center;
-      gap: $spacing-sm;
-      color: $text-secondary;
-      font-size: $font-sm;
-    }
-
-    .guide-route {
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-xs;
-      padding: $spacing-md 0;
-
-      .route-point {
-        display: flex;
-        align-items: center;
-        gap: $spacing-sm;
-        font-size: $font-sm;
-        font-weight: $font-medium;
-        color: $text-primary;
-      }
-
-      .route-line {
-        width: 2px;
-        height: 20px;
-        background: linear-gradient(to bottom, $brand-blue, $brand-red);
-        margin-left: 5px;
-      }
-    }
-
-    .guide-details {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: $spacing-sm;
-      padding-top: $spacing-md;
-      border-top: 1px solid $border-color;
-
-      .detail-item {
-        display: flex;
-        flex-direction: column;
-        gap: 2px;
-        font-size: $font-sm;
-
-        .detail-label {
-          color: $text-secondary;
-          font-size: $font-xs;
-        }
-
-        .detail-value {
-          color: $text-primary;
-          font-weight: $font-medium;
-
-          &.price {
-            color: $success-color;
-            font-weight: $font-semibold;
-          }
-        }
-      }
-    }
-  }
-
-  .guide-card-footer {
-    padding: $spacing-md $spacing-lg;
-    background: $bg-secondary;
-    border-top: 1px solid $border-color;
-    display: flex;
-    gap: $spacing-sm;
-
-    button {
-      flex: 1;
     }
   }
 }
 
-// ===== HISTORY TABLE =====
-.history-table {
-  overflow-x: auto;
-  border: 1px solid $border-color;
-  border-radius: $radius-lg;
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-
-    thead {
-      background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
-
-      th {
-        padding: $spacing-md $spacing-lg;
-        text-align: left;
-        font-size: $font-sm;
-        font-weight: $font-semibold;
-        color: $text-primary;
-        border-bottom: 2px solid $border-color;
-        white-space: nowrap;
-      }
-    }
-
-    tbody {
-      tr {
-        transition: all $transition-base;
-
-        &:hover {
-          background: $bg-secondary;
-        }
-
-        &:not(:last-child) {
-          border-bottom: 1px solid $border-color;
-        }
-      }
-
-      td {
-        padding: $spacing-md $spacing-lg;
-        font-size: $font-sm;
-        color: $text-primary;
-
-        &.guide-number-cell {
-          font-weight: $font-semibold;
-          color: $brand-blue;
-        }
-
-        &.price-cell {
-          font-weight: $font-semibold;
-          color: $success-color;
-        }
-
-        &.actions-cell {
-          display: flex;
-          gap: $spacing-xs;
-        }
-      }
-    }
-  }
-
-  .btn-icon {
-    padding: $spacing-xs;
-    background: transparent;
-    border: 1px solid $border-color;
-    border-radius: $radius-base;
-    cursor: pointer;
-    transition: all $transition-base;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    &:hover {
-      background: $brand-blue;
-      border-color: $brand-blue;
-      color: white;
-    }
-  }
-}
-
-// ===== EMPTY STATE =====
-.empty-state {
+// ===== MODAL =====
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: $spacing-3xl;
-  text-align: center;
-  gap: $spacing-lg;
-  color: $text-disabled;
+  z-index: 1000;
+  padding: $spacing-lg;
+  animation: fadeIn 0.2s ease-in-out;
+  backdrop-filter: blur(4px);
+}
 
-  h3 {
-    margin: 0;
-    font-size: $font-xl;
-    color: $text-primary;
-    font-weight: $font-bold;
-  }
+.modal-content {
+  background: white;
+  border-radius: $radius-xl;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.3s ease-out;
 
-  p {
-    margin: 0;
-    color: $text-secondary;
-    font-size: $font-base;
+  @include respond-to($breakpoint-md) {
+    max-width: 95%;
   }
 }
 
-// ===== STATUS BADGES =====
-.status-badge {
+// ===== STATUS BADGES (Global for all components) =====
+:host ::ng-deep .status-badge {
   display: inline-flex;
   align-items: center;
   padding: $spacing-xs $spacing-md;
@@ -726,239 +201,10 @@
   }
 }
 
-// ===== MODAL =====
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: $spacing-lg;
-  animation: fadeIn 0.2s ease-in-out;
-  backdrop-filter: blur(4px);
-}
-
-.modal-content {
-  background: white;
-  border-radius: $radius-xl;
-  max-width: 700px;
-  width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideInUp 0.3s ease-out;
-
-  @include respond-to($breakpoint-md) {
-    max-width: 95%;
-  }
-}
-
-.preview-modal {
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: $spacing-xl;
-    border-bottom: 2px solid $border-color;
-    background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
-
-    h2 {
-      margin: 0;
-      font-size: $font-xl;
-      color: $text-primary;
-      font-weight: $font-bold;
-    }
-
-    .btn-close {
-      padding: $spacing-xs;
-      background: transparent;
-      border: none;
-      border-radius: $radius-base;
-      cursor: pointer;
-      transition: all $transition-base;
-      color: $text-secondary;
-
-      &:hover {
-        background: rgba($error-color, 0.1);
-        color: $error-color;
-      }
-    }
-  }
-
-  .modal-body {
-    padding: $spacing-xl;
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-lg;
-
-    .warning-banner {
-      display: flex;
-      gap: $spacing-md;
-      padding: $spacing-md;
-      background: $warning-light;
-      border: 2px solid $warning-color;
-      border-radius: $radius-base;
-      color: $warning-dark;
-      font-size: $font-sm;
-
-      p {
-        margin: 0;
-
-        strong {
-          font-weight: $font-bold;
-        }
-      }
-    }
-
-    .price-banner {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: $spacing-sm;
-      padding: $spacing-xl;
-      background: linear-gradient(135deg, $success-light 0%, lighten($success-light, 5%) 100%);
-      border: 3px solid $success-color;
-      border-radius: $radius-lg;
-      text-align: center;
-
-      .price-label {
-        display: flex;
-        align-items: center;
-        gap: $spacing-sm;
-        font-size: $font-base;
-        font-weight: $font-semibold;
-        color: $success-dark;
-
-        app-icon {
-          color: $success-color;
-        }
-      }
-
-      .price-amount {
-        font-size: 2.5rem;
-        font-weight: $font-bold;
-        color: $success-dark;
-        line-height: 1;
-        margin: $spacing-xs 0;
-      }
-
-      .price-details {
-        font-size: $font-sm;
-        color: $success-dark;
-        opacity: 0.8;
-      }
-    }
-
-    .preview-content {
-      display: flex;
-      flex-direction: column;
-      gap: $spacing-lg;
-
-      .preview-section {
-        h3 {
-          display: flex;
-          align-items: center;
-          gap: $spacing-sm;
-          margin: 0 0 $spacing-md 0;
-          font-size: $font-base;
-          color: $text-primary;
-          font-weight: $font-bold;
-          padding-bottom: $spacing-sm;
-          border-bottom: 1px solid $border-color;
-        }
-
-        .preview-details {
-          display: flex;
-          flex-direction: column;
-          gap: $spacing-sm;
-
-          .preview-row {
-            display: flex;
-            justify-content: space-between;
-            padding: $spacing-xs 0;
-
-            .label {
-              color: $text-secondary;
-              font-size: $font-sm;
-              font-weight: $font-medium;
-            }
-
-            .value {
-              color: $text-primary;
-              font-size: $font-sm;
-              font-weight: $font-semibold;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: $spacing-md;
-    padding: $spacing-xl;
-    border-top: 2px solid $border-color;
-    background: $bg-secondary;
-
-    @include respond-to($breakpoint-sm) {
-      flex-direction: column-reverse;
-    }
-  }
-}
-
-// ===== FOOTER =====
-.dashboard-footer {
-  background: linear-gradient(135deg, $brand-black 0%, $brand-black-light 100%);
-  padding: $spacing-xl 0;
-  margin-top: auto;
-
-  .footer-content {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 0 $spacing-lg;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: $spacing-md;
-
-    .footer-logo {
-      background: rgba(255, 255, 255, 0.1);
-      padding: $spacing-sm;
-      border-radius: $radius-base;
-      backdrop-filter: blur(10px);
-      color: white;
-    }
-
-    p {
-      margin: 0;
-      color: rgba(255, 255, 255, 0.8);
-      font-size: $font-sm;
-    }
-  }
-}
-
 // ===== ANIMATIONS =====
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }
 
 @keyframes slideInUp {
@@ -972,7 +218,7 @@
   }
 }
 
-.spinner {
+:host ::ng-deep .spinner {
   animation: spin 1s linear infinite;
 }
 

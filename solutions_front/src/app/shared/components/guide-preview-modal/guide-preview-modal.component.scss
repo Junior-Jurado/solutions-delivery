@@ -1,0 +1,274 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+// ===== MODAL OVERLAY =====
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $spacing-lg;
+  animation: fadeIn 0.2s ease-in-out;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: white;
+  border-radius: $radius-xl;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideInUp 0.3s ease-out;
+
+  @include respond-to($breakpoint-md) {
+    max-width: 95%;
+  }
+}
+
+// ===== PREVIEW MODAL =====
+.preview-modal {
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-xl;
+    border-bottom: 2px solid $border-color;
+    background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
+
+    h2 {
+      margin: 0;
+      font-size: $font-xl;
+      color: $text-primary;
+      font-weight: $font-bold;
+    }
+
+    .btn-close {
+      padding: $spacing-xs;
+      background: transparent;
+      border: none;
+      border-radius: $radius-base;
+      cursor: pointer;
+      transition: all $transition-base;
+      color: $text-secondary;
+
+      &:hover:not(:disabled) {
+        background: rgba($error-color, 0.1);
+        color: $error-color;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .modal-body {
+    padding: $spacing-xl;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+
+    // Warning Banner
+    .warning-banner {
+      display: flex;
+      gap: $spacing-md;
+      padding: $spacing-md;
+      background: $warning-light;
+      border: 2px solid $warning-color;
+      border-radius: $radius-base;
+      color: $warning-dark;
+      font-size: $font-sm;
+
+      app-icon {
+        flex-shrink: 0;
+        color: $warning-color;
+      }
+
+      p {
+        margin: 0;
+
+        strong {
+          font-weight: $font-bold;
+        }
+      }
+    }
+
+    // Price Banner
+    .price-banner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $spacing-sm;
+      padding: $spacing-xl;
+      background: linear-gradient(135deg, $success-light 0%, lighten($success-light, 5%) 100%);
+      border: 3px solid $success-color;
+      border-radius: $radius-lg;
+      text-align: center;
+
+      .price-label {
+        display: flex;
+        align-items: center;
+        gap: $spacing-sm;
+        font-size: $font-base;
+        font-weight: $font-semibold;
+        color: $success-dark;
+
+        app-icon {
+          color: $success-color;
+        }
+      }
+
+      .price-amount {
+        font-size: 2.5rem;
+        font-weight: $font-bold;
+        color: $success-dark;
+        line-height: 1;
+        margin: $spacing-xs 0;
+
+        @include respond-to($breakpoint-sm) {
+          font-size: 2rem;
+        }
+      }
+
+      .price-details {
+        font-size: $font-sm;
+        color: $success-dark;
+        opacity: 0.8;
+      }
+    }
+
+    // Preview Content
+    .preview-content {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-lg;
+
+      .preview-section {
+        h3 {
+          display: flex;
+          align-items: center;
+          gap: $spacing-sm;
+          margin: 0 0 $spacing-md 0;
+          font-size: $font-base;
+          color: $text-primary;
+          font-weight: $font-bold;
+          padding-bottom: $spacing-sm;
+          border-bottom: 1px solid $border-color;
+
+          app-icon {
+            color: $brand-blue;
+          }
+        }
+
+        .preview-details {
+          display: flex;
+          flex-direction: column;
+          gap: $spacing-sm;
+
+          .preview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: $spacing-xs 0;
+            gap: $spacing-md;
+
+            @include respond-to($breakpoint-sm) {
+              flex-direction: column;
+              gap: $spacing-xs;
+            }
+
+            .label {
+              color: $text-secondary;
+              font-size: $font-sm;
+              font-weight: $font-medium;
+              flex-shrink: 0;
+            }
+
+            .value {
+              color: $text-primary;
+              font-size: $font-sm;
+              font-weight: $font-semibold;
+              text-align: right;
+
+              @include respond-to($breakpoint-sm) {
+                text-align: left;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-md;
+    padding: $spacing-xl;
+    border-top: 2px solid $border-color;
+    background: $bg-secondary;
+
+    @include respond-to($breakpoint-sm) {
+      flex-direction: column-reverse;
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      padding: $spacing-sm $spacing-lg;
+      border-radius: $radius-base;
+      font-weight: $font-medium;
+      cursor: pointer;
+      transition: all $transition-base;
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// ===== ANIMATIONS =====
+@keyframes fadeIn {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:host ::ng-deep .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { 
+    transform: rotate(0deg); 
+  }
+  to { 
+    transform: rotate(360deg); 
+  }
+}

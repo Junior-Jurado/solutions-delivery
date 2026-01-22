@@ -1,0 +1,105 @@
+<div class="tracking-section">
+  <div class="tracking-card">
+    <div class="card-header">
+      <app-icon category="common" name="search" size="24px"></app-icon>
+      <h2>Rastrear tu Envío</h2>
+    </div>
+
+    <div class="tracking-form">
+      <div class="form-group">
+        <label for="trackingInput">Número de Guía</label>
+        <input 
+          id="trackingInput"
+          type="text" 
+          [(ngModel)]="trackingNumber"
+          placeholder="Ej: EE123456789CO"
+          (keyup.enter)="onTrack()"
+          class="tracking-input"
+          [disabled]="isTracking">
+      </div>
+
+      <button 
+        class="btn btn-primary btn-track"
+        (click)="onTrack()"
+        [disabled]="isTracking || !trackingNumber.trim()">
+        <app-icon 
+          *ngIf="!isTracking"
+          category="common" 
+          name="search" 
+          size="20px">
+        </app-icon>
+        <app-icon 
+          *ngIf="isTracking"
+          category="common" 
+          name="loader" 
+          size="20px"
+          customClass="spinner">
+        </app-icon>
+        <span>{{ isTracking ? 'Rastreando...' : 'Rastrear Guía' }}</span>
+      </button>
+
+      <p class="error-message" *ngIf="trackingError">{{ trackingError }}</p>
+    </div>
+  </div>
+
+  <!-- Tracking Result -->
+  <div class="tracking-result" *ngIf="trackingResult">
+    <div class="result-header">
+      <app-icon category="common" name="package" size="24px"></app-icon>
+      <h3>Información del Envío</h3>
+      <button class="btn-close" (click)="onClear()">
+        <app-icon category="common" name="x" size="20px"></app-icon>
+      </button>
+    </div>
+
+    <div class="result-content">
+      <div class="result-row">
+        <span class="label">Número de Guía:</span>
+        <span class="value">{{ trackingResult.guide_id }}</span>
+      </div>
+
+      <div class="result-row">
+        <span class="label">Estado:</span>
+        <span class="status-badge" [ngClass]="getStatusClass(trackingResult.current_status)">
+          {{ getStatusText(trackingResult.current_status) }}
+        </span>
+      </div>
+
+      <div class="result-row">
+        <span class="label">Remitente:</span>
+        <span class="value">{{ trackingResult.sender?.full_name || 'N/A' }}</span>
+      </div>
+
+      <div class="result-row">
+        <span class="label">Destinatario:</span>
+        <span class="value">{{ trackingResult.receiver?.full_name || 'N/A' }}</span>
+      </div>
+
+      <div class="result-row">
+        <span class="label">Origen:</span>
+        <span class="value location">
+          <app-icon category="common" name="map-pin" size="16px"></app-icon>
+          {{ trackingResult.origin_city_name }}
+        </span>
+      </div>
+
+      <div class="result-row">
+        <span class="label">Destino:</span>
+        <span class="value location">
+          <app-icon category="common" name="map-pin" size="16px"></app-icon>
+          {{ trackingResult.destination_city_name }}
+        </span>
+      </div>
+
+      <div class="result-row">
+        <span class="label">Última Actualización:</span>
+        <span class="value">{{ formatDate(trackingResult.updated_at) }}</span>
+      </div>
+
+      <button class="btn btn-secondary btn-details" (click)="onViewDetails(trackingResult.guide_id)">
+        <app-icon category="common" name="eye" size="18px"></app-icon>
+        <span>Ver Detalles Completos</span>
+      </button>
+    </div>
+  </div>
+</div>
