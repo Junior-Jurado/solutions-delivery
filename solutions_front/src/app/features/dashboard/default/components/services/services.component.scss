@@ -1,0 +1,179 @@
+@use "sass:color";
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.services {
+  padding: 4rem 0;
+  background-color: rgba($gray-100, 0.5);
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+
+    @media (min-width: $breakpoint-sm) {
+      padding: 0 $spacing-lg;
+    }
+
+    @media (min-width: $breakpoint-lg) {
+      padding: 0 $spacing-xl;
+    }
+  }
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: $spacing-3xl;
+
+  .section-title {
+    font-size: $font-2xl;
+    font-weight: $font-bold;
+    color: $brand-black;
+    margin-bottom: $spacing-md;
+
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-3xl;
+    }
+  }
+
+  .section-description {
+    font-size: $font-lg;
+    color: $gray-600;
+
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-xl;
+    }
+  }
+}
+
+.services-grid {
+  display: grid;
+  gap: $spacing-lg;
+
+  @media (min-width: $breakpoint-md) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.service-card {
+  background-color: $white;
+  padding: $spacing-lg;
+  border-radius: $radius-md;
+  transition: box-shadow $transition-slow;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+  }
+
+  .service-icon {
+    width: 4rem;
+    height: 4rem;
+    margin-bottom: $spacing-md;
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.bg-blue {
+      background-color: rgba($brand-blue, 0.1);
+      color: $brand-blue;
+    }
+
+    &.bg-red {
+      background-color: rgba($brand-red, 0.1);
+      color: $brand-red;
+    }
+
+    &.bg-black {
+      background-color: rgba($brand-black, 0.1);
+      color: $brand-black;
+    }
+  }
+
+  .service-title {
+    font-size: $font-xl;
+    font-weight: $font-semibold;
+    margin-bottom: $spacing-xs;
+
+    &.text-blue {
+      color: $brand-blue;
+    }
+
+    &.text-red {
+      color: $brand-red;
+    }
+
+    &.text-black {
+      color: $brand-black;
+    }
+  }
+
+  .service-subtitle {
+    color: $gray-600;
+    font-size: $font-sm;
+    margin-bottom: $spacing-md;
+  }
+
+  .service-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: $spacing-md;
+
+    li {
+      color: $gray-600;
+      font-size: $font-sm;
+      margin-bottom: $spacing-sm;
+    }
+  }
+}
+
+// Button styles
+.btn-blue {
+  background-color: $brand-blue;
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: background-color $transition-base;
+
+  &:hover {
+    background-color: color.adjust($brand-blue, $lightness: -10%);
+  }
+}
+
+.btn-red {
+  background-color: $brand-red;
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: background-color $transition-base;
+
+  &:hover {
+    background-color: color.adjust($brand-red, $lightness: -10%);
+  }
+}
+
+.btn-secondary {
+  background-color: $gray-100;
+  color: $gray-700;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: background-color $transition-base;
+
+  &:hover {
+    background-color: $gray-300;
+  }
+}
+
+.w-full {
+  width: 100%;
+}

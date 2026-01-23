@@ -1,0 +1,47 @@
+<section class="features">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">
+        ¿Por qué elegir Soluciones?
+      </h2>
+      <p class="section-description">
+        Más de 10 años conectando a Colombia con excelencia
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div 
+        *ngFor="let feature of features" 
+        class="feature-card"
+        [class.border-blue]="feature.color === 'blue'"
+        [class.border-red]="feature.color === 'red'"
+        [class.border-black]="feature.color === 'black'">
+        
+        <div 
+          class="feature-icon"
+          [class.bg-blue]="feature.color === 'blue'"
+          [class.bg-red]="feature.color === 'red'"
+          [class.bg-black]="feature.color === 'black'">
+          
+          <app-icon 
+            category="common" 
+            [name]="feature.icon" 
+            size="32px">
+          </app-icon>
+        </div>
+
+        <h3 
+          class="feature-title"
+          [class.text-blue]="feature.color === 'blue'"
+          [class.text-red]="feature.color === 'red'"
+          [class.text-black]="feature.color === 'black'">
+          {{ feature.title }}
+        </h3>
+
+        <p class="feature-description">
+          {{ feature.description }}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

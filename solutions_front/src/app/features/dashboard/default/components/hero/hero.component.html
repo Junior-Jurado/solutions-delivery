@@ -1,0 +1,50 @@
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <h1 class="hero-title">
+          Envíos seguros y rápidos por toda Colombia
+        </h1>
+        <p class="hero-description">
+          La plataforma de mensajería más confiable del país. Rastrea tus envíos en tiempo real.
+        </p>
+        
+        <app-tracking-card (trackingSubmit)="onTrackingSubmit($event)"></app-tracking-card>
+      </div>
+      
+      <div class="map-section">
+        <div class="map-container">
+          <h3 class="map-title">Cobertura Nacional</h3>
+          
+          <app-colombia-map 
+            [showAnimations]="true"
+            (citySelected)="onCitySelected($event)">
+          </app-colombia-map>
+
+
+          <p class="map-description">
+            <app-icon category="common" name="map-pin" size="20px"></app-icon>
+
+            Conectamos más de 1,100 municipios en todo el territorio colombiano
+          </p>
+
+          <!-- Estadísticas -->
+          <div class="map-stats">
+            <div class="stat-item">
+              <span class="stat-value">32</span>
+              <span class="stat-label">Departamentos</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">1,100+</span>
+              <span class="stat-label">Municipios</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value">24/7</span>
+              <span class="stat-label">Cobertura</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

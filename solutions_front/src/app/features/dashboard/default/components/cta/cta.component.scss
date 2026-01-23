@@ -1,0 +1,93 @@
+@use "sass:color";
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.cta {
+  padding: 4rem 0;
+  background-color: $brand-black;
+  color: $white;
+  text-align: center;
+
+  .container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 $spacing-md;
+
+    @media (min-width: $breakpoint-sm) {
+      padding: 0 $spacing-lg;
+    }
+
+    @media (min-width: $breakpoint-lg) {
+      padding: 0 $spacing-xl;
+    }
+  }
+
+  .cta-title {
+    font-size: $font-2xl;
+    font-weight: $font-bold;
+    margin-bottom: $spacing-md;
+
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-3xl;
+    }
+  }
+
+  .cta-description {
+    font-size: $font-lg;
+    margin-bottom: $spacing-xl;
+    opacity: 0.9;
+
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-xl;
+    }
+  }
+
+  .cta-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    justify-content: center;
+
+    @media (min-width: $breakpoint-sm) {
+      flex-direction: row;
+    }
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, $brand-blue, $brand-red);
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: transform $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+.btn-outline {
+  background: transparent;
+  color: $white;
+  border: 1px solid $white;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: background-color $transition-base, color $transition-base;
+
+  &:hover {
+    background-color: $white;
+    color: $brand-black;
+  }
+}
+
+.btn-lg {
+  padding: $spacing-md $spacing-xl;
+  font-size: $font-lg;
+}

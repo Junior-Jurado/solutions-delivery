@@ -1,0 +1,446 @@
+// ==================================================================================
+// MAPA DE COLOMBIA - ESTILOS
+// Versión STANDALONE (sin dependencias de variables globales)
+// ==================================================================================
+
+.colombia-map {
+  position: relative;
+  width: 100%;
+  max-width: 550px;
+  margin: 0 auto;
+  user-select: none;
+
+  // SVG principal del mapa
+  .map-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 8px 24px rgba(59, 130, 246, 0.25));
+    transition: filter 0.3s ease;
+
+    &:hover {
+      filter: drop-shadow(0 12px 32px rgba(59, 130, 246, 0.35));
+    }
+  }
+
+  // ==================================================================================
+  // FORMA DEL MAPA
+  // ==================================================================================
+  .colombia-shape {
+    .main-territory {
+      transition: all 0.3s ease;
+      cursor: default;
+
+      &:hover {
+        opacity: 1 !important;
+        filter: drop-shadow(0 0 15px rgba(96, 165, 250, 0.6));
+      }
+    }
+  }
+
+  // ==================================================================================
+  // CIUDADES
+  // ==================================================================================
+  .cities {
+    .city-group {
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        .city-name {
+          font-size: 15px;
+          font-weight: 700;
+          fill: #fbbf24;
+        }
+
+        .city-dot {
+          filter: url(#strongGlow);
+        }
+      }
+
+      &.selected {
+        .city-dot {
+          stroke: #fbbf24;
+          stroke-width: 4;
+          filter: url(#strongGlow);
+        }
+
+        .city-name {
+          fill: #fbbf24;
+          font-size: 15px;
+          font-weight: 700;
+        }
+      }
+    }
+
+    .city-name {
+      pointer-events: none;
+      text-shadow: 
+        0 1px 2px rgba(0, 0, 0, 0.8),
+        0 2px 4px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .city-dot {
+      transition: all 0.3s ease;
+    }
+  }
+
+  // ==================================================================================
+  // RUTAS ANIMADAS
+  // ==================================================================================
+  .main-routes {
+    .route {
+      animation: dashAnimation 4s linear infinite;
+    }
+  }
+
+  @keyframes dashAnimation {
+    to {
+      stroke-dashoffset: -24;
+    }
+  }
+
+  // ==================================================================================
+  // PAQUETES ANIMADOS
+  // ==================================================================================
+  .animated-packages {
+    .package circle {
+      animation: packagePulse 0.6s ease-in-out infinite alternate;
+    }
+  }
+
+  @keyframes packagePulse {
+    from {
+      r: 5;
+    }
+    to {
+      r: 6;
+    }
+  }
+
+  // ==================================================================================
+  // TOOLTIP DE INFORMACIÓN DE CIUDAD
+  // ==================================================================================
+  .city-info {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(16px);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.15),
+      0 0 0 1px rgba(59, 130, 246, 0.1);
+    min-width: 280px;
+    max-width: 320px;
+    animation: slideIn 0.3s ease;
+    color: #1e293b;
+    z-index: 10;
+
+    .close-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      font-size: 28px;
+      color: #9ca3af;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      line-height: 1;
+      padding: 0;
+
+      &:hover {
+        background: #f3f4f6;
+        color: #374151;
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+    }
+
+    .city-title {
+      margin: 0 0 1rem 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #3b82f6;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-right: 2rem;
+
+      .capital-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        font-size: 0.625rem;
+        font-weight: 600;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    .city-details {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .detail-section {
+        .detail-label {
+          display: block;
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: #6b7280;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 0.5rem;
+        }
+
+        .coord-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.5rem;
+
+          .coord-item {
+            background: #f9fafb;
+            padding: 0.5rem;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+
+            .coord-label {
+              font-size: 0.75rem;
+              color: #6b7280;
+              font-weight: 500;
+            }
+
+            .coord-value {
+              font-size: 0.875rem;
+              color: #1e293b;
+              font-weight: 600;
+              font-family: 'Courier New', monospace;
+            }
+          }
+        }
+      }
+
+      .packages-section {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1rem;
+
+        .packages-count {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+
+          .label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1e40af;
+          }
+
+          .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+          }
+        }
+      }
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(20px) translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0) translateY(0);
+    }
+  }
+
+  // ==================================================================================
+  // LEYENDA DEL MAPA
+  // ==================================================================================
+  .map-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: #e5e7eb;
+      font-weight: 500;
+
+      .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+        &.capital {
+          background: #ef4444;
+        }
+
+        &.city {
+          background: #60a5fa;
+        }
+
+        &.package {
+          background: #fbbf24;
+        }
+      }
+    }
+  }
+
+  // ==================================================================================
+  // RESPONSIVE
+  // ==================================================================================
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 0 1rem;
+
+    .city-info {
+      position: fixed;
+      top: auto;
+      bottom: 1rem;
+      right: 1rem;
+      left: 1rem;
+      min-width: auto;
+      max-width: none;
+    }
+
+    .map-legend {
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 0.75rem;
+
+      .legend-item {
+        justify-content: center;
+      }
+    }
+  }
+
+  @media (max-width: 480px) {
+    .city-info {
+      .city-title {
+        font-size: 1.25rem;
+      }
+
+      .city-details {
+        .detail-section {
+          .coord-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      }
+    }
+  }
+
+  // ==================================================================================
+  // DARK MODE (opcional)
+  // ==================================================================================
+  @media (prefers-color-scheme: dark) {
+    .city-info {
+      background: rgba(30, 41, 59, 0.98);
+      color: #e5e7eb;
+
+      .city-title {
+        color: #60a5fa;
+      }
+
+      .city-details {
+        .detail-section {
+          .detail-label {
+            color: #9ca3af;
+          }
+
+          .coord-grid {
+            .coord-item {
+              background: rgba(0, 0, 0, 0.3);
+
+              .coord-label {
+                color: #9ca3af;
+              }
+
+              .coord-value {
+                color: #e5e7eb;
+              }
+            }
+          }
+        }
+
+        .packages-section {
+          border-top-color: rgba(255, 255, 255, 0.1);
+
+          .packages-count {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.3) 100%);
+
+            .label {
+              color: #93c5fd;
+            }
+
+            .value {
+              color: #60a5fa;
+            }
+          }
+        }
+      }
+
+      .close-btn {
+        color: #6b7280;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: #9ca3af;
+        }
+      }
+    }
+  }
+
+  // ==================================================================================
+  // ACCESIBILIDAD
+  // ==================================================================================
+  
+  // Mejorar contraste para lectores de pantalla
+  .city-group[aria-label] {
+    &:focus {
+      outline: 2px solid #fbbf24;
+      outline-offset: 2px;
+    }
+  }
+
+  // Reducir animaciones si el usuario lo prefiere
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

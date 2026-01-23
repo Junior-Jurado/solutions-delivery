@@ -1,0 +1,30 @@
+<div class="tracking-card">
+  <div class="card-header">
+    <h3 class="card-title">
+      <app-icon category="common" name="search" size="20px"></app-icon>
+      Rastrear Envío
+    </h3>
+    <p class="card-description">
+      Ingresa tu número de guía para conocer el estado
+    </p>
+  </div>
+  <div class="card-content">
+    <form (ngSubmit)="onSubmit($event)">
+      <div class="form-group">
+        <label for="tracking">Número de Guía</label>
+        <input
+          id="tracking"
+          type="text"
+          class="form-input"
+          placeholder="Ej: EE123456789CO"
+          [(ngModel)]="trackingNumber"
+          name="trackingNumber"
+          required
+        />
+      </div>
+      <button type="submit" class="btn-primary w-full">
+        Rastrear Ahora
+      </button>
+    </form>
+  </div>
+</div>
