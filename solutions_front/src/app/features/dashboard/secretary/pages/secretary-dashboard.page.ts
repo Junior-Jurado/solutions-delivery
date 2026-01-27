@@ -22,7 +22,7 @@ import { TranslationService } from "@shared/services/translation.service";
 
 // Components
 import { GuidePreviewModalComponent, GuidePreviewData } from "@shared/components/guide-preview-modal/guide-preview-modal.component";
-import { GuideFormComponent } from '../components/guide-form/guide-form.component';
+import { GuideFormComponent } from '@shared/components/guide-form/guide-form.component';
 import { GuideListComponent } from "../components/guide-list/guide-list.component";
 import { GuideFiltersComponent, GuideFilterValues } from "../components/guide-filters/guide-filters.component";
 import { StatsCardsComponent } from "../components/stats-cards/stats-cards.component";

@@ -1,0 +1,403 @@
+<form [formGroup]="guideForm" (ngSubmit)="onSubmit()" class="guide-form">
+  <div class="form-grid">
+    <!-- ===== REMITENTE ===== -->
+    <div class="form-section">
+      <div class="section-header">
+        <app-icon category="common" name="user-circle" size="20px" color="#3b82f6"></app-icon>
+        <h3>Información del Remitente</h3>
+      </div>
+
+      <!-- AUTOCOMPLETADO (Solo ADMIN y SECRETARY) -->
+      <div class="form-field" *ngIf="enableAutocomplete">
+        <label for="senderSearch">
+          Buscar cliente registrado
+          <span class="badge-role">ADMIN/SECRETARY</span>
+        </label>
+        <div class="autocomplete-wrapper">
+          <input 
+            id="senderSearch"
+            type="text" 
+            [formControl]="senderSearchControl"
+            placeholder="Escribe nombre o empresa..."
+            (focus)="onSenderFocus()"
+            (blur)="onSenderBlur()"
+            class="autocomplete-input">
+          <app-icon
+            *ngIf="isLoadingSenderSuggestions"
+            category="common"
+            name="loader"
+            size="16px"
+            customClass="spinner autocomplete-icon">
+          </app-icon>
+
+          <!-- DROPDOWN -->
+          <div class="autocomplete-dropdown" *ngIf="showSenderSuggestions && senderClientSuggestions.length > 0">
+            <div
+              *ngFor="let client of senderClientSuggestions"
+              class="autocomplete-item"
+              (mousedown)="onSenderClientSelected(client)">
+              <div class="client-info">
+                <div class="client-name">{{ client.full_name }}</div>
+                <div class="client-details">
+                  <span class="document">{{ client.document_type }}: {{ client.document_number }}</span>
+                  <span class="stats">• {{ client.total_cities }} {{ client.total_cities === 1 ? 'ciudad' : 'ciudades' }}</span>
+                  <span class="stats">• Usado {{ client.total_usage }} {{ client.total_usage === 1 ? 'vez' : 'veces' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="senderName">Nombre completo *</label>
+          <input 
+            id="senderName" 
+            type="text" 
+            formControlName="senderName" 
+            placeholder="Juan Pérez">
+          <span class="error-message" *ngIf="hasError('senderName')">
+            {{ getErrorMessage('senderName') }}
+          </span>
+        </div>
+        <div class="form-field">
+          <label for="senderDocType">Tipo de documento *</label>
+          <select id="senderDocType" formControlName="senderDocType">
+            <option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="senderDoc">Número de documento *</label>
+          <input 
+            id="senderDoc" 
+            type="text" 
+            formControlName="senderDoc" 
+            placeholder="12345678">
+          <span class="error-message" *ngIf="hasError('senderDoc')">
+            {{ getErrorMessage('senderDoc') }}
+          </span>
+        </div>
+        <div class="form-field">
+          <label for="senderPhone">Teléfono *</label>
+          <input 
+            id="senderPhone" 
+            type="tel" 
+            formControlName="senderPhone" 
+            placeholder="3001234567">
+          <span class="error-message" *ngIf="hasError('senderPhone')">
+            {{ getErrorMessage('senderPhone') }}
+          </span>
+        </div>
+        <div class="form-field">
+          <label for="senderEmail">Email</label>
+          <input 
+            id="senderEmail" 
+            type="email" 
+            formControlName="senderEmail" 
+            placeholder="juan@email.com">
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="senderCity">Ciudad origen *</label>
+        <app-city-selector
+          formControlName="senderCity"
+          [enableSearch]="true"
+          placeholder="Buscar ciudad de origen..."
+          (citySelected)="onSenderCitySelected($event)">
+        </app-city-selector>
+        <span class="error-message" *ngIf="hasError('senderCity')">
+          {{ getErrorMessage('senderCity') }}
+        </span>
+      </div>
+
+      <!-- DIRECCIONES GUARDADAS (Solo ADMIN y SECRETARY) -->
+      <div class="form-field" *ngIf="enableAutocomplete && senderAddresses.length > 0">
+        <label>
+          Direcciones guardadas en esta ciudad
+          <span class="badge-role">ADMIN/SECRETARY</span>
+        </label>
+        <div class="saved-addresses">
+          <div
+            *ngFor="let address of senderAddresses"
+            class="address-item"
+            [class.selected]="guideForm.get('senderAddress')?.value === address.address"
+            (click)="selectSenderAddress(address)">
+            <div class="address-text">{{ address.address }}</div>
+            <div class="address-meta">
+              <app-icon category="common" name="repeat" size="12px"></app-icon>
+              Usado {{ address.usage_count }} {{ address.usage_count === 1 ? 'vez' : 'veces' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="senderAddress">Dirección completa *</label>
+        <textarea 
+          id="senderAddress" 
+          formControlName="senderAddress" 
+          placeholder="Calle 123 #45-67, Barrio"
+          rows="2"></textarea>
+        <span class="error-message" *ngIf="hasError('senderAddress')">
+          {{ getErrorMessage('senderAddress') }}
+        </span>
+      </div>
+    </div>
+
+    <!-- ===== DESTINATARIO ===== -->
+    <div class="form-section">
+      <div class="section-header destination">
+        <app-icon category="common" name="map-pin" size="20px" color="#ef4444"></app-icon>
+        <h3>Información del Destinatario</h3>
+      </div>
+
+      <!-- AUTOCOMPLETADO (Solo ADMIN y SECRETARY) -->
+      <div class="form-field" *ngIf="enableAutocomplete">
+        <label for="receiverSearch">
+          Buscar cliente registrado
+          <span class="badge-role">ADMIN/SECRETARY</span>
+        </label>
+        <div class="autocomplete-wrapper">
+          <input 
+            id="receiverSearch"
+            type="text" 
+            [formControl]="receiverSearchControl"
+            placeholder="Escribe nombre o empresa..."
+            (focus)="onReceiverFocus()"
+            (blur)="onReceiverBlur()"
+            class="autocomplete-input">
+          <app-icon
+            *ngIf="isLoadingReceiverSuggestions"
+            category="common"
+            name="loader"
+            size="16px"
+            customClass="spinner autocomplete-icon">
+          </app-icon>
+
+          <!-- DROPDOWN -->
+          <div class="autocomplete-dropdown" *ngIf="showReceiverSuggestions && receiverClientSuggestions.length > 0">
+            <div
+              *ngFor="let client of receiverClientSuggestions"
+              class="autocomplete-item"
+              (mousedown)="onReceiverClientSelected(client)">
+              <div class="client-info">
+                <div class="client-name">{{ client.full_name }}</div>
+                <div class="client-details">
+                  <span class="document">{{ client.document_type }}: {{ client.document_number }}</span>
+                  <span class="stats">• {{ client.total_cities }} {{ client.total_cities === 1 ? 'ciudad' : 'ciudades' }}</span>
+                  <span class="stats">• Usado {{ client.total_usage }} {{ client.total_usage === 1 ? 'vez' : 'veces' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="receiverName">Nombre completo *</label>
+          <input 
+            id="receiverName" 
+            type="text" 
+            formControlName="receiverName" 
+            placeholder="María González">
+          <span class="error-message" *ngIf="hasError('receiverName')">
+            {{ getErrorMessage('receiverName') }}
+          </span>
+        </div>
+        <div class="form-field">
+          <label for="receiverDocType">Tipo de documento *</label>
+          <select id="receiverDocType" formControlName="receiverDocType">
+            <option *ngFor="let type of documentTypes" [value]="type">{{ type }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label for="receiverDoc">Número de documento *</label>
+          <input 
+            id="receiverDoc" 
+            type="text" 
+            formControlName="receiverDoc" 
+            placeholder="87654321">
+          <span class="error-message" *ngIf="hasError('receiverDoc')">
+            {{ getErrorMessage('receiverDoc') }}
+          </span>
+        </div>
+        <div class="form-field">
+          <label for="receiverPhone">Teléfono *</label>
+          <input 
+            id="receiverPhone" 
+            type="tel" 
+            formControlName="receiverPhone" 
+            placeholder="3009876543">
+          <span class="error-message" *ngIf="hasError('receiverPhone')">
+            {{ getErrorMessage('receiverPhone') }}
+          </span>
+        </div>
+        <div class="form-field">
+          <label for="receiverEmail">Email</label>
+          <input 
+            id="receiverEmail" 
+            type="email" 
+            formControlName="receiverEmail" 
+            placeholder="maria@email.com">
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="receiverCity">Ciudad destino *</label>
+        <app-city-selector
+          formControlName="receiverCity"
+          [enableSearch]="true"
+          placeholder="Buscar ciudad de destino..."
+          (citySelected)="onReceiverCitySelected($event)">
+        </app-city-selector>
+        <span class="error-message" *ngIf="hasError('receiverCity')">
+          {{ getErrorMessage('receiverCity') }}
+        </span>
+      </div>
+
+      <!-- DIRECCIONES GUARDADAS (Solo ADMIN y SECRETARY) -->
+      <div class="form-field" *ngIf="enableAutocomplete && receiverAddresses.length > 0">
+        <label>
+          Direcciones guardadas en esta ciudad
+          <span class="badge-role">ADMIN/SECRETARY</span>
+        </label>
+        <div class="saved-addresses">
+          <div
+            *ngFor="let address of receiverAddresses"
+            class="address-item"
+            [class.selected]="guideForm.get('receiverAddress')?.value === address.address"
+            (click)="selectReceiverAddress(address)">
+            <div class="address-text">{{ address.address }}</div>
+            <div class="address-meta">
+              <app-icon category="common" name="repeat" size="12px"></app-icon>
+              Usado {{ address.usage_count }} {{ address.usage_count === 1 ? 'vez' : 'veces' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="receiverAddress">Dirección completa *</label>
+        <textarea 
+          id="receiverAddress" 
+          formControlName="receiverAddress" 
+          placeholder="Carrera 89 #12-34, Barrio"
+          rows="2"></textarea>
+        <span class="error-message" *ngIf="hasError('receiverAddress')">
+          {{ getErrorMessage('receiverAddress') }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== INFORMACIÓN DEL PAQUETE ===== -->
+  <div class="form-section full-width">
+    <div class="section-header">
+      <app-icon category="common" name="box" size="20px" color="#3b82f6"></app-icon>
+      <h3>Información del Paquete</h3>
+    </div>
+
+    <div class="form-row four-cols">
+      <div class="form-field">
+        <label for="serviceType">Tipo de servicio *</label>
+        <select id="serviceType" formControlName="serviceType">
+          <option value="">Seleccionar</option>
+          <option *ngFor="let type of serviceTypes" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="weight">Peso (kg) *</label>
+        <input 
+          id="weight" 
+          type="number" 
+          step="0.1" 
+          formControlName="weight" 
+          placeholder="1.5">
+      </div>
+      <div class="form-field">
+        <label for="declaredValue">Valor declarado *</label>
+        <input 
+          id="declaredValue" 
+          type="text" 
+          formControlName="declaredValue" 
+          placeholder="50000">
+      </div>
+      <div class="form-field">
+        <label for="pieces">Número de piezas</label>
+        <input 
+          id="pieces" 
+          type="number" 
+          formControlName="pieces">
+      </div>
+    </div>
+
+    <div class="form-row three-cols">
+      <div class="form-field">
+        <label for="dimensions">Dimensiones (cm)</label>
+        <input 
+          id="dimensions" 
+          type="text" 
+          formControlName="dimensions" 
+          placeholder="20x15x10">
+      </div>
+      <div class="form-field">
+        <label for="priority">Prioridad</label>
+        <select id="priority" formControlName="priority">
+          <option *ngFor="let priority of priorities" [value]="priority.toLowerCase()">
+            {{ priority }}
+          </option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="insurance">Seguro adicional</label>
+        <select id="insurance" formControlName="insurance">
+          <option *ngFor="let option of insuranceOptions" [value]="option.toLowerCase()">
+            {{ option }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="content">Descripción del contenido</label>
+      <textarea 
+        id="content" 
+        formControlName="content" 
+        placeholder="Descripción detallada del contenido del paquete"
+        rows="2"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label for="observations">Observaciones especiales</label>
+      <textarea 
+        id="observations" 
+        formControlName="observations" 
+        placeholder="Instrucciones especiales para la entrega"
+        rows="2"></textarea>
+    </div>
+  </div>
+
+  <!-- ===== BOTÓN DE ENVÍO ===== -->
+  <button 
+    type="submit" 
+    class="btn btn-primary btn-large" 
+    [disabled]="!guideForm.valid || isSubmitting">
+    <app-icon 
+      *ngIf="isSubmitting" 
+      category="common" 
+      name="loader" 
+      size="20px"
+      customClass="spinner">
+    </app-icon>
+    {{ isSubmitting ? 'Creando guía...' : 'Crear Guía de Envío' }}
+  </button>
+</form>

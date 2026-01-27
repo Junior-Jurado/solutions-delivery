@@ -15,7 +15,7 @@ import { DeviceDetectionService } from '@shared/services/device-detection.servic
 // Components
 import { IconComponent } from '@shared/components/icon/icon.component';
 import { GuidePreviewData, GuidePreviewModalComponent } from '@shared/components/guide-preview-modal/guide-preview-modal.component';
-import { GuideFormComponent } from '@features/dashboard/secretary/components/guide-form/guide-form.component';
+import { GuideFormComponent } from '@shared/components/guide-form/guide-form.component';
 import { GuideDetailsModalComponent } from '@shared/components/guide-details-modal.component';
 import { TrackingComponent } from '../components/tracking/tracking.component';
 import { MyGuidesComponent } from '../components/my-guides/my-guides.component';

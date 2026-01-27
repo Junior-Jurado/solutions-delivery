@@ -8,7 +8,8 @@ import {
 
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Observable, from, of } from 'rxjs';
+import { firstValueFrom, map, catchError } from 'rxjs';
 import { environment } from '../../environments/environments.dev';
 
 const poolData = {
@@ -190,7 +191,40 @@ export class AuthService {
     // ==========================================
 
     /**
+     * Obtiene el rol del usuario como Observable
+     * Este método es necesario para el componente GuideFormComponent
+     */
+    getUserRole$(): Observable<string> {
+        // 1. Cache en memoria
+        if (this.cachedRole) {
+            return of(this.cachedRole);
+        }
+
+        // 2. Cache en sessionStorage
+        const storedRole = sessionStorage.getItem('role');
+        if (storedRole) {
+            this.cachedRole = storedRole;
+            return of(storedRole);
+        }
+
+        // 3. Llamada a la API (convertir Promise a Observable)
+        const idToken = sessionStorage.getItem('idToken');
+        if (!idToken) {
+            console.error('[AuthService] No se encontró idToken');
+            return of(''); // Retornar string vacío en lugar de error
+        }
+
+        return from(this.fetchAndCacheUserRole(idToken)).pipe(
+            catchError((error) => {
+                console.error('[AuthService] Error al obtener rol:', error);
+                return of(''); // Retornar string vacío en caso de error
+            })
+        );
+    }
+
+    /**
      * Obtiene el rol del usuario (con cache)
+     * Versión Promise - mantener para compatibilidad
      */
     async getUserRole(): Promise<string> {
         // 1. Cache en memoria
@@ -240,9 +274,11 @@ export class AuthService {
             sessionStorage.setItem('role', role);
             this.cachedRole = role;
 
+            console.log('[AuthService] Rol obtenido y cacheado:', role);
+
             return role;
         } catch (error) {
-            console.error('Error al obtener rol:', error);
+            console.error('[AuthService] Error al obtener rol:', error);
             throw new Error('No se pudo obtener el rol del usuario');
         }
     }

@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/models"
 	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/routers"
 	"github.com/aws/aws-lambda-go/events"
 	// "strconv"
@@ -41,6 +42,9 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	
 	case strings.HasPrefix(path, "/client"):
 		return ProccessClient(body, path, method, userUUID, id, request)
+	
+	case strings.HasPrefix(path, "/frequent-parties"):
+		return ProccessFrequentParties(body, path, method, userUUID, request)
 	
 	default:
 		return 400, "Method Invalid"
@@ -249,6 +253,118 @@ func ProccessClient(body string, path string, method string, user string, id str
 	case path == "/client/stats" && method == "GET":
 		return routers.GetClientStats(user)
 		
+	default:
+		return 400, "Method Invalid"
+	}
+}
+
+// ProccessFrequentParties maneja las peticiones de partes frecuentes
+func ProccessFrequentParties(body string, path string, method string, user string, request events.APIGatewayV2HTTPRequest) (int, string) {
+	fmt.Printf("ProccessFrequentParties -> Path:%s, Method: %s\n", path, method)
+
+	switch {
+
+	// GET /frequent-parties/search-by-name - Buscar SOLO por nombre (autocompletado inicial)
+	// Retorna clientes únicos sin importar la ciudad
+	case path == "/frequent-parties/search-by-name" && method == "GET":
+		searchTerm := ""
+		partyTypeStr := ""
+		
+		if request.QueryStringParameters != nil {
+			searchTerm = request.QueryStringParameters["q"]
+			partyTypeStr = request.QueryStringParameters["party_type"]
+		}
+
+		if searchTerm == "" {
+			return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
+		}
+
+		var partyType models.PartyType
+		if partyTypeStr == "SENDER" {
+			partyType = models.PartySender
+		} else if partyTypeStr == "RECEIVER" {
+			partyType = models.PartyReceiver
+		}
+
+		return routers.SearchFrequentPartiesByNameOnly(searchTerm, partyType)
+
+	// GET /frequent-parties/search-by-name-and-city - Buscar por nombre Y ciudad
+	// Retorna TODAS las direcciones de ese cliente en esa ciudad
+	case path == "/frequent-parties/search-by-name-and-city" && method == "GET":
+		searchTerm := ""
+		cityIDStr := ""
+		partyTypeStr := ""
+		
+		if request.QueryStringParameters != nil {
+			searchTerm = request.QueryStringParameters["q"]
+			cityIDStr = request.QueryStringParameters["city_id"]
+			partyTypeStr = request.QueryStringParameters["party_type"]
+		}
+
+		if searchTerm == "" {
+			return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
+		}
+
+		if cityIDStr == "" {
+			return 400, `{"error": "Parámetro 'city_id' requerido"}`
+		}
+
+		cityID, err := strconv.ParseInt(cityIDStr, 10, 64)
+		if err != nil {
+			return 400, `{"error": "city_id debe ser un número válido"}`
+		}
+
+		var partyType models.PartyType
+		if partyTypeStr == "SENDER" {
+			partyType = models.PartySender
+		} else if partyTypeStr == "RECEIVER" {
+			partyType = models.PartyReceiver
+		}
+
+		return routers.SearchFrequentPartiesByNameAndCity(searchTerm, cityID, partyType)
+
+	// GET /frequent-parties/by-document - Obtener direcciones por documento y ciudad
+	case path == "/frequent-parties/by-document" && method == "GET":
+		documentNumber := ""
+		cityIDStr := ""
+		partyTypeStr := ""
+
+		if request.QueryStringParameters != nil {
+			documentNumber = request.QueryStringParameters["document_number"]
+			cityIDStr = request.QueryStringParameters["city_id"]
+			partyTypeStr = request.QueryStringParameters["party_type"]
+		}
+
+		if documentNumber == "" {
+			return 400, `{"error": "Parámetro 'document_number' requerido"}`
+		}
+
+		if cityIDStr == "" {
+			return 400, `{"error": "Parámetro 'city_id' requerido"}`
+		}
+
+		cityID, err := strconv.ParseInt(cityIDStr, 10, 64)
+		if err != nil {
+			return 400, `{"error": "city_id debe ser un número válido"}`
+		}
+
+		var partyType models.PartyType
+		if partyTypeStr == "SENDER" {
+			partyType = models.PartySender
+		} else if partyTypeStr == "RECEIVER" {
+			partyType = models.PartyReceiver
+		}
+
+		return routers.GetFrequentPartiesByDocument(documentNumber, cityID, partyType)
+
+	// POST /frequent-parties - Registrar nueva parte frecuente
+	case path == "/frequent-parties" && method == "POST":
+		return routers.UpsertFrequentParty(body)
+
+	// GET /frequent-parties/stats - Obtener estadísticas
+	case path == "/frequent-parties/stats" && method == "GET":
+		return routers.GetFrequentPartyStats()
+
 	default:
 		return 400, "Method Invalid"
 	}
