@@ -48,12 +48,12 @@ export class GuideFormComponent implements OnInit, OnDestroy {
 
 
     // ==========================================
-    // 🆕 AUTOCARGA DE DATOS PARA CLIENT
+    // AUTOCARGA DE DATOS PARA CLIENT
     // ==========================================
     isLoadingClientData: boolean = false;
     clientDataLoaded: boolean = false;
     clientDocumentNumber: string = '';          // Número de documento del CLIENT para buscar sus direcciones
-
+    isClientReadonly: boolean = false;
 
     // ==========================================
     // AUTOCOMPLETADO DE REMITENTE
@@ -118,10 +118,13 @@ export class GuideFormComponent implements OnInit, OnDestroy {
                 
                 // TODOS los roles pueden ver historial de direcciones
                 this.enableAddressHistory = true; // Habilitado para todos
+
+                this.isClientReadonly = (role === 'CLIENT');
                 
                 console.log(`[GuideForm] Rol: ${role}`);
-                console.log(`[GuideForm] Autocompletado de clientes: ${this.enableAutocomplete ? '✅' : '❌'}`);
-                console.log(`[GuideForm] Historial de direcciones: ${this.enableAddressHistory ? '✅' : '❌'}`);
+                console.log(`[GuideForm] Autocompletado de clientes: ${this.enableAutocomplete ? 'Sí' : 'No'}`);
+                console.log(`[GuideForm] Historial de direcciones: ${this.enableAddressHistory ? 'Sí' : 'No'}`);
+                console.log(`[GuideForm] Campos readonly: ${this.isClientReadonly ? 'Sí' : 'No'}`);
 
                 // Configurar autocompletado si tiene permiso
                 if (this.enableAutocomplete) {
@@ -138,6 +141,7 @@ export class GuideFormComponent implements OnInit, OnDestroy {
                 console.error('[GuideForm] Error al obtener rol:', error);
                 this.enableAutocomplete = false;
                 this.enableAddressHistory = false;
+                this.isClientReadonly = false;
             }
         });
     }
@@ -180,6 +184,12 @@ export class GuideFormComponent implements OnInit, OnDestroy {
                 senderPhone: profile.phone || '',
                 senderEmail: profile.email || ''
             });
+
+            this.guideForm.get('senderName')?.disable();
+            this.guideForm.get('senderDocType')?.disable();
+            this.guideForm.get('senderDoc')?.disable();
+            this.guideForm.get('senderPhone')?.disable();
+            this.guideForm.get('senderEmail')?.disable();
 
             this.clientDataLoaded = true;
 
@@ -494,11 +504,19 @@ export class GuideFormComponent implements OnInit, OnDestroy {
         
         this.registerFrequentParties();
 
+        // Para CLIENT: incluir campos disabled en el valor del formulario
+        const formValue = this.isClientReadonly
+            ? this.guideForm.getRawValue()
+            : this.guideForm.value;
+
         this.formSubmit.emit(this.guideForm.value);
     }
 
     private registerFrequentParties(): void {
-        const formValue = this.guideForm.value;
+        // getRawValue() para incluir campos disabled de CLIENT
+        const formValue = this.isClientReadonly 
+            ? this.guideForm.getRawValue()
+            : this.guideForm.value;
 
         // Registrar remitente
         const senderRequest: CreateFrequentPartyRequest = {
@@ -513,7 +531,7 @@ export class GuideFormComponent implements OnInit, OnDestroy {
         };
 
         this.frequentPartyService.upsertFrequentParty(senderRequest).subscribe({
-            next: () => console.log('[GuideForm] ✓ Remitente registrado en frequent_parties'),
+            next: () => console.log('[GuideForm] Remitente registrado en frequent_parties'),
             error: (err) => console.warn('[GuideForm] Error registrando remitente:', err)
         });
 
@@ -530,7 +548,7 @@ export class GuideFormComponent implements OnInit, OnDestroy {
         };
 
         this.frequentPartyService.upsertFrequentParty(receiverRequest).subscribe({
-            next: () => console.log('[GuideForm] ✓ Destinatario registrado en frequent_parties'),
+            next: () => console.log('[GuideForm] Destinatario registrado en frequent_parties'),
             error: (err) => console.warn('[GuideForm] Error registrando destinatario:', err)
         });
     }
