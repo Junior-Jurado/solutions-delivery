@@ -1,0 +1,31 @@
+<header class="dashboard-header">
+  <div class="header-content">
+    <!-- Left Side: Logo -->
+    <div class="header-left">
+      <div class="logo-container">
+        <div class="logo-circle">
+          <app-icon category="common" name="package" size="24px" color="#ffffff"></app-icon>
+        </div>
+        <span class="logo-text">{{ companyName }}</span>
+      </div>
+    </div>
+
+    <!-- Right Side: User Info & Logout -->
+    <div class="header-right">
+      <div class="user-info">
+        <div class="user-avatar">
+          <app-icon category="common" name="user" size="20px" color="#ffffff"></app-icon>
+        </div>
+        <div class="user-details">
+          <div class="user-role">{{ displayName }}</div>
+          <div class="user-description">{{ userDescription }}</div>
+        </div>
+      </div>
+
+      <button class="btn-logout" (click)="onLogout()">
+        <app-icon category="common" name="log-out" size="18px"></app-icon>
+        <span class="logout-text" *ngIf="!isMobile">Cerrar Sesión</span>
+      </button>
+    </div>
+  </div>
+</header>

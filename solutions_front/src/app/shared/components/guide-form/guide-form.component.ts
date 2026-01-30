@@ -161,13 +161,16 @@ export class GuideFormComponent implements OnInit, OnDestroy {
 
             console.log('[GuideForm] Datos del cliente obtenidos:', profile);
 
+            // Corregir encoding UTF-8 del nombre
+            const fullName = this.fixUtf8Encoding(profile.full_name);
+
             // Guardar el número de documento para buscar direcciones
             this.clientDocumentNumber = profile.document_number || '';
 
             // Crear un objeto "selectedSenderClient" virtual para el CLIENT
             // Esto permite que funcione el flujo de carga de direcciones
             this.selectedSenderClient = {
-                full_name: profile.full_name,
+                full_name: fullName,
                 document_type: profile.document_type || 'CC',
                 document_number: profile.document_number || '',
                 phone: profile.phone || '',
@@ -178,7 +181,7 @@ export class GuideFormComponent implements OnInit, OnDestroy {
 
             // Autocompletar campos del remitente con datos del cliente
             this.guideForm.patchValue({
-                senderName: profile.full_name,
+                senderName: fullName,
                 senderDocType: profile.document_type || 'CC',
                 senderDoc: profile.document_number || '',
                 senderPhone: profile.phone || '',
@@ -501,15 +504,16 @@ export class GuideFormComponent implements OnInit, OnDestroy {
             this.markFormGroupTouched(this.guideForm);
             return;
         }
-        
+
         this.registerFrequentParties();
 
         // Para CLIENT: incluir campos disabled en el valor del formulario
+        // getRawValue() obtiene todos los valores incluyendo campos disabled
         const formValue = this.isClientReadonly
             ? this.guideForm.getRawValue()
             : this.guideForm.value;
 
-        this.formSubmit.emit(this.guideForm.value);
+        this.formSubmit.emit(formValue);
     }
 
     private registerFrequentParties(): void {
@@ -624,5 +628,24 @@ export class GuideFormComponent implements OnInit, OnDestroy {
 
     formatAddressDisplay(address: FrequentParty): string {
         return this.frequentPartyService.formatAddressDisplay(address);
+    }
+
+    /**
+     * Corrige problemas de doble codificación UTF-8
+     * Ejemplo: "GermÃ¡n" -> "Germán"
+     */
+    private fixUtf8Encoding(text: string): string {
+        if (!text) return text;
+        try {
+            // Detectar si tiene caracteres de doble encoding (ej: Ã¡, Ã©, Ã­, Ã³, Ãº, Ã±)
+            if (/Ã[\x80-\xBF]/.test(text)) {
+                // Convertir string a bytes Latin-1 y luego interpretar como UTF-8
+                const bytes = new Uint8Array([...text].map(c => c.charCodeAt(0)));
+                return new TextDecoder('utf-8').decode(bytes);
+            }
+            return text;
+        } catch {
+            return text;
+        }
     }
 }

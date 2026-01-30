@@ -13,7 +13,7 @@
     <p>Cargando guías...</p>
   </div>
 
-  <div class="guides-grid" *ngIf="!loading && guides.length > 0">
+  <div class="guides-grid" *ngIf="!loading && guides && guides.length > 0">
     <div class="guide-card" *ngFor="let guide of guides">
       <div class="guide-card-header">
         <span class="guide-number">#{{ guide.guide_id }}</span>
@@ -73,7 +73,7 @@
     </div>
   </div>
 
-  <div class="empty-state" *ngIf="!loading && guides.length === 0">
+  <div class="empty-state" *ngIf="!loading && (!guides || guides.length === 0)">
     <app-icon category="common" name="inbox" size="64px"></app-icon>
     <h3>No tienes guías activas</h3>
     <p>Crea una nueva guía para comenzar</p>

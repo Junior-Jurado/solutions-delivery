@@ -35,6 +35,13 @@ export const DASHBOARD_ROUTES: Routes = [
                 loadComponent: () =>
                     import('../client/pages/client-dashboard.page').then(m => m.ClientDashboardPage)
             },
+            {
+                path: 'delivery',
+                canActivate: [RoleGuard],
+                data: { roles: ['DELIVERY'] },
+                loadComponent: () =>
+                    import('../delivery/pages/delivery-dashboard.page').then(m => m.DeliveryDashboardPage)
+            },
 
             // {
             //     path: 'admin',
@@ -44,13 +51,6 @@ export const DASHBOARD_ROUTES: Routes = [
 
             
 
-            {
-                path: 'delivery',
-                canActivate: [RoleGuard],
-                data: { roles: ['DELIVERY'] },
-                loadComponent: () =>
-                    import('../delivery/pages/delivery-dashboard.page').then(m => m.DeliveryDashboardComponent)
-            },
             
         ]
     }

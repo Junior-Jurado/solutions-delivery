@@ -9,7 +9,7 @@
     <p>Cargando histórico...</p>
   </div>
 
-  <div class="history-table" *ngIf="!loading && guides.length > 0">
+  <div class="history-table" *ngIf="!loading && guides && guides.length > 0">
     <table>
       <thead>
         <tr>
@@ -47,7 +47,7 @@
     </table>
   </div>
 
-  <div class="empty-state" *ngIf="!loading && guides.length === 0">
+  <div class="empty-state" *ngIf="!loading && (!guides || guides.length === 0)">
     <app-icon category="common" name="archive" size="64px"></app-icon>
     <h3>No hay registros en el histórico</h3>
     <p>Aquí aparecerán tus guías entregadas</p>

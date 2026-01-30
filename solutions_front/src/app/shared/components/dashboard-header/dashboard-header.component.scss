@@ -1,0 +1,148 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+// ===============================
+// HEADER
+// ===============================
+.dashboard-header {
+  background: $white;
+  border-bottom: 1px solid $border-color;
+  box-shadow: $shadow-sm;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 $spacing-lg;
+    height: 4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @include respond-to($breakpoint-md) {
+      padding: 0 $spacing-md;
+      height: auto;
+      min-height: 4rem;
+      flex-wrap: wrap;
+      gap: $spacing-md;
+    }
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    .logo-circle {
+      background: $brand-blue;
+      padding: $spacing-sm;
+      border-radius: $radius-md;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-text {
+      font-size: $font-xl;
+      font-weight: $font-bold;
+      color: $text-primary;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-lg;
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: $spacing-lg;
+
+    @include respond-to($breakpoint-md) {
+      gap: $spacing-sm;
+      width: 100%;
+      justify-content: space-between;
+      padding: $spacing-sm 0;
+    }
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    .user-avatar {
+      background: $brand-red;
+      padding: $spacing-sm;
+      border-radius: $radius-full;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-details {
+      @include respond-to($breakpoint-xs) {
+        display: none;
+      }
+
+      .user-role {
+        font-weight: $font-semibold;
+        font-size: $font-sm;
+        color: $text-primary;
+      }
+
+      .user-description {
+        font-size: $font-xs;
+        color: $text-muted;
+      }
+    }
+  }
+
+  .btn-logout {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-md;
+    background: $white;
+    border: 1px solid $border-color;
+    border-radius: $radius-base;
+    cursor: pointer;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $text-primary;
+    transition: all $transition-base;
+
+    @include respond-to($breakpoint-xs) {
+      padding: $spacing-sm;
+    }
+
+    app-icon {
+      flex-shrink: 0;
+    }
+
+    .logout-text {
+      @include respond-to($breakpoint-xs) {
+        display: none;
+      }
+    }
+
+    &:hover {
+      background: $bg-light;
+      border-color: $brand-blue;
+      color: $brand-blue;
+
+      app-icon {
+        color: $brand-blue;
+      }
+    }
+  }
+}

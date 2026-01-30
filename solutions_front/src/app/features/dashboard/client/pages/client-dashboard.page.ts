@@ -21,7 +21,7 @@ import { TrackingComponent } from '../components/tracking/tracking.component';
 import { MyGuidesComponent } from '../components/my-guides/my-guides.component';
 import { HistoryComponent } from '../components/history/history.component';
 import { QuoteComponent, QuoteData } from '../components/quote/quote.component';
-import { DashboardHeaderComponent } from '../components/dashboard-header/dashboard-header.component';
+import { DashboardHeaderComponent } from '@shared/components/dashboard-header/dashboard-header.component';
 import { DashboardFooterComponent } from '../components/dashboard-footer/dashboard-footer.component';
 
 interface GuidePreview {
@@ -152,6 +152,10 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   private async loadUserProfile(): Promise<void> {
     try {
       this.currentUser = await this.clientService.getProfile();
+      // Corregir encoding UTF-8 del nombre
+      if (this.currentUser.full_name) {
+        this.currentUser.full_name = this.fixUtf8Encoding(this.currentUser.full_name);
+      }
       this.userId = this.currentUser.user_id;
       this.cdr.detectChanges();
     } catch (error) {
@@ -161,14 +165,33 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   }
 
   /**
+   * Corrige problemas de doble codificación UTF-8
+   * Ejemplo: "GermÃ¡n" -> "Germán"
+   */
+  private fixUtf8Encoding(text: string): string {
+    if (!text) return text;
+    try {
+      // Detectar si tiene caracteres de doble encoding (ej: Ã¡, Ã©, Ã­, Ã³, Ãº, Ã±)
+      if (/Ã[\x80-\xBF]/.test(text)) {
+        // Convertir string a bytes Latin-1 y luego interpretar como UTF-8
+        const bytes = new Uint8Array([...text].map(c => c.charCodeAt(0)));
+        return new TextDecoder('utf-8').decode(bytes);
+      }
+      return text;
+    } catch {
+      return text;
+    }
+  }
+
+  /**
    * Cambia la pestaña activa
    */
   setActiveTab(tab: 'tracking' | 'my-guides' | 'history' | 'quote' | 'create'): void {
     this.activeTab = tab;
 
-    if (tab === 'my-guides' && this.myGuides.length === 0) {
+    if (tab === 'my-guides' && (!this.myGuides || this.myGuides.length === 0)) {
       this.loadMyGuides();
-    } else if (tab === 'history' && this.guidesHistory.length === 0) {
+    } else if (tab === 'history' && (!this.guidesHistory || this.guidesHistory.length === 0)) {
       this.loadGuidesHistory();
     }
   }

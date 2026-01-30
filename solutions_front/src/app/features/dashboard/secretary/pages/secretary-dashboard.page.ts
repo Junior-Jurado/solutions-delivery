@@ -33,6 +33,7 @@ import { GuideSearchComponent } from "../components/guide-search/guide-search.co
 import { StatusDistributionComponent } from "../components/status-distribution/status-distribution.component";
 import { CashCloseStatsComponent } from "../components/cash-close-stats/cash-close-stats.component";
 import { IconComponent } from "@shared/components/icon/icon.component";
+import { DashboardHeaderComponent } from "@shared/components/dashboard-header/dashboard-header.component";
 
 interface GuidePreview {
   senderName: string;
@@ -72,7 +73,8 @@ interface GuidePreview {
         CashCloseListComponent,
         CashCloseStatsComponent,
         IconComponent,
-        GuidePreviewModalComponent
+        GuidePreviewModalComponent,
+        DashboardHeaderComponent
     ]
 })
 export class SecretaryDashboardPage implements OnInit {
@@ -87,6 +89,7 @@ export class SecretaryDashboardPage implements OnInit {
     // USER
     // ==========================================
     currentUserId: string = '';
+    userName: string = '';
 
     // ==========================================
     // GUIDES MANAGEMENT
@@ -184,6 +187,8 @@ export class SecretaryDashboardPage implements OnInit {
             try {
                 const payload = JSON.parse(atob(idToken.split('.')[1]));
                 this.currentUserId = payload.sub || payload['cognito:username'];
+                const rawName = payload['custom:full_name'] || payload.name || 'Secretari@';
+                this.userName = this.fixUtf8Encoding(rawName);
                 console.log('Usuario actual:', this.currentUserId);
             } catch (error) {
                 console.error('Error al decodificar token:', error);
@@ -191,6 +196,25 @@ export class SecretaryDashboardPage implements OnInit {
             }
         } else {
             this.router.navigate(['/auth']);
+        }
+    }
+
+    /**
+     * Corrige problemas de doble codificación UTF-8
+     * Ejemplo: "GermÃ¡n" -> "Germán"
+     */
+    private fixUtf8Encoding(text: string): string {
+        if (!text) return text;
+        try {
+            // Detectar si tiene caracteres de doble encoding (ej: Ã¡, Ã©, Ã­, Ã³, Ãº, Ã±)
+            if (/Ã[\x80-\xBF]/.test(text)) {
+                // Convertir string a bytes Latin-1 y luego interpretar como UTF-8
+                const bytes = new Uint8Array([...text].map(c => c.charCodeAt(0)));
+                return new TextDecoder('utf-8').decode(bytes);
+            }
+            return text;
+        } catch {
+            return text;
         }
     }
 

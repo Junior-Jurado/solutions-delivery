@@ -1,7 +1,10 @@
 <div class="client-dashboard">
   <!-- Header Component -->
   <app-dashboard-header
-    [currentUser]="currentUser"
+    userRole="Cliente"
+    userDescription="Panel de usuario"
+    [userName]="currentUser?.full_name || ''"
+    [showUserName]="true"
     [isMobile]="isMobile"
     (logout)="logout()">
   </app-dashboard-header>
