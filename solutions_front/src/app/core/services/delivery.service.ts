@@ -93,10 +93,76 @@ export interface CustomerReview {
     date: string;
 }
 
+// Interfaces alineadas con el backend
+export interface DeliveryAssignment {
+    assignment_id: number;
+    guide_id: number;
+    delivery_user_id: string;
+    delivery_user_name?: string;
+    assignment_type: 'PICKUP' | 'DELIVERY';
+    status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+    notes?: string;
+    assigned_by: string;
+    assigned_by_name?: string;
+    assigned_at: string;
+    updated_at: string;
+    completed_at?: string;
+    guide?: GuideInfo;
+}
+
+export interface GuideInfo {
+    guide_id: number;
+    service_type: string;
+    current_status: string;
+    origin_city_name: string;
+    destination_city_name: string;
+    sender_name?: string;
+    sender_address?: string;
+    sender_phone?: string;
+    receiver_name?: string;
+    receiver_address?: string;
+    receiver_phone?: string;
+    created_at: string;
+}
+
+export interface MyAssignmentStats {
+    pending_pickups: number;
+    pending_deliveries: number;
+    in_progress_pickups: number;
+    in_progress_deliveries: number;
+    completed_today: number;
+    completed_this_week: number;
+}
+
+export interface MyAssignmentsResponse {
+    pickups: DeliveryAssignment[];
+    deliveries: DeliveryAssignment[];
+    stats: MyAssignmentStats;
+}
+
+export interface StartRouteRequest {
+    assignment_id: number;
+    notes?: string;
+}
+
+export interface ConfirmDeliveryBackendRequest {
+    assignment_id: number;
+    notes?: string;
+    delivery_photo_url?: string;
+    signature_url?: string;
+}
+
+export interface ReportIssueBackendRequest {
+    assignment_id: number;
+    issue_type: IssueType;
+    description: string;
+    notes?: string;
+}
+
 @Injectable({ providedIn: 'root'})
 export class DeliveryService {
 
-    private readonly BASE_URL = `${environment.apiBaseUrl}/delivery`;
+    private readonly BASE_URL = `${environment.apiBaseUrl}/assignments`;
 
     constructor(private http: HttpClient) {}
 
@@ -105,80 +171,75 @@ export class DeliveryService {
     // ==========================================
 
     /**
-     * Obtiene las entregas asignadas al repartidor
+     * Obtiene las asignaciones del repartidor (pickups y deliveries)
      */
-    async getMyDeliveries(): Promise<Delivery[]> {
+    async getMyAssignments(): Promise<MyAssignmentsResponse> {
         const headers = this.getHeaders();
 
         try {
             const response = await firstValueFrom(
-                this.http.get<{ deliveries: Delivery[] }>(
-                    `${this.BASE_URL}/my-deliveries`, 
-                    { headers }
-                )
-            );
-            return response.deliveries;
-        } catch (error) {
-            console.error('Error al obtener mis entregas:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Obtiene estadísticas del repartidor
-     */
-    async getDeliveryStats(): Promise<DeliveryStats> {
-        const headers = this.getHeaders();
-
-        try {
-            const response = await firstValueFrom(
-                this.http.get<DeliveryStats>(
-                    `${this.BASE_URL}/stats`, 
+                this.http.get<MyAssignmentsResponse>(
+                    `${this.BASE_URL}/my`,
                     { headers }
                 )
             );
             return response;
         } catch (error) {
-            console.error('Error al obtener estadísticas:', error);
+            console.error('Error al obtener mis asignaciones:', error);
             throw error;
         }
     }
 
     /**
-     * Inicia la ruta de entrega
+     * Obtiene estadísticas del repartidor (usa las stats de getMyAssignments)
+     * @deprecated Usar getMyAssignments().stats en su lugar
      */
-    async startRoute(guideId: number): Promise<void> {
+    async getDeliveryStats(): Promise<MyAssignmentStats> {
+        const response = await this.getMyAssignments();
+        return response.stats;
+    }
+
+    /**
+     * Inicia la ruta de entrega (cambia el estado a IN_PROGRESS)
+     */
+    async startRoute(assignmentId: number, notes?: string): Promise<DeliveryAssignment> {
         const headers = this.getHeaders();
 
         try {
-            await firstValueFrom(
-                this.http.post(
-                    `${this.BASE_URL}/${guideId}/start-route`,
-                    {}, 
+            const response = await firstValueFrom(
+                this.http.put<{ success: boolean; assignment: DeliveryAssignment; message: string }>(
+                    `${this.BASE_URL}/${assignmentId}/status`,
+                    { status: 'IN_PROGRESS', notes: notes || 'Ruta iniciada' },
                     { headers }
                 )
             );
+            return response.assignment;
         } catch (error) {
             console.error('Error al iniciar la ruta:', error);
+            throw error;
         }
     }
 
     /**
-     * Confirmar la entrega exitosa
+     * Confirmar la entrega exitosa (cambia estado a COMPLETED)
      */
-    async confirmDelivery(data: ConfirmDeliveryRequest): Promise<ConfirmDeliveryResponse> {
+    async confirmDelivery(assignmentId: number, notes?: string): Promise<ConfirmDeliveryResponse> {
         const headers = this.getHeaders();
 
         try {
             const response = await firstValueFrom(
-                this.http.post<ConfirmDeliveryResponse>(
-                    `${this.BASE_URL}/confirm`,
-                    data, 
+                this.http.put<{ success: boolean; assignment: DeliveryAssignment; message: string }>(
+                    `${this.BASE_URL}/${assignmentId}/status`,
+                    { status: 'COMPLETED', notes: notes || 'Entrega completada' },
                     { headers }
                 )
             );
 
-            return response;
+            return {
+                success: response.success,
+                delivery_id: String(response.assignment.assignment_id),
+                message: response.message
+            };
         } catch (error) {
             console.error('Error al confirmar la entrega:', error);
             throw error;
@@ -186,21 +247,26 @@ export class DeliveryService {
     }
 
     /**
-     * Reportar un problema con la entrega
+     * Reportar un problema con la entrega (marca como CANCELLED con notas del issue)
      */
-    async reportIssue(data: ReportIssueRequest): Promise<ReportIssueResponse> {
+    async reportIssue(assignmentId: number, issueType: IssueType, description: string): Promise<ReportIssueResponse> {
         const headers = this.getHeaders();
+        const notes = `[${issueType}] ${description}`;
 
         try {
             const response = await firstValueFrom(
-                this.http.post<ReportIssueResponse>(
-                    `${this.BASE_URL}/report-issue`,
-                    data, 
+                this.http.put<{ success: boolean; assignment: DeliveryAssignment; message: string }>(
+                    `${this.BASE_URL}/${assignmentId}/status`,
+                    { status: 'CANCELLED', notes },
                     { headers }
                 )
             );
 
-            return response;
+            return {
+                success: response.success,
+                issue_id: String(response.assignment.assignment_id),
+                message: response.message
+            };
         } catch (error) {
             console.error('Error al reportar un problema:', error);
             throw error;
@@ -212,19 +278,27 @@ export class DeliveryService {
     // ==========================================
 
     /**
-     * Obtiene las estadísticas de rendimiento
+     * Obtiene las estadísticas de rendimiento (calculadas desde las asignaciones)
      */
     async getPerformanceStats(): Promise<PerformanceStats> {
-        const headers = this.getHeaders();
-
         try {
-            const response = await firstValueFrom(
-                this.http.get<PerformanceStats>(
-                    `${this.BASE_URL}/performance`, 
-                    { headers }
-                )
-            );
-            return response;
+            const myAssignments = await this.getMyAssignments();
+            const stats = myAssignments.stats;
+
+            // Calcular estadísticas de rendimiento basadas en los datos disponibles
+            const totalCompleted = stats.completed_this_week;
+            const totalPending = stats.pending_pickups + stats.pending_deliveries;
+            const totalInProgress = stats.in_progress_pickups + stats.in_progress_deliveries;
+            const total = totalCompleted + totalPending + totalInProgress;
+
+            return {
+                deliveries_this_week: stats.completed_this_week,
+                success_rate: total > 0 ? Math.round((totalCompleted / total) * 100) : 100,
+                avg_time_minutes: 0, // No disponible en el backend actual
+                avg_rating: 0, // No disponible en el backend actual
+                daily_performance: [], // No disponible en el backend actual
+                recent_reviews: [] // No disponible en el backend actual
+            };
         } catch (error) {
             console.error('Error al obtener estadísticas de rendimiento:', error);
             throw error;

@@ -298,10 +298,10 @@ func GetGuideByID(guideID int64) (models.ShippingGuide, error) {
 	if err == nil {
 		for _, party := range parties {
 			switch party.PartyRole {
-				case models.RoleSender:
-					guide.Sender = &party
-				case models.RoleReceiver:
-					guide.Receiver = &party
+			case models.RoleSender:
+				guide.Sender = &party
+			case models.RoleReceiver:
+				guide.Receiver = &party
 			}
 		}
 	}

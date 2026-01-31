@@ -18,7 +18,7 @@ func GetAllDepartments() ([]models.Department, error) {
 		return departments, err
 	}
 	defer Db.Close()
-	
+
 	query := `
 		SELECT id, dane_code, name
 		FROM departments

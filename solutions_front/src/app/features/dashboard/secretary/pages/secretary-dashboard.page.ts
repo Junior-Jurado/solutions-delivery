@@ -32,6 +32,7 @@ import { CashCloseListComponent } from "../components/cash-close-list/cash-close
 import { GuideSearchComponent } from "../components/guide-search/guide-search.component";
 import { StatusDistributionComponent } from "../components/status-distribution/status-distribution.component";
 import { CashCloseStatsComponent } from "../components/cash-close-stats/cash-close-stats.component";
+import { AssignmentPanelComponent } from "../components/assignment-panel/assignment-panel.component";
 import { IconComponent } from "@shared/components/icon/icon.component";
 import { DashboardHeaderComponent } from "@shared/components/dashboard-header/dashboard-header.component";
 
@@ -72,6 +73,7 @@ interface GuidePreview {
         CashCloseFormComponent,
         CashCloseListComponent,
         CashCloseStatsComponent,
+        AssignmentPanelComponent,
         IconComponent,
         GuidePreviewModalComponent,
         DashboardHeaderComponent

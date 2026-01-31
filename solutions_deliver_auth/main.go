@@ -13,18 +13,18 @@ import (
 	lambda "github.com/aws/aws-lambda-go/lambda"
 )
 
-func main(){
+func main() {
 	lambda.Start(AuthLambda)
 }
 
 func AuthLambda(ctx context.Context, event events.CognitoEventUserPoolsPostConfirmation) (events.CognitoEventUserPoolsPostConfirmation, error) {
-// AuthLambda es la función principal que se ejecuta al inicio del programa.
-// Se encarga de inicializar la función lambda que se va a ejecutar.
+	// AuthLambda es la función principal que se ejecuta al inicio del programa.
+	// Se encarga de inicializar la función lambda que se va a ejecutar.
 	awsgo.InicializoAWS()
 	// Inicializa AWS
 
 	if !ValidoParametros() {
-	// Verifica que se estan enviando los parámetros necesarios
+		// Verifica que se estan enviando los parámetros necesarios
 		fmt.Println("Error en los parámetros. debe enviar 'SecretName'")
 		err := errors.New("Error en los parámetros debe enviar SecretName")
 		return event, err
@@ -34,34 +34,33 @@ func AuthLambda(ctx context.Context, event events.CognitoEventUserPoolsPostConfi
 	// Crea un objeto para almacenar los datos del usuario
 
 	for row, att := range event.Request.UserAttributes {
-	// Recorre los atributos del usuario y los almacena en el objeto
+		// Recorre los atributos del usuario y los almacena en el objeto
 		switch row {
 		case "email":
 			datos.UserEmail = att
 			fmt.Println("Email = " + datos.UserEmail)
-		
-		case "sub": 
+
+		case "sub":
 			datos.UserUUID = att
 			fmt.Println("Sub = " + datos.UserUUID)
-		
+
 		case "phone_number":
 			datos.Phone = att
 			fmt.Println("Phone = " + datos.Phone)
-		
+
 		case "custom:full_name":
 			datos.FullName = att
 			fmt.Println("FullName = " + datos.FullName)
-		
+
 		case "custom:type_document":
 			datos.TypeDocument = att
 			fmt.Println("TypeDocument = " + datos.TypeDocument)
-		
+
 		case "custom:number_document":
 			datos.NumberDocument = att
 			fmt.Println("NumberDocument = " + datos.NumberDocument)
 		}
 
-		
 	}
 
 	err := bd.ReadSecret()

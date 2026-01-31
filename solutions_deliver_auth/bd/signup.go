@@ -17,7 +17,6 @@ func SignUp(sig models.SignUp) error {
 	}
 	defer Db.Close()
 
-
 	query := `
 		INSERT INTO users (
 			user_uuid,

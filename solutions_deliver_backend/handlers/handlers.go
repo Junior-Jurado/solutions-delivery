@@ -25,30 +25,32 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	if !isValid {
 		return statusCode, userUUID
 	}
-	
+
 	switch {
 
 	case strings.HasPrefix(path, "/guides"):
 		return ProcesoGuias(body, path, method, userUUID, idn, request)
-	
+
 	case strings.HasPrefix(path, "/auth"):
 		return ProcesoAutencaciones(body, path, method, userUUID, id, request)
-	
+
 	case strings.HasPrefix(path, "/locations"):
 		return ProcesoUbicaciones(body, path, method, userUUID, id, request)
 
 	case strings.HasPrefix(path, "/cash-close"):
-		return ProccessCashClose(body, path, method, userUUID, idn, request) 
-	
+		return ProccessCashClose(body, path, method, userUUID, idn, request)
+
 	case strings.HasPrefix(path, "/client"):
 		return ProccessClient(body, path, method, userUUID, id, request)
-	
+
 	case strings.HasPrefix(path, "/frequent-parties"):
 		return ProccessFrequentParties(body, path, method, userUUID, request)
-	
+
+	case strings.HasPrefix(path, "/assignments"):
+		return ProccessAssignments(body, path, method, userUUID, request)
+
 	default:
 		return 400, "Method Invalid"
-
 	}
 
 }
@@ -60,7 +62,7 @@ func validateAuthorization(path string, method string, request events.APIGateway
 	}
 
 	if (path == "/login" && method == "POST") ||
-	   (path == "/register" && method == "POST") {
+		(path == "/register" && method == "POST") {
 		return true, 200, "OK"
 	}
 
@@ -71,7 +73,7 @@ func validateAuthorization(path string, method string, request events.APIGateway
 	}
 
 	claims := request.RequestContext.Authorizer.JWT.Claims
-	
+
 	userUUID, ok := claims["sub"]
 	if !ok {
 		return false, 401, "Unauthorized"
@@ -80,66 +82,63 @@ func validateAuthorization(path string, method string, request events.APIGateway
 	return true, 200, userUUID
 }
 
-func ProcesoGuias(body string, path  string, method string, user string, id int, request events.APIGatewayV2HTTPRequest) (int, string) {
+func ProcesoGuias(body string, path string, method string, user string, id int, request events.APIGatewayV2HTTPRequest) (int, string) {
 	fmt.Printf("ProcesoGuias -> Path: %s, Mehtod: %s \n", path, method)
 
 	switch {
-		// GET /guides - Obtener lista de guías con filtros
-		case path == "/guides" && method == "GET":
-			return routers.GetGuides(request, user)
+	// GET /guides - Obtener lista de guías con filtros
+	case path == "/guides" && method == "GET":
+		return routers.GetGuides(request, user)
 
-		// GET /guides/stats - Obtener estadísticas de guías
-		case path == "/guides/stats" && method == "GET":
-			return routers.GetGuidesStats(user)
-		
-		// GET /guides/search
-		case path == "/guides/search" && method == "GET":
-			searchTerm := ""
-			if request.QueryStringParameters != nil {
-				searchTerm = request.QueryStringParameters["q"]
-			}
+	// GET /guides/stats - Obtener estadísticas de guías
+	case path == "/guides/stats" && method == "GET":
+		return routers.GetGuidesStats(user)
 
-			if searchTerm == "" {
-				return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
-			}
-			return routers.SearchGuides(searchTerm)
+	// GET /guides/search
+	case path == "/guides/search" && method == "GET":
+		searchTerm := ""
+		if request.QueryStringParameters != nil {
+			searchTerm = request.QueryStringParameters["q"]
+		}
 
-		// GET /guides/{id}/pdf - Obtener URL pre-firmada para descargar PDF
-		case strings.HasPrefix(path, "/guides/") && strings.HasSuffix(path, "/pdf") && method == "GET":
-			if id <= 0{
-				return 400, `{"error": "ID de guía inválido"}`
-			}
-			return routers.GetGuidePDFURL(int64(id))
+		if searchTerm == "" {
+			return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
+		}
+		return routers.SearchGuides(searchTerm)
 
-		// GET /guides/{id} - Obtener detalle de una guía específica
-		case strings.HasPrefix(path, "/guides/")&& !strings.Contains(path, "/status") && method == "GET":
-			if id <= 0{
-				return 400, `{"error": "ID de guía inválido"}`
-			}
-			return routers.GetGuideByID(int64(id)  )
+	// GET /guides/{id}/pdf - Obtener URL pre-firmada para descargar PDF
+	case strings.HasPrefix(path, "/guides/") && strings.HasSuffix(path, "/pdf") && method == "GET":
+		if id <= 0 {
+			return 400, `{"error": "ID de guía inválido"}`
+		}
+		return routers.GetGuidePDFURL(int64(id))
 
-		// PUT /guides/{id}/status - Actualizar estado de una guía
-		case strings.HasPrefix(path, "/guides/")&& strings.HasSuffix(path, "/status") && method == "PUT":
-			if id <= 0{
-				return 400, `{"error": "ID de guía inválido"}`
-			}
-			return routers.UpdateGuideStatus(int64(id), body, user)
-		
+	// GET /guides/{id} - Obtener detalle de una guía específica
+	case strings.HasPrefix(path, "/guides/") && !strings.Contains(path, "/status") && method == "GET":
+		if id <= 0 {
+			return 400, `{"error": "ID de guía inválido"}`
+		}
+		return routers.GetGuideByID(int64(id))
 
-		
-		
-		default:
-			return 400, "Method Invalid"
+	// PUT /guides/{id}/status - Actualizar estado de una guía
+	case strings.HasPrefix(path, "/guides/") && strings.HasSuffix(path, "/status") && method == "PUT":
+		if id <= 0 {
+			return 400, `{"error": "ID de guía inválido"}`
+		}
+		return routers.UpdateGuideStatus(int64(id), body, user)
+
+	default:
+		return 400, "Method Invalid"
 	}
-	
+
 }
 
-func ProcesoAutencaciones(body string, path  string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
+func ProcesoAutencaciones(body string, path string, method string, user string, id string, request events.APIGatewayV2HTTPRequest) (int, string) {
 	switch {
-		case path == "/auth/role" && method == "GET":
-			return routers.GetRole(user)
+	case path == "/auth/role" && method == "GET":
+		return routers.GetRole(user)
 	}
-	
+
 	return 400, "Method Invalid"
 }
 
@@ -147,76 +146,76 @@ func ProcesoUbicaciones(body string, path string, method string, user string, id
 	fmt.Printf("ProcesoUbicaciones -> Path: %s, Mehtod: %s \n", path, method)
 
 	switch {
-		// GET /locations/departments - Obtener todos los departamentos
-		case path == "/locations/departments" && method == "GET":
-			return routers.GetDepartments()
-		
-		// GET /locations/cities - Obtener ciudades (con filtro opcional por departamento)
-		case path == "/locations/cities" && method == "GET":
-			// Obtener parámetro de query department_id si existe
-			departmentID := ""
-			if request.QueryStringParameters != nil {
-				departmentID = request.QueryStringParameters["department_id"]
-			}
-			return routers.GetCities(departmentID)
-		
-		// GET /locations/cities/{id} - Obtener una ciudad especifica
-		case strings.HasPrefix(path, "/locations/cities/") && method == "GET":
-			// Extraer el ID de la ciudad del path
-			cityIDStr := strings.TrimPrefix(path, "/locations/cities/")
-			cityID, err := strconv.ParseInt(cityIDStr, 10, 64)
-			if err != nil {
-				return 400, fmt.Sprintf(`{"error": "ID de ciudad inválido"}`)
-			}
-			return routers.GetCityByID(cityID)
+	// GET /locations/departments - Obtener todos los departamentos
+	case path == "/locations/departments" && method == "GET":
+		return routers.GetDepartments()
 
-		// GET /locations/search - Búsqueda de ciudades por nombre
-		case path == "/locations/search" && method == "GET":
-			// Obtener parámetro de query search_term si existe
-			searchTerm := ""
-			if request.QueryStringParameters != nil {
-				searchTerm = request.QueryStringParameters["q"]
-			}
+	// GET /locations/cities - Obtener ciudades (con filtro opcional por departamento)
+	case path == "/locations/cities" && method == "GET":
+		// Obtener parámetro de query department_id si existe
+		departmentID := ""
+		if request.QueryStringParameters != nil {
+			departmentID = request.QueryStringParameters["department_id"]
+		}
+		return routers.GetCities(departmentID)
 
-			if searchTerm == "" {
-				return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
-			}
-			return routers.SearchCities(searchTerm)
+	// GET /locations/cities/{id} - Obtener una ciudad especifica
+	case strings.HasPrefix(path, "/locations/cities/") && method == "GET":
+		// Extraer el ID de la ciudad del path
+		cityIDStr := strings.TrimPrefix(path, "/locations/cities/")
+		cityID, err := strconv.ParseInt(cityIDStr, 10, 64)
+		if err != nil {
+			return 400, fmt.Sprintf(`{"error": "ID de ciudad inválido"}`)
+		}
+		return routers.GetCityByID(cityID)
+
+	// GET /locations/search - Búsqueda de ciudades por nombre
+	case path == "/locations/search" && method == "GET":
+		// Obtener parámetro de query search_term si existe
+		searchTerm := ""
+		if request.QueryStringParameters != nil {
+			searchTerm = request.QueryStringParameters["q"]
+		}
+
+		if searchTerm == "" {
+			return 400, `{"error": "Parámetro 'q' requerido para búsqueda"}`
+		}
+		return routers.SearchCities(searchTerm)
 	}
-	
+
 	return 400, "Method Invalid"
 }
 
 func ProccessCashClose(body string, path string, method string, user string, id int, request events.APIGatewayV2HTTPRequest) (int, string) {
 	switch {
-		// POST /cash-close - Generate new close
-		case path == "/cash-close" && method == "POST":
-			return routers.GenerateCashClose(body, user)
+	// POST /cash-close - Generate new close
+	case path == "/cash-close" && method == "POST":
+		return routers.GenerateCashClose(body, user)
 
-		// GET /cash-close - List closes
-		case path == "/cash-close" && method == "GET":
-			return routers.GetCashCloses(request)
-		
-		// GET /cash-close/stats - Statistics
-		case path == "/cash-close/stats" && method == "GET":
-			return routers.GetCashCloseStats()
+	// GET /cash-close - List closes
+	case path == "/cash-close" && method == "GET":
+		return routers.GetCashCloses(request)
 
-		// GET /cash-close/{id}/pdf - Get specific close PDF
-		case strings.HasPrefix(path, "/cash-close/") && strings.Contains(path, "/pdf") && method == "GET":
-			if id <= 0{
-				return 400, `{"error": "Invalid close ID"}`
-			}
-			return routers.GetCashClosePDFURL(int64(id))
-		
-		// GET /cash-close/{id} - Get specific close
-		case strings.HasPrefix(path, "/cash-close/") && !strings.Contains(path, "/stats") && method == "GET":
-			if id <= 0{
-				return 400, `{"error": "Invalid close ID"}`
-			}
-			return routers.GetCashCloseByID(int64(id))
-		
-		default:
-			return 400, "Method Invalid"
+	// GET /cash-close/stats - Statistics
+	case path == "/cash-close/stats" && method == "GET":
+		return routers.GetCashCloseStats()
+
+	// GET /cash-close/{id}/pdf - Get specific close PDF
+	case strings.HasPrefix(path, "/cash-close/") && strings.Contains(path, "/pdf") && method == "GET":
+		if id <= 0 {
+			return 400, `{"error": "Invalid close ID"}`
+		}
+		return routers.GetCashClosePDFURL(int64(id))
+
+	// GET /cash-close/{id} - Get specific close
+	case strings.HasPrefix(path, "/cash-close/") && !strings.Contains(path, "/stats") && method == "GET":
+		if id <= 0 {
+			return 400, `{"error": "Invalid close ID"}`
+		}
+		return routers.GetCashCloseByID(int64(id))
+
+	default:
+		return 400, "Method Invalid"
 	}
 }
 
@@ -224,7 +223,7 @@ func ProccessClient(body string, path string, method string, user string, id str
 	fmt.Printf("ProccessClient -> Path:%s, Method: %s\n", path, method)
 
 	switch {
-	
+
 	// GET /client/profile - Obtener perfil del cliente
 	case path == "/client/profile" && method == "GET":
 		return routers.GetClientProfile(user)
@@ -232,15 +231,15 @@ func ProccessClient(body string, path string, method string, user string, id str
 	// PUT /client/profile
 	case path == "/client/profile" && method == "PUT":
 		return routers.UpdateClientProfile(body, user)
-	
+
 	// GET /client/guides/active - Obtener guías activas del cliente
 	case path == "/client/guides/active" && method == "GET":
 		return routers.GetClientActiveGuides(user)
-	
+
 	// GET /client/guides/history - Obtener histórico de guías del cliente
 	case path == "/client/guides/history" && method == "GET":
 		return routers.GetClientGuideHistory(request, user)
-	
+
 	// GET /client/guides/track/{guideNumber} - Rastrear guía por número
 	case strings.HasPrefix(path, "/client/guides/track/") && method == "GET":
 		guideNumber := strings.TrimPrefix(path, "/client/guides/track/")
@@ -248,11 +247,11 @@ func ProccessClient(body string, path string, method string, user string, id str
 			return 400, `{"error": "Number of guide required"}`
 		}
 		return routers.TrackGuideByNumber(guideNumber, user)
-	
+
 	// GET client/stats - Obtener estadísticas del cliente
 	case path == "/client/stats" && method == "GET":
 		return routers.GetClientStats(user)
-		
+
 	default:
 		return 400, "Method Invalid"
 	}
@@ -269,7 +268,7 @@ func ProccessFrequentParties(body string, path string, method string, user strin
 	case path == "/frequent-parties/search-by-name" && method == "GET":
 		searchTerm := ""
 		partyTypeStr := ""
-		
+
 		if request.QueryStringParameters != nil {
 			searchTerm = request.QueryStringParameters["q"]
 			partyTypeStr = request.QueryStringParameters["party_type"]
@@ -294,7 +293,7 @@ func ProccessFrequentParties(body string, path string, method string, user strin
 		searchTerm := ""
 		cityIDStr := ""
 		partyTypeStr := ""
-		
+
 		if request.QueryStringParameters != nil {
 			searchTerm = request.QueryStringParameters["q"]
 			cityIDStr = request.QueryStringParameters["city_id"]
@@ -368,4 +367,62 @@ func ProccessFrequentParties(body string, path string, method string, user strin
 	default:
 		return 400, "Method Invalid"
 	}
+}
+
+func ProccessAssignments(body string, path string, method string, user string, request events.APIGatewayV2HTTPRequest) (int, string) {
+	fmt.Printf("ProccessAssignments -> Path:%s, Method: %s\n", path, method)
+
+	switch {
+	// ==========================================
+	// RUTAS EXACTAS
+	// ==========================================
+
+	// POST /assignments - Crear asignación
+	case path == "/assignments" && method == "POST":
+		return routers.CreateAssignment(body, user)
+
+	// GET /assignments - Listar asignaciones
+	case path == "/assignments" && method == "GET":
+		return routers.GetAssignments(request)
+
+	// GET /assignments/my - Listar mis asignaciones (DELIVERY)
+	case path == "/assignments/my" && method == "GET":
+		return routers.GetMyAssignments(user)
+
+	// GET /assignments/delivery-users - Listar repartidores
+	case path == "/assignments/delivery-users" && method == "GET":
+		return routers.GetDeliveryUsers()
+
+	// GET /assignments/pending-guides - Listar guías pendientes
+	case path == "/assignments/pending-guides" && method == "GET":
+		return routers.GetPendingGuides(user)
+
+	// GET /assignments/stats - Obtener estadísticas (ADMIN, SECRETARY)
+	case path == "/assignments/stats" && method == "GET":
+		return routers.GetAssignmentStats(user)
+
+	// ==========================================
+	// RUTAS CON PARÁMETROS
+	// ==========================================
+
+	// PUT /assignments/{id}/reassign
+	case strings.Contains(path, "/reassign") && method == "PUT":
+		return routers.ReassignDelivery(body, user, path)
+
+	// PUT /assignments/{id}/status
+	case strings.Contains(path, "/status") && method == "PUT":
+		return routers.UpdateAssignmentStatus(body, user, path)
+
+	// GET /assignments/{id}/history
+	case strings.Contains(path, "/history") && method == "GET":
+		return routers.GetAssignmentHistory(user, path)
+
+	// GET /assignments/{id} - obtener asignación (debe ser la última ruta con prefijo)
+	case strings.HasPrefix(path, "/assignments/") && method == "GET":
+		return routers.GetAssignmentByID(user, path)
+
+	default:
+		return 404, `{"error": "Ruta no encontrada"}`
+	}
+
 }

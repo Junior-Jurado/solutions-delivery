@@ -57,12 +57,12 @@ type ShippingGuide struct {
 	CreatedBy           string        `json:"created_by"`
 	CreatedAt           time.Time     `json:"created_at"`
 	UpdatedAt           time.Time     `json:"updated_at"`
-	
+
 	// Relaciones
-	Sender   *GuideParty      `json:"sender,omitempty"`
-	Receiver *GuideParty      `json:"receiver,omitempty"`
-	Package  *Package         `json:"package,omitempty"`
-	History  []StatusHistory  `json:"history,omitempty"`
+	Sender   *GuideParty     `json:"sender,omitempty"`
+	Receiver *GuideParty     `json:"receiver,omitempty"`
+	Package  *Package        `json:"package,omitempty"`
+	History  []StatusHistory `json:"history,omitempty"`
 }
 
 // GuideParty representa una parte (remitente o destinatario)

@@ -23,7 +23,7 @@ func DbConnect() error {
 	Db, err = sql.Open("mysql", ConnStr(SecretModel))
 	if err != nil {
 		fmt.Println(err.Error())
-		return err 
+		return err
 	}
 
 	err = Db.Ping()
@@ -41,12 +41,12 @@ func ConnStr(claves models.SecretRDSJson) string {
 	authToken = claves.Password
 	dbEndpoint = claves.Host
 	dbName = claves.DBName
-	
+
 	// CAMBIO IMPORTANTE: Agregar zona horaria de Colombia
 	return fmt.Sprintf(
 		"%s:%s@tcp(%s)/%s?allowCleartextPasswords=true&parseTime=true&loc=America%%2FBogota",
 		dbUser, authToken, dbEndpoint, dbName,
-	)	
+	)
 }
 
 func UserExists(UserUUID string) (bool, error) {
@@ -75,4 +75,3 @@ func UserExists(UserUUID string) (bool, error) {
 	}
 	return false, nil
 }
-

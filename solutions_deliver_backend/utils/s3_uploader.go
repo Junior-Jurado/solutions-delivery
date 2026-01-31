@@ -14,9 +14,9 @@ import (
 
 // LambdaResponse representa la respuesta de la Lambda de Node.js
 type LambdaResponse struct {
-	StatusCode int                 `json:"statusCode"`
-	Headers    map[string]string   `json:"headers"`
-	Body       string              `json:"body"` // El body viene como string JSON
+	StatusCode int               `json:"statusCode"`
+	Headers    map[string]string `json:"headers"`
+	Body       string            `json:"body"` // El body viene como string JSON
 }
 
 // PDFGenerationResponse representa el body parseado

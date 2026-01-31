@@ -7,16 +7,16 @@ import (
 )
 
 func GetRole(userUUID string) (int, string) {
-	
+
 	user, err := bd.GetUserRole(userUUID)
 
 	if err != nil {
 		return 404, err.Error()
 	}
-	
-	response, _ := json.Marshal(map[string] string {
+
+	response, _ := json.Marshal(map[string]string{
 		"userUUID": user.UserUUID,
-		"role": user.Role,
+		"role":     string(user.Role),
 	})
 
 	return 200, string(response)

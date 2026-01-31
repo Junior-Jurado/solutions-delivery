@@ -36,8 +36,8 @@ type FrequentPartyUnique struct {
 	DocumentNumber string `json:"document_number"`
 	Phone          string `json:"phone"`
 	Email          string `json:"email,omitempty"`
-	TotalCities    int    `json:"total_cities"`    // Cuántas ciudades tiene registradas
-	TotalUsage     int    `json:"total_usage"`     // Total de veces usado
+	TotalCities    int    `json:"total_cities"` // Cuántas ciudades tiene registradas
+	TotalUsage     int    `json:"total_usage"`  // Total de veces usado
 }
 
 // FrequentPartySearchRequest búsqueda de partes frecuentes

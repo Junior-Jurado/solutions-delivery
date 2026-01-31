@@ -31,7 +31,7 @@ func GetDepartments() (int, string) {
 	return 200, string(jsonResponse)
 }
 
-func GetCities(deparmentIDStr  string) (int, string) {
+func GetCities(deparmentIDStr string) (int, string) {
 	fmt.Printf("GetCities -> DepartmentID: %s\n", deparmentIDStr)
 
 	var cities []models.City
@@ -61,9 +61,9 @@ func GetCities(deparmentIDStr  string) (int, string) {
 		return 500, fmt.Sprintf(`{"error": "Error al obtener las ciudades: %s"}`, err.Error())
 	}
 
-	response := models.CitiesResponse {
-		Cities: cities,
-		Total: len(cities),
+	response := models.CitiesResponse{
+		Cities:               cities,
+		Total:                len(cities),
 		FilteredByDepartment: filteredByDept,
 	}
 

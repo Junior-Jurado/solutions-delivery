@@ -1,0 +1,369 @@
+<div class="assignment-panel">
+    <!-- ========================================
+         STATS CARDS
+         ======================================== -->
+    <div class="stats-grid" *ngIf="stats">
+        <div class="stat-card">
+            <div class="stat-icon pickup">
+                <app-icon category="common" name="package" size="24px"></app-icon>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ pendingPickups.length }}</div>
+                <div class="stat-label">Por Recoger</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon delivery">
+                <app-icon category="common" name="truck" size="24px"></app-icon>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ pendingDeliveries.length }}</div>
+                <div class="stat-label">Por Entregar</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon progress">
+                <app-icon category="common" name="clock" size="24px"></app-icon>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ (stats.in_progress_pickups || 0) + (stats.in_progress_deliveries || 0) }}</div>
+                <div class="stat-label">En Progreso</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon completed">
+                <app-icon category="common" name="check-circle" size="24px"></app-icon>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value">{{ stats.completed_today || 0 }}</div>
+                <div class="stat-label">Completadas Hoy</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         VIEW TABS
+         ======================================== -->
+    <div class="view-tabs">
+        <button
+            class="view-tab"
+            [class.active]="activeView === 'pickups'"
+            (click)="setActiveView('pickups')">
+            <app-icon category="common" name="package" size="18px"></app-icon>
+            <span>Recoger ({{ pendingPickups.length }})</span>
+        </button>
+
+        <button
+            class="view-tab"
+            [class.active]="activeView === 'deliveries'"
+            (click)="setActiveView('deliveries')">
+            <app-icon category="common" name="truck" size="18px"></app-icon>
+            <span>Entregar ({{ pendingDeliveries.length }})</span>
+        </button>
+
+        <button
+            class="view-tab"
+            [class.active]="activeView === 'history'"
+            (click)="setActiveView('history')">
+            <app-icon category="common" name="clock" size="18px"></app-icon>
+            <span>Historial</span>
+        </button>
+    </div>
+
+    <!-- ========================================
+         PICKUPS VIEW
+         ======================================== -->
+    <div class="view-content" *ngIf="activeView === 'pickups'">
+        <div class="section-header">
+            <h3>Guias Pendientes de Recoger</h3>
+            <p class="section-description">Guias con origen en Bogota que necesitan ser recogidas</p>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="isLoadingGuides" class="loading-state">
+            <app-icon category="common" name="loader" size="32px" customClass="spinner"></app-icon>
+            <p>Cargando guias...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoadingGuides && pendingPickups.length === 0" class="empty-state">
+            <app-icon category="common" name="check-circle" size="48px"></app-icon>
+            <p>No hay guias pendientes de recoger</p>
+        </div>
+
+        <!-- Pickups List -->
+        <div class="guides-list" *ngIf="!isLoadingGuides && pendingPickups.length > 0">
+            <div *ngFor="let guide of pendingPickups" class="guide-card">
+                <div class="guide-header">
+                    <div class="guide-id">
+                        <app-icon category="common" name="file-text" size="16px"></app-icon>
+                        <span>Guia #{{ guide.guide_id }}</span>
+                    </div>
+                    <span class="badge badge-info">RECOGER</span>
+                </div>
+
+                <div class="guide-details">
+                    <div class="detail-row">
+                        <app-icon category="common" name="user" size="14px"></app-icon>
+                        <span>{{ guide.contact_name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <app-icon category="common" name="map-pin" size="14px"></app-icon>
+                        <span>{{ guide.contact_address }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <app-icon category="common" name="phone" size="14px"></app-icon>
+                        <span>{{ guide.contact_phone || 'Sin telefono' }}</span>
+                    </div>
+                    <div class="detail-row route">
+                        <app-icon category="common" name="navigation" size="14px"></app-icon>
+                        <span>{{ guide.origin_city_name }} → {{ guide.destination_city_name }}</span>
+                    </div>
+                </div>
+
+                <div class="guide-footer">
+                    <span class="guide-date">{{ formatDate(guide.created_at) }}</span>
+                    <button class="btn btn-primary btn-sm" (click)="openAssignModal(guide)">
+                        <app-icon category="common" name="user-plus" size="14px"></app-icon>
+                        Asignar Repartidor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         DELIVERIES VIEW
+         ======================================== -->
+    <div class="view-content" *ngIf="activeView === 'deliveries'">
+        <div class="section-header">
+            <h3>Guias Pendientes de Entregar</h3>
+            <p class="section-description">Guias con destino Bogota que estan en bodega listas para entregar</p>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="isLoadingGuides" class="loading-state">
+            <app-icon category="common" name="loader" size="32px" customClass="spinner"></app-icon>
+            <p>Cargando guias...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoadingGuides && pendingDeliveries.length === 0" class="empty-state">
+            <app-icon category="common" name="check-circle" size="48px"></app-icon>
+            <p>No hay guias pendientes de entregar</p>
+        </div>
+
+        <!-- Deliveries List -->
+        <div class="guides-list" *ngIf="!isLoadingGuides && pendingDeliveries.length > 0">
+            <div *ngFor="let guide of pendingDeliveries" class="guide-card">
+                <div class="guide-header">
+                    <div class="guide-id">
+                        <app-icon category="common" name="file-text" size="16px"></app-icon>
+                        <span>Guia #{{ guide.guide_id }}</span>
+                    </div>
+                    <span class="badge badge-warning">ENTREGAR</span>
+                </div>
+
+                <div class="guide-details">
+                    <div class="detail-row">
+                        <app-icon category="common" name="user" size="14px"></app-icon>
+                        <span>{{ guide.contact_name }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <app-icon category="common" name="map-pin" size="14px"></app-icon>
+                        <span>{{ guide.contact_address }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <app-icon category="common" name="phone" size="14px"></app-icon>
+                        <span>{{ guide.contact_phone || 'Sin telefono' }}</span>
+                    </div>
+                    <div class="detail-row route">
+                        <app-icon category="common" name="navigation" size="14px"></app-icon>
+                        <span>{{ guide.origin_city_name }} → {{ guide.destination_city_name }}</span>
+                    </div>
+                </div>
+
+                <div class="guide-footer">
+                    <span class="guide-date">{{ formatDate(guide.created_at) }}</span>
+                    <button class="btn btn-primary btn-sm" (click)="openAssignModal(guide)">
+                        <app-icon category="common" name="user-plus" size="14px"></app-icon>
+                        Asignar Repartidor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         HISTORY VIEW
+         ======================================== -->
+    <div class="view-content" *ngIf="activeView === 'history'">
+        <div class="section-header">
+            <h3>Asignaciones Recientes</h3>
+            <p class="section-description">Ultimas asignaciones realizadas</p>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="isLoadingAssignments" class="loading-state">
+            <app-icon category="common" name="loader" size="32px" customClass="spinner"></app-icon>
+            <p>Cargando historial...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoadingAssignments && recentAssignments.length === 0" class="empty-state">
+            <app-icon category="common" name="inbox" size="48px"></app-icon>
+            <p>No hay asignaciones recientes</p>
+        </div>
+
+        <!-- Assignments List -->
+        <div class="assignments-list" *ngIf="!isLoadingAssignments && recentAssignments.length > 0">
+            <div *ngFor="let assignment of recentAssignments" class="assignment-card">
+                <div class="assignment-header">
+                    <div class="assignment-info">
+                        <span class="assignment-id">Guia #{{ assignment.guide_id }}</span>
+                        <span class="badge" [ngClass]="getAssignmentTypeClass(assignment.assignment_type)">
+                            {{ getAssignmentTypeLabel(assignment.assignment_type) }}
+                        </span>
+                    </div>
+                    <span class="badge" [ngClass]="getStatusClass(assignment.status)">
+                        {{ getStatusLabel(assignment.status) }}
+                    </span>
+                </div>
+
+                <div class="assignment-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Repartidor:</span>
+                        <span class="detail-value">{{ assignment.delivery_user_name || 'Sin asignar' }}</span>
+                    </div>
+                    <div class="detail-item" *ngIf="assignment.guide">
+                        <span class="detail-label">Ruta:</span>
+                        <span class="detail-value">{{ assignment.guide.origin_city_name }} → {{ assignment.guide.destination_city_name }}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Asignado:</span>
+                        <span class="detail-value">{{ formatDate(assignment.assigned_at) }}</span>
+                    </div>
+                </div>
+
+                <div class="assignment-notes" *ngIf="assignment.notes">
+                    <app-icon category="common" name="info" size="14px"></app-icon>
+                    <span>{{ assignment.notes }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================
+         ASSIGNMENT MODAL
+         ======================================== -->
+    <div class="modal-overlay" *ngIf="showAssignModal" (click)="closeAssignModal()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>
+                    <app-icon category="common" name="user-plus" size="20px"></app-icon>
+                    Asignar Repartidor
+                </h3>
+                <button class="modal-close" (click)="closeAssignModal()">
+                    <app-icon category="common" name="x" size="20px"></app-icon>
+                </button>
+            </div>
+
+            <div class="modal-body" *ngIf="selectedGuide">
+                <!-- Guide Info -->
+                <div class="guide-info-card">
+                    <div class="guide-info-header">
+                        <span class="badge" [ngClass]="getAssignmentTypeClass(selectedGuide.assignment_type)">
+                            {{ getAssignmentTypeLabel(selectedGuide.assignment_type) }}
+                        </span>
+                        <span>Guia #{{ selectedGuide.guide_id }}</span>
+                    </div>
+                    <div class="guide-info-details">
+                        <p><strong>Contacto:</strong> {{ selectedGuide.contact_name }}</p>
+                        <p><strong>Direccion:</strong> {{ selectedGuide.contact_address }}</p>
+                        <p><strong>Telefono:</strong> {{ selectedGuide.contact_phone || 'N/A' }}</p>
+                        <p><strong>Ruta:</strong> {{ selectedGuide.origin_city_name }} → {{ selectedGuide.destination_city_name }}</p>
+                    </div>
+                </div>
+
+                <!-- Delivery Users Selection -->
+                <div class="form-field">
+                    <label>Seleccionar Repartidor *</label>
+                    <div class="delivery-users-grid" *ngIf="!isLoadingUsers && deliveryUsers.length > 0">
+                        <div
+                            *ngFor="let user of deliveryUsers"
+                            class="delivery-user-card"
+                            [class.selected]="selectedDeliveryUserId === user.user_id"
+                            [ngClass]="getWorkloadClass(user)"
+                            (click)="selectedDeliveryUserId = user.user_id">
+                            <div class="user-avatar">
+                                <app-icon category="common" name="user" size="24px"></app-icon>
+                            </div>
+                            <div class="user-info">
+                                <div class="user-name">{{ user.full_name }}</div>
+                                <div class="user-stats">
+                                    <span class="stat">
+                                        <app-icon category="common" name="package" size="12px"></app-icon>
+                                        {{ user.active_pickups }}
+                                    </span>
+                                    <span class="stat">
+                                        <app-icon category="common" name="truck" size="12px"></app-icon>
+                                        {{ user.active_deliveries }}
+                                    </span>
+                                    <span class="stat completed">
+                                        <app-icon category="common" name="check" size="12px"></app-icon>
+                                        {{ user.total_completed }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="user-workload">
+                                {{ getDeliveryUserWorkload(user) }} activas
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="isLoadingUsers" class="loading-state small">
+                        <app-icon category="common" name="loader" size="20px" customClass="spinner"></app-icon>
+                        <span>Cargando repartidores...</span>
+                    </div>
+
+                    <div *ngIf="!isLoadingUsers && deliveryUsers.length === 0" class="empty-state small">
+                        <p>No hay repartidores disponibles</p>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-field">
+                    <label>Notas (opcional)</label>
+                    <textarea
+                        [(ngModel)]="assignmentNotes"
+                        placeholder="Instrucciones especiales para el repartidor..."
+                        rows="3"
+                        class="form-textarea">
+                    </textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" (click)="closeAssignModal()" [disabled]="isAssigning">
+                    Cancelar
+                </button>
+                <button
+                    class="btn btn-primary"
+                    (click)="confirmAssignment()"
+                    [disabled]="isAssigning || !selectedDeliveryUserId">
+                    <app-icon
+                        *ngIf="isAssigning"
+                        category="common"
+                        name="loader"
+                        size="16px"
+                        customClass="spinner">
+                    </app-icon>
+                    <span>{{ isAssigning ? 'Asignando...' : 'Confirmar Asignacion' }}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

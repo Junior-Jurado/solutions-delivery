@@ -353,3 +353,107 @@ resource "aws_apigatewayv2_route" "frequent_parties_stats" {
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
+
+# -----------------------------------------
+# Assignments
+
+// POST /assignments - Crear nueva asignación
+resource "aws_apigatewayv2_route" "assignments_create" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "POST /api/v1/assignments"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /assignments
+resource "aws_apigatewayv2_route" "assignments" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/assignments"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /assignments/my
+resource "aws_apigatewayv2_route" "assignments_my" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/assignments/my"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /assignments/delivery-users
+resource "aws_apigatewayv2_route" "assignments_delivery_users" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/assignments/delivery-users"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /assignments/pending-guides
+resource "aws_apigatewayv2_route" "assignments_pending_guides" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/assignments/pending-guides"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /assignments/stats
+resource "aws_apigatewayv2_route" "assignments_stats" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/assignments/stats"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+
+// GET /assignments/{id}
+resource "aws_apigatewayv2_route" "assignments_by_id" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/assignments/{id}"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// PUT /assignments/{id}/reassign
+resource "aws_apigatewayv2_route" "assignments_reassign" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "PUT /api/v1/assignments/{id}/reassign"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// PUT /assignments/{id}/status
+resource "aws_apigatewayv2_route" "assignments_status" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "PUT /api/v1/assignments/{id}/status"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /assignments/{id}/history
+resource "aws_apigatewayv2_route" "assignments_history" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/assignments/{id}/history"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}

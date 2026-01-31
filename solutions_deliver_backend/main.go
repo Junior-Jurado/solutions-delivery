@@ -40,7 +40,7 @@ func EjecutarLambda(ctx context.Context, request events.APIGatewayV2HTTPRequest)
 
 	var res *events.APIGatewayProxyResponse
 	prefix := os.Getenv("UrlPrefix")
-	
+
 	path := strings.Replace(request.RawPath, prefix, "", -1)
 	method := request.RequestContext.HTTP.Method
 	body := request.Body
@@ -50,20 +50,20 @@ func EjecutarLambda(ctx context.Context, request events.APIGatewayV2HTTPRequest)
 
 	status, message := handlers.Manejadores(path, method, body, header, request)
 
-	headersResp := map[string] string {
+	headersResp := map[string]string{
 		"Content-Type": "application/json",
 	}
 	res = &events.APIGatewayProxyResponse{
 		StatusCode: status,
-		Body: string(message),
-		Headers: headersResp,
+		Body:       string(message),
+		Headers:    headersResp,
 	}
 
 	return res, nil
 
 }
 
-func ValidoParametros() bool{
+func ValidoParametros() bool {
 	_, traeParametros := os.LookupEnv("SecretName")
 	if !traeParametros {
 		return traeParametros
@@ -76,4 +76,3 @@ func ValidoParametros() bool{
 
 	return traeParametros
 }
-

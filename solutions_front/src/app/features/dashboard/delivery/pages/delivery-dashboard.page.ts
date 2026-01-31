@@ -5,15 +5,14 @@ import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 // Services
-import { 
-  DeliveryService, 
-  Delivery, 
-  DeliveryStats, 
+import {
+  DeliveryService,
+  DeliveryAssignment,
+  MyAssignmentsResponse,
+  MyAssignmentStats,
   PerformanceStats,
   PackageCondition,
-  IssueType,
-  ConfirmDeliveryRequest,
-  ReportIssueRequest
+  IssueType
 } from '@core/services/delivery.service';
 import { AuthService } from '@core/services/auth.service';
 import { ToastService } from '@shared/services/toast.service';
@@ -42,14 +41,14 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   // Navigation
   activeTab: 'deliveries' | 'confirm' | 'issues' | 'performance' = 'deliveries';
 
-  // Deliveries
-  deliveries: Delivery[] = [];
+  // Assignments (Pickups y Deliveries)
+  pickups: DeliveryAssignment[] = [];
+  deliveries: DeliveryAssignment[] = [];
   isLoadingDeliveries: boolean = false;
-  stats: DeliveryStats | null = null;
+  stats: MyAssignmentStats | null = null;
 
   // Confirm Delivery
-  selectedDelivery: string = '';
-  otpCode: string = '';
+  selectedAssignmentId: number | null = null;
   deliveryNotes: string = '';
   packageCondition: PackageCondition = 'perfect';
   deliveryPhotoBase64: string = '';
@@ -57,7 +56,7 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   isConfirming: boolean = false;
 
   // Report Issue
-  selectedIssueGuide: string = '';
+  selectedIssueAssignmentId: number | null = null;
   issueType: IssueType | '' = '';
   issueDescription: string = '';
   attemptedResolution: string = '';
@@ -167,11 +166,14 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      this.deliveries = await this.deliveryService.getMyDeliveries();
-      console.log('Entregas cargadas:', this.deliveries.length);
+      const response: MyAssignmentsResponse = await this.deliveryService.getMyAssignments();
+      this.pickups = response.pickups || [];
+      this.deliveries = response.deliveries || [];
+      this.stats = response.stats;
+      console.log('Asignaciones cargadas - Pickups:', this.pickups.length, 'Entregas:', this.deliveries.length);
     } catch (error) {
       console.error('Error loading deliveries:', error);
-      this.toastService.error('Error al cargar las entregas');
+      this.toastService.error('Error al cargar las asignaciones');
     } finally {
       this.isLoadingDeliveries = false;
       this.cdr.detectChanges();
@@ -179,18 +181,17 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   }
 
   async loadStats(): Promise<void> {
-    try {
-      this.stats = await this.deliveryService.getDeliveryStats();
-      this.cdr.detectChanges();
-    } catch (error) {
-      console.error('Error loading stats:', error);
+    // Las stats ahora vienen incluidas en loadDeliveries
+    // Este método se mantiene por compatibilidad
+    if (!this.stats) {
+      await this.loadDeliveries();
     }
   }
 
-  async startRoute(delivery: Delivery): Promise<void> {
+  async startRoute(assignment: DeliveryAssignment): Promise<void> {
     try {
-      await this.deliveryService.startRoute(delivery.guide_id);
-      delivery.status = 'IN_ROUTE';
+      await this.deliveryService.startRoute(assignment.assignment_id, 'Ruta iniciada');
+      assignment.status = 'IN_PROGRESS';
       this.toastService.success('Ruta iniciada exitosamente');
       this.cdr.detectChanges();
     } catch (error) {
@@ -199,18 +200,30 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
     }
   }
 
-  viewOnMap(delivery: Delivery): void {
+  viewOnMap(assignment: DeliveryAssignment): void {
     // Abrir Google Maps con la dirección
-    const encodedAddress = encodeURIComponent(delivery.address);
-    window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+    const address = assignment.assignment_type === 'PICKUP'
+      ? assignment.guide?.sender_address
+      : assignment.guide?.receiver_address;
+
+    if (address) {
+      const encodedAddress = encodeURIComponent(address);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+    }
   }
 
-  callRecipient(delivery: Delivery): void {
-    window.location.href = `tel:${delivery.phone}`;
+  callRecipient(assignment: DeliveryAssignment): void {
+    const phone = assignment.assignment_type === 'PICKUP'
+      ? assignment.guide?.sender_phone
+      : assignment.guide?.receiver_phone;
+
+    if (phone) {
+      window.location.href = `tel:${phone}`;
+    }
   }
 
-  goToConfirmTab(delivery: Delivery): void {
-    this.selectedDelivery = delivery.id;
+  goToConfirmTab(assignment: DeliveryAssignment): void {
+    this.selectedAssignmentId = assignment.assignment_id;
     this.setActiveTab('confirm');
   }
 
@@ -218,12 +231,23 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   // CONFIRM DELIVERY
   // ==========================================
 
-  get selectedDeliveryData(): Delivery | null {
-    return this.deliveries.find(d => d.id === this.selectedDelivery) || null;
+  get selectedAssignmentData(): DeliveryAssignment | null {
+    if (!this.selectedAssignmentId) return null;
+    const allAssignments = [...this.pickups, ...this.deliveries];
+    return allAssignments.find(a => a.assignment_id === this.selectedAssignmentId) || null;
   }
 
-  get deliveriesInRoute(): Delivery[] {
-    return this.deliveries.filter(d => d.status === 'IN_ROUTE');
+  get assignmentsInProgress(): DeliveryAssignment[] {
+    const allAssignments = [...this.pickups, ...this.deliveries];
+    return allAssignments.filter(a => a.status === 'IN_PROGRESS');
+  }
+
+  get pendingPickups(): DeliveryAssignment[] {
+    return this.pickups.filter(p => p.status === 'PENDING' || p.status === 'IN_PROGRESS');
+  }
+
+  get pendingDeliveries(): DeliveryAssignment[] {
+    return this.deliveries.filter(d => d.status === 'PENDING' || d.status === 'IN_PROGRESS');
   }
 
   onDeliveryPhotoChange(event: Event): void {
@@ -248,38 +272,29 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   }
 
   async confirmDelivery(): Promise<void> {
-    if (!this.selectedDelivery || !this.otpCode || !this.deliveryPhotoBase64) {
-      this.toastService.error('Por favor complete todos los campos requeridos');
+    if (!this.selectedAssignmentId) {
+      this.toastService.error('Por favor seleccione una asignación');
       return;
     }
 
-    const delivery = this.selectedDeliveryData;
-    if (!delivery) return;
+    const assignment = this.selectedAssignmentData;
+    if (!assignment) return;
 
     this.isConfirming = true;
     this.cdr.detectChanges();
 
     try {
-      const request: ConfirmDeliveryRequest = {
-        guide_id: delivery.guide_id,
-        otp_code: this.otpCode,
-        delivery_notes: this.deliveryNotes,
-        package_condition: this.packageCondition,
-        delivery_photo: this.deliveryPhotoBase64,
-        signature: this.signatureBase64
-      };
+      const notes = this.deliveryNotes || `Completado - Condición: ${this.packageCondition}`;
+      await this.deliveryService.confirmDelivery(assignment.assignment_id, notes);
 
-      await this.deliveryService.confirmDelivery(request);
+      this.toastService.success('¡Asignación completada exitosamente!');
 
-      this.toastService.success('¡Entrega confirmada exitosamente!');
-      
       // Resetear formulario
       this.resetConfirmForm();
-      
+
       // Recargar entregas
       await this.loadDeliveries();
-      await this.loadStats();
-      
+
       // Volver a la pestaña de entregas
       this.setActiveTab('deliveries');
 
@@ -293,8 +308,7 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   }
 
   resetConfirmForm(): void {
-    this.selectedDelivery = '';
-    this.otpCode = '';
+    this.selectedAssignmentId = null;
     this.deliveryNotes = '';
     this.packageCondition = 'perfect';
     this.deliveryPhotoBase64 = '';
@@ -318,33 +332,30 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   }
 
   async reportIssue(): Promise<void> {
-    if (!this.selectedIssueGuide || !this.issueType || !this.issueDescription) {
+    if (!this.selectedIssueAssignmentId || !this.issueType || !this.issueDescription) {
       this.toastService.error('Por favor complete todos los campos requeridos');
       return;
     }
-
-    const delivery = this.deliveries.find(d => d.id === this.selectedIssueGuide);
-    if (!delivery) return;
 
     this.isReporting = true;
     this.cdr.detectChanges();
 
     try {
-      const request: ReportIssueRequest = {
-        guide_id: delivery.guide_id,
-        issue_type: this.issueType,
-        description: this.issueDescription,
-        attempted_resolution: this.attemptedResolution,
-        evidence_photos: this.issuePhotos
-      };
+      const fullDescription = this.attemptedResolution
+        ? `${this.issueDescription}. Resolución intentada: ${this.attemptedResolution}`
+        : this.issueDescription;
 
-      await this.deliveryService.reportIssue(request);
+      await this.deliveryService.reportIssue(
+        this.selectedIssueAssignmentId,
+        this.issueType as IssueType,
+        fullDescription
+      );
 
       this.toastService.success('Problema reportado exitosamente');
-      
+
       // Resetear formulario
       this.resetIssueForm();
-      
+
       // Recargar entregas
       await this.loadDeliveries();
 
@@ -358,7 +369,7 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   }
 
   resetIssueForm(): void {
-    this.selectedIssueGuide = '';
+    this.selectedIssueAssignmentId = null;
     this.issueType = '';
     this.issueDescription = '';
     this.attemptedResolution = '';
@@ -392,11 +403,29 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   getStatusBadgeClass(status: string): string {
     const classes: Record<string, string> = {
       'PENDING': 'badge-warning',
-      'IN_ROUTE': 'badge-info',
-      'DELIVERED': 'badge-success',
-      'FAILED': 'badge-error'
+      'IN_PROGRESS': 'badge-info',
+      'COMPLETED': 'badge-success',
+      'CANCELLED': 'badge-error'
     };
     return classes[status] || 'badge-default';
+  }
+
+  getStatusLabel(status: string): string {
+    const labels: Record<string, string> = {
+      'PENDING': 'Pendiente',
+      'IN_PROGRESS': 'En Progreso',
+      'COMPLETED': 'Completado',
+      'CANCELLED': 'Cancelado'
+    };
+    return labels[status] || status;
+  }
+
+  getAssignmentTypeLabel(type: string): string {
+    const labels: Record<string, string> = {
+      'PICKUP': 'Recoger',
+      'DELIVERY': 'Entregar'
+    };
+    return labels[type] || type;
   }
 
   getPriorityBadgeClass(priority: string): string {
@@ -406,6 +435,27 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
       'Normal': 'badge-secondary'
     };
     return classes[priority] || 'badge-default';
+  }
+
+  getContactName(assignment: DeliveryAssignment): string {
+    if (assignment.assignment_type === 'PICKUP') {
+      return assignment.guide?.sender_name || 'Sin nombre';
+    }
+    return assignment.guide?.receiver_name || 'Sin nombre';
+  }
+
+  getContactAddress(assignment: DeliveryAssignment): string {
+    if (assignment.assignment_type === 'PICKUP') {
+      return assignment.guide?.sender_address || 'Sin dirección';
+    }
+    return assignment.guide?.receiver_address || 'Sin dirección';
+  }
+
+  getContactPhone(assignment: DeliveryAssignment): string {
+    if (assignment.assignment_type === 'PICKUP') {
+      return assignment.guide?.sender_phone || '';
+    }
+    return assignment.guide?.receiver_phone || '';
   }
 
   formatPrice(value: number): string {

@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/models"
-
 )
 
 func GetUserRole(userUUID string) (models.User, error) {
@@ -13,14 +12,13 @@ func GetUserRole(userUUID string) (models.User, error) {
 
 	var user models.User
 
-
 	err := DbConnect()
 	if err != nil {
 		return user, err
 	}
 	defer Db.Close()
 
-	query	:= `
+	query := `
 		SELECT user_uuid, email, role
 		FROM users 
 		WHERE user_uuid = ?
@@ -30,7 +28,7 @@ func GetUserRole(userUUID string) (models.User, error) {
 	err = row.Scan(&user.UserUUID, &user.UserEmail, &user.Role)
 
 	if err != nil {
-		if err == sql.ErrNoRows{
+		if err == sql.ErrNoRows {
 			return user, fmt.Errorf("Usuario no encontrado")
 		}
 		return user, err

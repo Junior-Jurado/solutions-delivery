@@ -58,68 +58,151 @@
       <!-- Stats Cards -->
       <div class="stats-grid" *ngIf="stats">
         <div class="stat-card">
-          <div class="stat-label">Entregas Hoy</div>
-          <div class="stat-value primary">{{ stats.total_today }}</div>
-          <div class="stat-detail">{{ stats.pending }} pendientes</div>
+          <div class="stat-label">Recoger Pendientes</div>
+          <div class="stat-value primary">{{ stats.pending_pickups }}</div>
+          <div class="stat-detail">{{ stats.in_progress_pickups }} en progreso</div>
         </div>
 
         <div class="stat-card">
-          <div class="stat-label">Completadas</div>
-          <div class="stat-value success">{{ stats.completed }}</div>
-          <div class="stat-detail success">{{ ((stats.completed / stats.total_today) * 100).toFixed(0) }}% completado</div>
+          <div class="stat-label">Entregar Pendientes</div>
+          <div class="stat-value warning">{{ stats.pending_deliveries }}</div>
+          <div class="stat-detail">{{ stats.in_progress_deliveries }} en progreso</div>
         </div>
 
         <div class="stat-card">
-          <div class="stat-label">Tiempo Promedio</div>
-          <div class="stat-value warning">{{ stats.avg_time_minutes }}min</div>
-          <div class="stat-detail">Por entrega</div>
+          <div class="stat-label">Completadas Hoy</div>
+          <div class="stat-value success">{{ stats.completed_today }}</div>
+          <div class="stat-detail success">Asignaciones completadas</div>
         </div>
 
         <div class="stat-card">
-          <div class="stat-label">Calificación</div>
-          <div class="stat-value rating">{{ stats.rating }}⭐</div>
-          <div class="stat-detail">Promedio cliente</div>
+          <div class="stat-label">Esta Semana</div>
+          <div class="stat-value rating">{{ stats.completed_this_week }}</div>
+          <div class="stat-detail">Total completadas</div>
         </div>
       </div>
 
-      <!-- Deliveries List -->
-      <div class="card">
+      <!-- Loading -->
+      <div *ngIf="isLoadingDeliveries" class="loading-state">
+        <app-icon category="common" name="loader" size="48px" customClass="spinner"></app-icon>
+        <p>Cargando asignaciones...</p>
+      </div>
+
+      <!-- Pickups Section -->
+      <div class="card" *ngIf="!isLoadingDeliveries">
         <div class="card-header">
-          <h2 class="card-title">Entregas Asignadas</h2>
-          <p class="card-description">Paquetes para entregar hoy</p>
+          <h2 class="card-title">Paquetes por Recoger</h2>
+          <p class="card-description">Ir a recoger paquetes del remitente</p>
         </div>
 
         <div class="card-content">
-          <!-- Loading -->
-          <div *ngIf="isLoadingDeliveries" class="loading-state">
-            <app-icon category="common" name="loader" size="48px" customClass="spinner"></app-icon>
-            <p>Cargando entregas...</p>
-          </div>
-
           <!-- Empty State -->
-          <div *ngIf="!isLoadingDeliveries && deliveries.length === 0" class="empty-state">
+          <div *ngIf="pendingPickups.length === 0" class="empty-state">
             <app-icon category="common" name="package" size="64px"></app-icon>
-            <p>No hay entregas asignadas en este momento</p>
+            <p>No hay paquetes por recoger</p>
           </div>
 
-          <!-- Deliveries -->
-          <div class="deliveries-list" *ngIf="!isLoadingDeliveries && deliveries.length > 0">
-            <div *ngFor="let delivery of deliveries" class="delivery-card">
+          <!-- Pickups -->
+          <div class="deliveries-list" *ngIf="pendingPickups.length > 0">
+            <div *ngFor="let assignment of pendingPickups" class="delivery-card">
               <!-- Header -->
               <div class="delivery-header">
                 <div class="delivery-info">
-                  <div class="delivery-id">{{ delivery.guide_number }}</div>
+                  <div class="delivery-id">Guía #{{ assignment.guide_id }}</div>
                   <div class="delivery-time">
                     <app-icon category="common" name="clock" size="16px"></app-icon>
-                    <span>Estimado: {{ delivery.estimated_time }}</span>
+                    <span>{{ assignment.guide?.service_type || 'Estándar' }}</span>
                   </div>
                 </div>
                 <div class="delivery-badges">
-                  <span class="badge" [ngClass]="getPriorityBadgeClass(delivery.priority)">
-                    {{ delivery.priority }}
+                  <span class="badge badge-info">RECOGER</span>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(assignment.status)">
+                    {{ getStatusLabel(assignment.status) }}
                   </span>
-                  <span class="badge" [ngClass]="getStatusBadgeClass(delivery.status)">
-                    {{ delivery.status === 'PENDING' ? 'Pendiente' : delivery.status === 'IN_ROUTE' ? 'En ruta' : 'Entregada' }}
+                </div>
+              </div>
+
+              <!-- Details Grid -->
+              <div class="delivery-details">
+                <div class="detail-section">
+                  <div class="detail-label">
+                    <app-icon category="common" name="map-pin" size="16px"></app-icon>
+                    Remitente:
+                  </div>
+                  <div class="detail-value">{{ getContactName(assignment) }}</div>
+                  <div class="detail-value muted">{{ getContactAddress(assignment) }}</div>
+                </div>
+
+                <div class="detail-section">
+                  <div class="detail-label">
+                    <app-icon category="common" name="phone" size="16px"></app-icon>
+                    Contacto:
+                  </div>
+                  <div class="detail-value">{{ getContactPhone(assignment) || 'Sin teléfono' }}</div>
+                  <div class="detail-value muted">{{ assignment.guide?.origin_city_name }} → {{ assignment.guide?.destination_city_name }}</div>
+                </div>
+              </div>
+
+              <!-- Notes -->
+              <div class="delivery-instructions" *ngIf="assignment.notes">
+                <div class="instructions-label">Notas:</div>
+                <div class="instructions-text">{{ assignment.notes }}</div>
+              </div>
+
+              <!-- Actions -->
+              <div class="delivery-actions">
+                <button class="btn btn-outline" (click)="viewOnMap(assignment)">
+                  <app-icon category="common" name="navigation" size="16px"></app-icon>
+                  <span>Ver Mapa</span>
+                </button>
+
+                <button class="btn btn-outline" (click)="callRecipient(assignment)" [disabled]="!getContactPhone(assignment)">
+                  <app-icon category="common" name="phone" size="16px"></app-icon>
+                  <span>Llamar</span>
+                </button>
+
+                <button
+                  class="btn"
+                  [ngClass]="assignment.status === 'IN_PROGRESS' ? 'btn-primary' : 'btn-secondary'"
+                  (click)="assignment.status === 'IN_PROGRESS' ? goToConfirmTab(assignment) : startRoute(assignment)">
+                  <span>{{ assignment.status === 'IN_PROGRESS' ? 'Completar Recogida' : 'Iniciar Recogida' }}</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deliveries Section -->
+      <div class="card" *ngIf="!isLoadingDeliveries">
+        <div class="card-header">
+          <h2 class="card-title">Paquetes por Entregar</h2>
+          <p class="card-description">Paquetes para entregar al destinatario</p>
+        </div>
+
+        <div class="card-content">
+          <!-- Empty State -->
+          <div *ngIf="pendingDeliveries.length === 0" class="empty-state">
+            <app-icon category="common" name="package" size="64px"></app-icon>
+            <p>No hay paquetes por entregar</p>
+          </div>
+
+          <!-- Deliveries -->
+          <div class="deliveries-list" *ngIf="pendingDeliveries.length > 0">
+            <div *ngFor="let assignment of pendingDeliveries" class="delivery-card">
+              <!-- Header -->
+              <div class="delivery-header">
+                <div class="delivery-info">
+                  <div class="delivery-id">Guía #{{ assignment.guide_id }}</div>
+                  <div class="delivery-time">
+                    <app-icon category="common" name="clock" size="16px"></app-icon>
+                    <span>{{ assignment.guide?.service_type || 'Estándar' }}</span>
+                  </div>
+                </div>
+                <div class="delivery-badges">
+                  <span class="badge badge-warning">ENTREGAR</span>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(assignment.status)">
+                    {{ getStatusLabel(assignment.status) }}
                   </span>
                 </div>
               </div>
@@ -131,8 +214,8 @@
                     <app-icon category="common" name="map-pin" size="16px"></app-icon>
                     Destinatario:
                   </div>
-                  <div class="detail-value">{{ delivery.recipient }}</div>
-                  <div class="detail-value muted">{{ delivery.address }}</div>
+                  <div class="detail-value">{{ getContactName(assignment) }}</div>
+                  <div class="detail-value muted">{{ getContactAddress(assignment) }}</div>
                 </div>
 
                 <div class="detail-section">
@@ -140,34 +223,34 @@
                     <app-icon category="common" name="phone" size="16px"></app-icon>
                     Contacto:
                   </div>
-                  <div class="detail-value">{{ delivery.phone }}</div>
-                  <div class="detail-value">Valor: ${{ formatPrice(delivery.value) }}</div>
+                  <div class="detail-value">{{ getContactPhone(assignment) || 'Sin teléfono' }}</div>
+                  <div class="detail-value muted">{{ assignment.guide?.origin_city_name }} → {{ assignment.guide?.destination_city_name }}</div>
                 </div>
               </div>
 
-              <!-- Instructions -->
-              <div class="delivery-instructions" *ngIf="delivery.instructions">
-                <div class="instructions-label">Instrucciones especiales:</div>
-                <div class="instructions-text">{{ delivery.instructions }}</div>
+              <!-- Notes -->
+              <div class="delivery-instructions" *ngIf="assignment.notes">
+                <div class="instructions-label">Notas:</div>
+                <div class="instructions-text">{{ assignment.notes }}</div>
               </div>
 
               <!-- Actions -->
               <div class="delivery-actions">
-                <button class="btn btn-outline" (click)="viewOnMap(delivery)">
+                <button class="btn btn-outline" (click)="viewOnMap(assignment)">
                   <app-icon category="common" name="navigation" size="16px"></app-icon>
                   <span>Ver Mapa</span>
                 </button>
 
-                <button class="btn btn-outline" (click)="callRecipient(delivery)">
+                <button class="btn btn-outline" (click)="callRecipient(assignment)" [disabled]="!getContactPhone(assignment)">
                   <app-icon category="common" name="phone" size="16px"></app-icon>
                   <span>Llamar</span>
                 </button>
 
-                <button 
+                <button
                   class="btn"
-                  [ngClass]="delivery.status === 'IN_ROUTE' ? 'btn-primary' : 'btn-secondary'"
-                  (click)="delivery.status === 'IN_ROUTE' ? goToConfirmTab(delivery) : startRoute(delivery)">
-                  <span>{{ delivery.status === 'IN_ROUTE' ? 'Confirmar Entrega' : 'Iniciar Ruta' }}</span>
+                  [ngClass]="assignment.status === 'IN_PROGRESS' ? 'btn-primary' : 'btn-secondary'"
+                  (click)="assignment.status === 'IN_PROGRESS' ? goToConfirmTab(assignment) : startRoute(assignment)">
+                  <span>{{ assignment.status === 'IN_PROGRESS' ? 'Confirmar Entrega' : 'Iniciar Entrega' }}</span>
                 </button>
               </div>
             </div>
@@ -186,76 +269,60 @@
         <div class="card-header">
           <h2 class="card-title">
             <app-icon category="common" name="check-circle" size="24px"></app-icon>
-            Confirmar Entrega
+            Completar Asignación
           </h2>
           <p class="card-description">
-            Confirma la entrega usando el código OTP y sube la imagen de entrega
+            Marca como completada una recogida o entrega
           </p>
         </div>
 
         <div class="card-content">
           <form (ngSubmit)="confirmDelivery()" class="confirm-form">
-            <!-- Select Guide -->
+            <!-- Select Assignment -->
             <div class="form-field">
-              <label for="guide-select">Seleccionar guía a confirmar *</label>
-              <select 
+              <label for="guide-select">Seleccionar asignación a completar *</label>
+              <select
                 id="guide-select"
-                [(ngModel)]="selectedDelivery"
-                name="selectedDelivery"
+                [(ngModel)]="selectedAssignmentId"
+                name="selectedAssignmentId"
                 class="form-select"
                 required>
-                <option value="">Seleccionar...</option>
-                <option *ngFor="let delivery of deliveriesInRoute" [value]="delivery.id">
-                  {{ delivery.guide_number }} - {{ delivery.recipient }}
+                <option [ngValue]="null">Seleccionar...</option>
+                <option *ngFor="let assignment of assignmentsInProgress" [ngValue]="assignment.assignment_id">
+                  {{ getAssignmentTypeLabel(assignment.assignment_type) }} - Guía #{{ assignment.guide_id }} - {{ getContactName(assignment) }}
                 </option>
               </select>
             </div>
 
-            <!-- Selected Delivery Info -->
-            <div class="info-banner" *ngIf="selectedDeliveryData">
-              <div class="info-title">Información de la entrega:</div>
+            <!-- Selected Assignment Info -->
+            <div class="info-banner" *ngIf="selectedAssignmentData">
+              <div class="info-title">Información de la asignación:</div>
               <div class="info-details">
-                <div>Destinatario: {{ selectedDeliveryData.recipient }}</div>
-                <div>Dirección: {{ selectedDeliveryData.address }}</div>
-                <div>Valor: ${{ formatPrice(selectedDeliveryData.value) }}</div>
+                <div>Tipo: {{ getAssignmentTypeLabel(selectedAssignmentData.assignment_type) }}</div>
+                <div>Contacto: {{ getContactName(selectedAssignmentData) }}</div>
+                <div>Dirección: {{ getContactAddress(selectedAssignmentData) }}</div>
+                <div>Ruta: {{ selectedAssignmentData.guide?.origin_city_name }} → {{ selectedAssignmentData.guide?.destination_city_name }}</div>
               </div>
             </div>
 
             <div class="form-grid">
               <!-- Left Column -->
               <div class="form-column">
-                <!-- OTP Code -->
-                <div class="form-field">
-                  <label for="otp">Código OTP del cliente *</label>
-                  <input 
-                    id="otp"
-                    type="text"
-                    [(ngModel)]="otpCode"
-                    name="otpCode"
-                    placeholder="123456"
-                    maxlength="6"
-                    class="form-input"
-                    required>
-                  <div class="field-hint">
-                    El cliente debe proporcionarte este código de 6 dígitos
-                  </div>
-                </div>
-
                 <!-- Delivery Notes -->
                 <div class="form-field">
-                  <label for="delivery-notes">Notas de entrega</label>
-                  <textarea 
+                  <label for="delivery-notes">Notas de completado</label>
+                  <textarea
                     id="delivery-notes"
                     [(ngModel)]="deliveryNotes"
                     name="deliveryNotes"
-                    placeholder="Entregado en perfectas condiciones..."
+                    placeholder="Entregado/Recogido en perfectas condiciones..."
                     class="form-textarea"></textarea>
                 </div>
 
                 <!-- Package Condition -->
                 <div class="form-field">
                   <label for="package-condition">Estado del paquete</label>
-                  <select 
+                  <select
                     id="package-condition"
                     [(ngModel)]="packageCondition"
                     name="packageCondition"
@@ -271,18 +338,18 @@
               <div class="form-column">
                 <!-- Delivery Photo -->
                 <div class="form-field">
-                  <label>Imagen de entrega *</label>
+                  <label>Imagen de evidencia (opcional)</label>
                   <div class="upload-area">
                     <app-icon category="common" name="camera" size="48px"></app-icon>
-                    <p>Toma una foto de la entrega</p>
+                    <p>Toma una foto como evidencia</p>
                     <div class="upload-buttons">
                       <button type="button" class="btn btn-outline" (click)="openCamera()">
                         <app-icon category="common" name="camera" size="16px"></app-icon>
                         Abrir Cámara
                       </button>
-                      <input 
-                        type="file" 
-                        accept="image/*" 
+                      <input
+                        type="file"
+                        accept="image/*"
                         (change)="onDeliveryPhotoChange($event)"
                         style="display: none;"
                         #photoInput>
@@ -296,40 +363,28 @@
                     </div>
                   </div>
                 </div>
-
-                <!-- Signature -->
-                <div class="form-field">
-                  <label>Firma del destinatario</label>
-                  <div class="signature-area">
-                    <app-icon category="common" name="file-text" size="32px"></app-icon>
-                    <p>Área de firma digital</p>
-                    <button type="button" class="btn btn-outline btn-sm">
-                      Activar Firma
-                    </button>
-                  </div>
-                </div>
               </div>
             </div>
 
             <!-- Submit Button -->
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               class="btn btn-primary btn-large btn-full"
-              [disabled]="isConfirming || !selectedDelivery || !otpCode || !deliveryPhotoBase64">
-              <app-icon 
+              [disabled]="isConfirming || !selectedAssignmentId">
+              <app-icon
                 *ngIf="isConfirming"
-                category="common" 
-                name="loader" 
+                category="common"
+                name="loader"
                 size="20px"
                 customClass="spinner">
               </app-icon>
-              <app-icon 
+              <app-icon
                 *ngIf="!isConfirming"
-                category="common" 
-                name="check-circle" 
+                category="common"
+                name="check-circle"
                 size="20px">
               </app-icon>
-              <span>{{ isConfirming ? 'Confirmando...' : 'Confirmar Entrega Exitosa' }}</span>
+              <span>{{ isConfirming ? 'Completando...' : 'Marcar como Completado' }}</span>
             </button>
           </form>
         </div>
@@ -346,35 +401,42 @@
         <div class="card-header">
           <h2 class="card-title">
             <app-icon category="common" name="alert-triangle" size="24px"></app-icon>
-            Reportar Problema en Entrega
+            Reportar Problema
           </h2>
           <p class="card-description">
-            Reporta cualquier inconveniente durante la entrega
+            Reporta cualquier inconveniente durante la recogida o entrega
           </p>
         </div>
 
         <div class="card-content">
           <form (ngSubmit)="reportIssue()" class="issue-form">
-            <!-- Guide Select -->
+            <!-- Assignment Select -->
             <div class="form-field">
-              <label for="problem-guide">Número de guía *</label>
-              <select 
+              <label for="problem-guide">Seleccionar asignación *</label>
+              <select
                 id="problem-guide"
-                [(ngModel)]="selectedIssueGuide"
-                name="selectedIssueGuide"
+                [(ngModel)]="selectedIssueAssignmentId"
+                name="selectedIssueAssignmentId"
                 class="form-select"
                 required>
-                <option value="">Seleccionar guía...</option>
-                <option *ngFor="let delivery of deliveries" [value]="delivery.id">
-                  {{ delivery.guide_number }} - {{ delivery.recipient }}
-                </option>
+                <option [ngValue]="null">Seleccionar...</option>
+                <optgroup label="Recogidas">
+                  <option *ngFor="let assignment of pendingPickups" [ngValue]="assignment.assignment_id">
+                    Guía #{{ assignment.guide_id }} - {{ getContactName(assignment) }} ({{ getStatusLabel(assignment.status) }})
+                  </option>
+                </optgroup>
+                <optgroup label="Entregas">
+                  <option *ngFor="let assignment of pendingDeliveries" [ngValue]="assignment.assignment_id">
+                    Guía #{{ assignment.guide_id }} - {{ getContactName(assignment) }} ({{ getStatusLabel(assignment.status) }})
+                  </option>
+                </optgroup>
               </select>
             </div>
 
             <!-- Issue Type -->
             <div class="form-field">
               <label for="issue-type">Tipo de problema *</label>
-              <select 
+              <select
                 id="issue-type"
                 [(ngModel)]="issueType"
                 name="issueType"
@@ -393,7 +455,7 @@
             <!-- Description -->
             <div class="form-field">
               <label for="issue-description">Descripción del problema *</label>
-              <textarea 
+              <textarea
                 id="issue-description"
                 [(ngModel)]="issueDescription"
                 name="issueDescription"
@@ -408,10 +470,10 @@
               <div class="upload-area">
                 <app-icon category="common" name="camera" size="32px"></app-icon>
                 <p>Opcional: Sube fotos que sustenten el reporte</p>
-                <input 
-                  type="file" 
-                  multiple 
-                  accept="image/*" 
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
                   (change)="onIssuePhotoChange($event)"
                   style="display: none;"
                   #issuePhotoInput>
@@ -424,7 +486,7 @@
             <!-- Attempted Resolution -->
             <div class="form-field">
               <label for="attempted-resolution">¿Qué intentaste hacer para resolver el problema?</label>
-              <textarea 
+              <textarea
                 id="attempted-resolution"
                 [(ngModel)]="attemptedResolution"
                 name="attemptedResolution"
@@ -433,24 +495,24 @@
             </div>
 
             <!-- Submit Button -->
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               class="btn btn-danger btn-full"
-              [disabled]="isReporting || !selectedIssueGuide || !issueType || !issueDescription">
-              <app-icon 
+              [disabled]="isReporting || !selectedIssueAssignmentId || !issueType || !issueDescription">
+              <app-icon
                 *ngIf="isReporting"
-                category="common" 
-                name="loader" 
+                category="common"
+                name="loader"
                 size="16px"
                 customClass="spinner">
               </app-icon>
-              <app-icon 
+              <app-icon
                 *ngIf="!isReporting"
-                category="common" 
-                name="alert-triangle" 
+                category="common"
+                name="alert-triangle"
                 size="16px">
               </app-icon>
-              <span>{{ isReporting ? 'Enviando...' : 'Enviar Reporte' }}</span>
+              <span>{{ isReporting ? 'Enviando...' : 'Cancelar Asignación y Reportar' }}</span>
             </button>
           </form>
         </div>

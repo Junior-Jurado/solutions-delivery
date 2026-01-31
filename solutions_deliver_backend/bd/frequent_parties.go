@@ -236,7 +236,7 @@ func GetFrequentPartiesByDocument(documentNumber string, cityID int64, partyType
 	`
 
 	countArgs := []interface{}{documentNumber, cityID}
-	
+
 	// Si se especifica tipo de parte, filtrar por eso también
 	if partyType != "" {
 		countQuery += " AND fp.party_type = ?"
@@ -333,7 +333,7 @@ func GetFrequentPartiesByDocument(documentNumber string, cityID int64, partyType
 // Si la combinación documento+ciudad+dirección existe, incrementa usage_count
 // Si no existe, crea un nuevo registro
 func UpsertFrequentParty(req models.CreateFrequentPartyRequest) error {
-	fmt.Printf("UpsertFrequentParty -> Doc: %s, City: %d, Address: %s\n", 
+	fmt.Printf("UpsertFrequentParty -> Doc: %s, City: %d, Address: %s\n",
 		req.DocumentNumber, req.CityID, req.Address)
 
 	err := DbConnect()

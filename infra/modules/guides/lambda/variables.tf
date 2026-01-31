@@ -19,5 +19,7 @@ variable "db_secret_arn" {
   type = string
 }
 
-variable "secret_name" {}
+variable "secret_name" {
+  type = string
+}
 

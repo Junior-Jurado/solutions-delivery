@@ -17,7 +17,7 @@ func GetGuides(request events.APIGatewayV2HTTPRequest, userUUID string) (int, st
 
 	// Construir filtros desde query parameters
 	filters := models.GuideFilters{
-		Limit: 20,
+		Limit:  20,
 		Offset: 0,
 	}
 
@@ -87,7 +87,7 @@ func GetGuides(request events.APIGatewayV2HTTPRequest, userUUID string) (int, st
 		}
 	}
 
-	// Obtener guías 
+	// Obtener guías
 	guides, total, err := bd.GetGuidesByFilters(filters)
 	if err != nil {
 		return 500, fmt.Sprintf(`{"error": "Error al obtener las guías: %s"}`, err.Error())
@@ -95,8 +95,8 @@ func GetGuides(request events.APIGatewayV2HTTPRequest, userUUID string) (int, st
 
 	response := models.GuidesListResponse{
 		Guides: guides,
-		Total: total,
-		Limit: filters.Limit,
+		Total:  total,
+		Limit:  filters.Limit,
 		Offset: filters.Offset,
 	}
 
@@ -177,10 +177,10 @@ func UpdateGuideStatus(guideID int64, body string, userUUID string) (int, string
 	}
 
 	response := models.UpdateStatusResponse{
-		Success: true,
-		GuideID: guideID,
+		Success:   true,
+		GuideID:   guideID,
 		NewStatus: request.Status,
-		Message: "Estado actualizado correctamente",
+		Message:   "Estado actualizado correctamente",
 	}
 
 	jsonResponse, err := json.Marshal(response)
@@ -208,7 +208,7 @@ func GetGuidesStats(userUUID string) (int, string) {
 	return 200, string(jsonResponse)
 }
 
-// SearchGuides búsqueda rápida de guías 
+// SearchGuides búsqueda rápida de guías
 func SearchGuides(searchTerm string) (int, string) {
 	fmt.Printf("SearchGuides -> SearchTerm: %s\n", searchTerm)
 
@@ -220,8 +220,8 @@ func SearchGuides(searchTerm string) (int, string) {
 	// Construir filtros solo con término de búsqueda
 	filters := models.GuideFilters{
 		SearchTerm: searchTerm,
-		Limit: 50,
-		Offset: 0,
+		Limit:      50,
+		Offset:     0,
 	}
 
 	guides, total, err := bd.GetGuidesByFilters(filters)
@@ -232,7 +232,7 @@ func SearchGuides(searchTerm string) (int, string) {
 	response := models.GuidesListResponse{
 		Guides: guides,
 		Total:  total,
-		Limit: filters.Limit,
+		Limit:  filters.Limit,
 		Offset: filters.Offset,
 	}
 

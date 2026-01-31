@@ -36,7 +36,7 @@ func GenerateCashClose(body string, userUUID string) (int, string) {
 		}
 		startDate = time.Date(request.Year, time.Month(request.Month), request.Day, 0, 0, 0, 0, time.UTC)
 		endDate = startDate.AddDate(0, 0, 1).Add(-time.Second)
-	
+
 	case "WEEKLY":
 		if request.Year == 0 || request.Week == 0 {
 			return 400, `{"error": "For WEEKLY, year and week are required"}`
@@ -44,14 +44,14 @@ func GenerateCashClose(body string, userUUID string) (int, string) {
 		// Calcular el inicio de la semana
 		startDate = getStartOfWeek(request.Year, request.Week)
 		endDate = startDate.AddDate(0, 0, 7).Add(-time.Second)
-		
+
 	case "MONTHLY":
 		if request.Year == 0 || request.Month == 0 {
 			return 400, `{"error": "For MONTHLY, year and month are required"}`
 		}
 		startDate = time.Date(request.Year, time.Month(request.Month), 1, 0, 0, 0, 0, time.UTC)
 		endDate = startDate.AddDate(0, 1, 0).Add(-time.Second)
-		
+
 	case "YEARLY":
 		if request.Year == 0 {
 			return 400, `{"error": "For YEARLY, year is required"}`
@@ -152,7 +152,7 @@ func GenerateCashClose(body string, userUUID string) (int, string) {
 func getStartOfWeek(year, week int) time.Time {
 	// Primer día del año
 	jan1 := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
-	
+
 	// Calcular el lunes de la primera semana
 	// Si el 1 de enero es lunes a jueves, está en la semana 1
 	// Si es viernes a domingo, la semana 1 empieza el siguiente lunes
@@ -160,7 +160,7 @@ func getStartOfWeek(year, week int) time.Time {
 	if weekday == 0 { // Domingo
 		weekday = 7
 	}
-	
+
 	var firstMonday time.Time
 	if weekday <= 4 { // Lunes a Jueves
 		// Retroceder al lunes anterior o el mismo día si es lunes
@@ -169,10 +169,10 @@ func getStartOfWeek(year, week int) time.Time {
 		// Avanzar al siguiente lunes
 		firstMonday = jan1.AddDate(0, 0, 8-weekday)
 	}
-	
+
 	// Calcular el lunes de la semana solicitada
 	startOfWeek := firstMonday.AddDate(0, 0, (week-1)*7)
-	
+
 	return startOfWeek
 }
 

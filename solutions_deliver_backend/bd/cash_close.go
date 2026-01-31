@@ -126,7 +126,7 @@ func GetGuidesForCashClose(startDate, endDate time.Time) ([]models.CashCloseDeta
 	for rows.Next() {
 		var detail models.CashCloseDetail
 		var paymentMethod string
-		
+
 		err := rows.Scan(
 			&detail.GuideID,
 			&detail.Date,
@@ -144,15 +144,16 @@ func GetGuidesForCashClose(startDate, endDate time.Time) ([]models.CashCloseDeta
 		if err != nil {
 			return details, err
 		}
-		
+
 		// Store payment method in uppercase for consistency
 		detail.PaymentMethod = paymentMethod
-		
+
 		details = append(details, detail)
 	}
 
 	return details, nil
 }
+
 // UpdateCashClosePDF updates the PDF URL
 func UpdateCashClosePDF(closeID int64, pdfURL, pdfS3Key string) error {
 	fmt.Printf("UpdateCashClosePDF -> CloseID: %d\n", closeID)

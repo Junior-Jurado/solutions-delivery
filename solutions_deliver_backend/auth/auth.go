@@ -43,7 +43,7 @@ func ValidarToken(token string) (bool, error, string) {
 	}
 
 	hora_actual := time.Now()
-	hora_expiracion := time.Unix(int64(tokenJson.Exp),0)
+	hora_expiracion := time.Unix(int64(tokenJson.Exp), 0)
 
 	if hora_expiracion.Before(hora_actual) {
 		fmt.Println("El token ha expirado, fecha de expiracion: ", hora_expiracion.String())
