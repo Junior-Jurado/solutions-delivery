@@ -186,39 +186,67 @@ func UpdateAssignmentStatus(body string, userUUID string, path string) (int, str
 		return 500, fmt.Sprintf(`{"error": "%s"}`, err.Error())
 	}
 
+	// Log detallado para debug
+	fmt.Printf("=== ACTUALIZACIÓN DE ASIGNACIÓN ===\n")
+	fmt.Printf("AssignmentID: %d\n", assignment.AssignmentID)
+	fmt.Printf("GuideID: %d\n", assignment.GuideID)
+	fmt.Printf("AssignmentType: '%s'\n", assignment.AssignmentType)
+	fmt.Printf("Nuevo Status de Asignación: '%s'\n", req.Status)
+	fmt.Printf("Comparación PICKUP: %v (tipo='%s', esperado='%s')\n",
+		assignment.AssignmentType == models.AssignmentPickup,
+		assignment.AssignmentType,
+		models.AssignmentPickup)
+	fmt.Printf("Comparación COMPLETED: %v (status='%s', esperado='%s')\n",
+		req.Status == models.AssignmentCompleted,
+		req.Status,
+		models.AssignmentCompleted)
+
 	// Actualizar automáticamente el estado de la guía según el tipo de asignación y nuevo estado
 	var newGuideStatus models.GuideStatus
 	shouldUpdateGuide := false
 	guideStatusMessage := ""
 
-	if assignment.AssignmentType == models.AssignmentPickup && req.Status == models.AssignmentCompleted {
+	// Usar string comparison para mayor seguridad
+	assignmentTypeStr := string(assignment.AssignmentType)
+	statusStr := string(req.Status)
+
+	if assignmentTypeStr == "PICKUP" && statusStr == "COMPLETED" {
 		// PICKUP completado -> Guía pasa a EN RUTA
 		newGuideStatus = models.StatusInRoute
 		shouldUpdateGuide = true
 		guideStatusMessage = "Guía actualizada a 'En ruta'"
-	} else if assignment.AssignmentType == models.AssignmentDelivery {
-		if req.Status == models.AssignmentInProgress {
+		fmt.Printf(">>> Condición PICKUP+COMPLETED cumplida\n")
+	} else if assignmentTypeStr == "DELIVERY" {
+		if statusStr == "IN_PROGRESS" {
 			// DELIVERY iniciado -> Guía pasa a EN REPARTO
 			newGuideStatus = models.StatusOutForDelivery
 			shouldUpdateGuide = true
 			guideStatusMessage = "Guía actualizada a 'En reparto'"
-		} else if req.Status == models.AssignmentCompleted {
+			fmt.Printf(">>> Condición DELIVERY+IN_PROGRESS cumplida\n")
+		} else if statusStr == "COMPLETED" {
 			// DELIVERY completado -> Guía pasa a ENTREGADA
 			newGuideStatus = models.StatusDelivered
 			shouldUpdateGuide = true
 			guideStatusMessage = "Guía actualizada a 'Entregada'"
+			fmt.Printf(">>> Condición DELIVERY+COMPLETED cumplida\n")
 		}
 	}
 
+	fmt.Printf("shouldUpdateGuide: %v\n", shouldUpdateGuide)
+
 	if shouldUpdateGuide {
+		fmt.Printf(">>> Intentando actualizar guía %d a estado %s\n", assignment.GuideID, newGuideStatus)
 		err = bd.UpdateGuideStatus(assignment.GuideID, newGuideStatus, userUUID)
 		if err != nil {
-			fmt.Printf("Error al actualizar estado de guía %d: %s\n", assignment.GuideID, err.Error())
+			fmt.Printf("!!! ERROR al actualizar estado de guía %d: %s\n", assignment.GuideID, err.Error())
 			// No retornamos error porque la asignación ya se actualizó correctamente
 		} else {
-			fmt.Printf("Guía %d actualizada a estado %s\n", assignment.GuideID, newGuideStatus)
+			fmt.Printf(">>> ÉXITO: Guía %d actualizada a estado %s\n", assignment.GuideID, newGuideStatus)
 		}
+	} else {
+		fmt.Printf(">>> No se requiere actualizar la guía\n")
 	}
+	fmt.Printf("=== FIN ACTUALIZACIÓN ===\n")
 
 	message := "Estado de asignación actualizado correctamente"
 	if guideStatusMessage != "" {
