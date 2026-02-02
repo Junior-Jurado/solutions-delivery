@@ -602,12 +602,19 @@ export class SecretaryDashboardPage implements OnInit {
                 this.currentClosePage * this.closePageSize
             );
 
-            this.cashCloses = response.closes;
-            this.totalCloses = response.total;
+            // Manejar caso cuando response.closes es null o undefined
+            this.cashCloses = response.closes || [];
+            this.totalCloses = response.total || 0;
 
-            console.log('Cierres de caja cargados:', this.cashCloses.length);
+            if (this.cashCloses.length === 0) {
+                console.log('No hay cierres de caja registrados');
+            } else {
+                console.log('Cierres de caja cargados:', this.cashCloses.length);
+            }
         } catch (error) {
             console.error('Error al cargar cierres:', error);
+            this.cashCloses = [];
+            this.totalCloses = 0;
             this.toast.error('Error al cargar los cierres de caja');
         } finally {
             this.isLoadingCloses = false;
