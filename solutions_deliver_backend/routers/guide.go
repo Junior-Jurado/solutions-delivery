@@ -136,6 +136,12 @@ func GetGuideByID(guideID int64) (int, string) {
 func UpdateGuideStatus(guideID int64, body string, userUUID string) (int, string) {
 	fmt.Printf("UpdateGuideStatus -> GuideID: %d\n", guideID)
 
+	// Obtener rol del usuario
+	userRole, err := bd.GetUserRole(userUUID)
+	if err != nil {
+		return 500, fmt.Sprintf(`{"error": "Error al obtener rol del usuario: %s"}`, err.Error())
+	}
+
 	// Verificar que la guía existe
 	if !bd.GuideExists(guideID) {
 		return 404, fmt.Sprintf(`{"error": "Guía no encontrada"}`)
@@ -143,7 +149,7 @@ func UpdateGuideStatus(guideID int64, body string, userUUID string) (int, string
 
 	// Parsear body
 	var request models.UpdateStatusRequest
-	err := json.Unmarshal([]byte(body), &request)
+	err = json.Unmarshal([]byte(body), &request)
 	if err != nil {
 		return 400, fmt.Sprintf(`{"error": "Body inválido: %s"}`, err.Error())
 	}
@@ -168,6 +174,19 @@ func UpdateGuideStatus(guideID int64, body string, userUUID string) (int, string
 
 	if !isValid {
 		return 400, fmt.Sprintf(`{"error": "Estado inválido"}`)
+	}
+
+	// Validar permisos según rol
+	switch userRole.Role {
+	case models.RoleAdmin:
+		// Admin puede cambiar a cualquier estado
+	case models.RoleSecretary:
+		// Secretary solo puede cambiar a IN_WAREHOUSE
+		if request.Status != models.StatusInWarehouse {
+			return 403, `{"error": "Solo puedes cambiar el estado a 'En bodega'"}`
+		}
+	default:
+		return 403, `{"error": "No tienes permisos para cambiar el estado de la guía"}`
 	}
 
 	// Actualizar estado

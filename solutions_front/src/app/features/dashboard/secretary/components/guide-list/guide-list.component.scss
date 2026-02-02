@@ -202,6 +202,28 @@
       }
     }
 
+    .status-info-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: $spacing-sm $spacing-md;
+      background: $bg-light;
+      border: 1px solid $border-color;
+      border-radius: $radius-base;
+      font-size: $font-sm;
+      color: $text-muted;
+      min-width: 180px;
+
+      @include respond-to($breakpoint-sm) {
+        width: 100%;
+        justify-content: center;
+        min-width: 0;
+      }
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-xs;
+      }
+    }
+
     .btn {
       @include respond-to($breakpoint-sm) {
         width: 100%;

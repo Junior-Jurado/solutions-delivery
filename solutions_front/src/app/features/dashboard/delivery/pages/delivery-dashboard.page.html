@@ -168,6 +168,11 @@
                   <span>{{ assignment.status === 'IN_PROGRESS' ? 'Completar Recogida' : 'Iniciar Recogida' }}</span>
                 </button>
               </div>
+              <!-- Info sobre cambio de estado -->
+              <div class="status-change-info" *ngIf="assignment.status === 'PENDING'">
+                <app-icon category="common" name="info" size="14px"></app-icon>
+                <span>Al iniciar, la guía pasará a estado "En ruta"</span>
+              </div>
             </div>
           </div>
         </div>
@@ -253,6 +258,11 @@
                   <span>{{ assignment.status === 'IN_PROGRESS' ? 'Confirmar Entrega' : 'Iniciar Entrega' }}</span>
                 </button>
               </div>
+              <!-- Info sobre cambio de estado -->
+              <div class="status-change-info" *ngIf="assignment.status === 'PENDING'">
+                <app-icon category="common" name="info" size="14px"></app-icon>
+                <span>Al iniciar, la guía pasará a estado "En reparto"</span>
+              </div>
             </div>
           </div>
         </div>
@@ -302,6 +312,15 @@
                 <div>Contacto: {{ getContactName(selectedAssignmentData) }}</div>
                 <div>Dirección: {{ getContactAddress(selectedAssignmentData) }}</div>
                 <div>Ruta: {{ selectedAssignmentData.guide?.origin_city_name }} → {{ selectedAssignmentData.guide?.destination_city_name }}</div>
+              </div>
+              <div class="info-status-update">
+                <app-icon category="common" name="info" size="16px"></app-icon>
+                <span *ngIf="selectedAssignmentData.assignment_type === 'PICKUP'">
+                  Al completar, la guía pasará a estado "En ruta"
+                </span>
+                <span *ngIf="selectedAssignmentData.assignment_type === 'DELIVERY'">
+                  Al completar, la guía pasará a estado "Entregada"
+                </span>
               </div>
             </div>
 

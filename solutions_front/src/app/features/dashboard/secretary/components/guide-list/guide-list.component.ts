@@ -21,14 +21,34 @@ export class GuideListComponent {
   @Output() downloadPDF = new EventEmitter<number>();
   @Output() pageChange = new EventEmitter<'prev' | 'next'>();
 
-  // Estados disponibles para actualización
-  availableStatuses: { value: GuideStatus; label: string }[] = [
+  // Estados disponibles para actualización (todos - para referencia)
+  allStatuses: { value: GuideStatus; label: string }[] = [
     { value: 'CREATED', label: 'Creada' },
     { value: 'IN_ROUTE', label: 'En ruta' },
     { value: 'IN_WAREHOUSE', label: 'En bodega' },
     { value: 'OUT_FOR_DELIVERY', label: 'En reparto' },
     { value: 'DELIVERED', label: 'Entregada' }
   ];
+
+  /**
+   * Obtiene los estados disponibles para cambiar según el estado actual de la guía
+   * La secretaria solo puede cambiar a IN_WAREHOUSE cuando la guía está en IN_ROUTE
+   */
+  getAvailableStatusesForGuide(currentStatus: GuideStatus): { value: GuideStatus; label: string }[] {
+    // La secretaria solo puede cambiar a IN_WAREHOUSE si la guía está EN RUTA
+    if (currentStatus === 'IN_ROUTE') {
+      return [{ value: 'IN_WAREHOUSE', label: 'En bodega' }];
+    }
+    // Para otros estados, la secretaria no puede cambiar (controlado por entregador o admin)
+    return [];
+  }
+
+  /**
+   * Verifica si la guía puede ser actualizada por la secretaria
+   */
+  canUpdateStatus(currentStatus: GuideStatus): boolean {
+    return this.getAvailableStatusesForGuide(currentStatus).length > 0;
+  }
 
   /**
    * Maneja el cambio de estado

@@ -54,15 +54,26 @@
     
     <!-- Actions -->
     <div class="guide-actions">
-      <select 
-        class="status-select" 
-        [value]="guide.current_status"
-        (change)="onStatusChange(guide.guide_id, $event)">
-        <option value="">Cambiar estado</option>
-        <option *ngFor="let status of availableStatuses" [value]="status.value">
-          {{ status.label }}
-        </option>
-      </select>
+      <!-- Select de estado solo si hay estados disponibles para cambiar -->
+      <ng-container *ngIf="canUpdateStatus(guide.current_status); else statusInfo">
+        <select
+          class="status-select"
+          [value]="guide.current_status"
+          (change)="onStatusChange(guide.guide_id, $event)">
+          <option value="">Cambiar estado</option>
+          <option *ngFor="let status of getAvailableStatusesForGuide(guide.current_status)" [value]="status.value">
+            {{ status.label }}
+          </option>
+        </select>
+      </ng-container>
+      <ng-template #statusInfo>
+        <span class="status-info-badge">
+          {{ guide.current_status === 'CREATED' ? 'Pendiente de recogida' :
+             guide.current_status === 'IN_WAREHOUSE' ? 'En bodega - Pendiente de asignar' :
+             guide.current_status === 'OUT_FOR_DELIVERY' ? 'En reparto' :
+             guide.current_status === 'DELIVERED' ? 'Entregada' : 'Estado controlado' }}
+        </span>
+      </ng-template>
       <button class="btn btn-outline" (click)="onViewDetails(guide.guide_id)">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>

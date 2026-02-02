@@ -313,6 +313,23 @@
       flex-direction: column;
     }
   }
+
+  .status-change-info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-top: $spacing-md;
+    padding: $spacing-sm $spacing-md;
+    background: rgba($info-color, 0.1);
+    border-radius: $radius-sm;
+    font-size: $font-xs;
+    color: $info-dark;
+
+    app-icon {
+      color: $info-color;
+      flex-shrink: 0;
+    }
+  }
 }
 
 // ===== FORMS =====
@@ -405,6 +422,23 @@
       &:last-child {
         margin-bottom: 0;
       }
+    }
+  }
+
+  .info-status-update {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+    padding-top: $spacing-md;
+    border-top: 1px solid rgba($info-color, 0.3);
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $info-dark;
+
+    app-icon {
+      color: $info-color;
+      flex-shrink: 0;
     }
   }
 }
