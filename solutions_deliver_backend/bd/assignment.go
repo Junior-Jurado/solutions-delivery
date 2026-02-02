@@ -416,7 +416,7 @@ func GetAssignmentsByFilters(filters models.AssignmentFilters) ([]models.Deliver
 		return assignments, 0, err
 	}
 
-	// Consulta principal
+	// Consulta principal - incluye datos de sender y receiver
 	query := fmt.Sprintf(`
 		SELECT
 			da.assignment_id,
@@ -434,13 +434,22 @@ func GetAssignmentsByFilters(filters models.AssignmentFilters) ([]models.Deliver
 			sg.service_type,
 			sg.current_status,
 			oc.name AS origin_city_name,
-			dc.name AS destination_city_name
+			dc.name AS destination_city_name,
+			sender.full_name AS sender_name,
+			sender.address AS sender_address,
+			sender.phone AS sender_phone,
+			receiver.full_name AS receiver_name,
+			receiver.address AS receiver_address,
+			receiver.phone AS receiver_phone,
+			sg.created_at AS guide_created_at
 		FROM delivery_assignments da
 		LEFT JOIN users du ON da.delivery_user_id = du.user_uuid
 		LEFT JOIN users abu ON da.assigned_by = abu.user_uuid
 		LEFT JOIN shipping_guides sg ON da.guide_id = sg.guide_id
 		LEFT JOIN cities oc ON sg.origin_city_id = oc.id
 		LEFT JOIN cities dc ON sg.destination_city_id = dc.id
+		LEFT JOIN guide_parties sender ON sg.guide_id = sender.guide_id AND sender.party_role = 'SENDER'
+		LEFT JOIN guide_parties receiver ON sg.guide_id = receiver.guide_id AND receiver.party_role = 'RECEIVER'
 		%s
 		ORDER BY da.assigned_at DESC
 		LIMIT ? OFFSET ?
@@ -459,6 +468,9 @@ func GetAssignmentsByFilters(filters models.AssignmentFilters) ([]models.Deliver
 		var guideInfo models.GuideInfo
 		var completedAt sql.NullTime
 		var deliveryUserName, assignedByName, notes sql.NullString
+		var senderName, senderAddr, senderPhone sql.NullString
+		var receiverName, receiverAddr, receiverPhone sql.NullString
+		var guideCreatedAt sql.NullTime
 
 		err := rows.Scan(
 			&a.AssignmentID,
@@ -477,6 +489,13 @@ func GetAssignmentsByFilters(filters models.AssignmentFilters) ([]models.Deliver
 			&guideInfo.CurrentStatus,
 			&guideInfo.OriginCityName,
 			&guideInfo.DestinationCityName,
+			&senderName,
+			&senderAddr,
+			&senderPhone,
+			&receiverName,
+			&receiverAddr,
+			&receiverPhone,
+			&guideCreatedAt,
 		)
 		if err != nil {
 			return assignments, 0, err
@@ -493,6 +512,33 @@ func GetAssignmentsByFilters(filters models.AssignmentFilters) ([]models.Deliver
 		}
 		if completedAt.Valid {
 			a.CompletedAt = &completedAt.Time
+		}
+
+		// Asignar datos del sender
+		if senderName.Valid {
+			guideInfo.SenderName = senderName.String
+		}
+		if senderAddr.Valid {
+			guideInfo.SenderAddress = senderAddr.String
+		}
+		if senderPhone.Valid {
+			guideInfo.SenderPhone = senderPhone.String
+		}
+
+		// Asignar datos del receiver
+		if receiverName.Valid {
+			guideInfo.ReceiverName = receiverName.String
+		}
+		if receiverAddr.Valid {
+			guideInfo.ReceiverAddress = receiverAddr.String
+		}
+		if receiverPhone.Valid {
+			guideInfo.ReceiverPhone = receiverPhone.String
+		}
+
+		// Asignar fecha de creación
+		if guideCreatedAt.Valid {
+			guideInfo.CreatedAt = guideCreatedAt.Time.Format("2006-01-02T15:04:05Z07:00")
 		}
 
 		guideInfo.GuideID = a.GuideID
