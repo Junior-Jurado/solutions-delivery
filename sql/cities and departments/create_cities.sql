@@ -14,7 +14,7 @@ CREATE TABLE cities (
 INSERT INTO cities (dane_code, name, department_id)
 SELECT c.dane_code, c.name, d.id
 FROM (
-  SELECT '5001000', 'MEDELLÍN'
+  SELECT '5001000' AS dane_code, 'MEDELLÍN' AS name
   UNION ALL SELECT '5002000', 'ABEJORRAL'
   UNION ALL SELECT '5004000', 'ABRIAQUÍ'
   UNION ALL SELECT '5021000', 'ALEJANDRÍA'
@@ -77,7 +77,7 @@ JOIN departments d
 INSERT INTO cities (dane_code, name, department_id)
 SELECT c.dane_code, c.name, d.id
 FROM (
-  SELECT '91001000', 'LETICIA'
+  SELECT '91001000' AS dane_code, 'LETICIA' AS name
   UNION ALL SELECT '91263000', 'EL ENCANTO'
   UNION ALL SELECT '91405000', 'LA CHORRERA'
   UNION ALL SELECT '91407000', 'LA PEDRERA'

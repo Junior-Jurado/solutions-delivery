@@ -110,7 +110,7 @@ type PendingGuide struct {
 // CreateAssignmentRequest peticion de creación de una asignación
 type CreateAssignmentRequest struct {
 	GuideID        int64          `json:"guide_id"`
-	DeliveryUserID string         `json:delivery_user_id`
+	DeliveryUserID string         `json:"delivery_user_id"`
 	AssignmentType AssignmentType `json:"assignment_type"`
 	Notes          string         `json:"notes,omitempty"`
 }

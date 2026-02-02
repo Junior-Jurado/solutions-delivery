@@ -1,7 +1,3 @@
--- =====================================================
--- TABLA: delivery_assignments
--- Gestiona las asignaciones de entregadores a guías
--- =====================================================
 
 CREATE TABLE delivery_assignments (
   assignment_id BIGINT AUTO_INCREMENT,

@@ -22,10 +22,6 @@ resource "aws_iam_role_policy_attachment" "lambda_create_guides" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-data "aws_secretsmanager_secret" "db" {
-  name = var.secret_name
-}
-
 resource "aws_iam_policy" "lambda_secrets" {
   name = "${var.name_prefix}-lambda-secrets-${var.environment}"
 
@@ -38,8 +34,7 @@ resource "aws_iam_policy" "lambda_secrets" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "${data.aws_secretsmanager_secret.db.arn}*"
-        # Resource = "${var.db_secret_arn}*"
+        Resource = "${var.db_secret_arn}*"
       }
     ]
   })
