@@ -11,6 +11,18 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
+// Zona horaria de Colombia (UTC-5)
+var clientsColombiaLoc *time.Location
+
+func init() {
+	var err error
+	clientsColombiaLoc, err = time.LoadLocation("America/Bogota")
+	if err != nil {
+		// Fallback: crear zona horaria fija UTC-5
+		clientsColombiaLoc = time.FixedZone("COT", -5*60*60)
+	}
+}
+
 // ==========================================
 // PROFILE
 // ==========================================
@@ -102,18 +114,20 @@ func GetClientGuideHistory(request events.APIGatewayV2HTTPRequest, userUUID stri
 			filters.Status = &status
 		}
 
-		// Filtro por fecha desde
+		// Filtro por fecha desde (con zona horaria de Colombia)
 		if dateFromStr := request.QueryStringParameters["date_from"]; dateFromStr != "" {
-			dateFrom, err := time.Parse("2006-01-02", dateFromStr)
+			dateFrom, err := time.ParseInLocation("2006-01-02", dateFromStr, clientsColombiaLoc)
 			if err == nil {
 				filters.DateFrom = &dateFrom
 			}
 		}
 
-		// Filtro por fecha hasta
+		// Filtro por fecha hasta (con zona horaria de Colombia)
 		if dateToStr := request.QueryStringParameters["date_to"]; dateToStr != "" {
-			dateTo, err := time.Parse("2006-01-02", dateToStr)
+			dateTo, err := time.ParseInLocation("2006-01-02", dateToStr, clientsColombiaLoc)
 			if err == nil {
+				// Agregar 23:59:59 para incluir todo el día
+				dateTo = dateTo.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
 				filters.DateTo = &dateTo
 			}
 		}

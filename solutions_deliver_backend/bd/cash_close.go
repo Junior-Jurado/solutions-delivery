@@ -9,6 +9,18 @@ import (
 	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/models"
 )
 
+// Zona horaria de Colombia (UTC-5)
+var colombiaLoc *time.Location
+
+func init() {
+	var err error
+	colombiaLoc, err = time.LoadLocation("America/Bogota")
+	if err != nil {
+		// Fallback: crear zona horaria fija UTC-5
+		colombiaLoc = time.FixedZone("COT", -5*60*60)
+	}
+}
+
 // CreateCashClose creates a new cash close
 func CreateCashClose(close *models.CashClose) (int64, error) {
 	fmt.Println("CreateCashClose")
@@ -344,17 +356,18 @@ func GetCashCloseStats() (models.CashCloseStatsResponse, error) {
 	}
 	defer Db.Close()
 
-	now := time.Now()
+	// Usar zona horaria de Colombia
+	now := time.Now().In(colombiaLoc)
 	today := now.Format("2006-01-02")
-	monthStart := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, time.UTC).Format("2006-01-02")
-	yearStart := time.Date(now.Year(), 1, 1, 0, 0, 0, 0, time.UTC).Format("2006-01-02")
+	monthStart := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, colombiaLoc).Format("2006-01-02")
+	yearStart := time.Date(now.Year(), 1, 1, 0, 0, 0, 0, colombiaLoc).Format("2006-01-02")
 
 	// Week calculation
 	weekday := int(now.Weekday())
 	if weekday == 0 { // domingo
 		weekday = 7
 	}
-	weekStart := time.Date(now.Year(), now.Month(), now.Day()-weekday+1, 0, 0, 0, 0, time.UTC).Format("2006-01-02")
+	weekStart := time.Date(now.Year(), now.Month(), now.Day()-weekday+1, 0, 0, 0, 0, colombiaLoc).Format("2006-01-02")
 
 	// ===================================
 	// SUMAR DESDE LAS GUÍAS, NO LOS CIERRES

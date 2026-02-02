@@ -11,6 +11,18 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
+// Zona horaria de Colombia (UTC-5)
+var guideColombiaLoc *time.Location
+
+func init() {
+	var err error
+	guideColombiaLoc, err = time.LoadLocation("America/Bogota")
+	if err != nil {
+		// Fallback: crear zona horaria fija UTC-5
+		guideColombiaLoc = time.FixedZone("COT", -5*60*60)
+	}
+}
+
 // GetGuides obtiene la lista de guías con filtros
 func GetGuides(request events.APIGatewayV2HTTPRequest, userUUID string) (int, string) {
 	fmt.Println("GetGuides")
@@ -49,18 +61,20 @@ func GetGuides(request events.APIGatewayV2HTTPRequest, userUUID string) (int, st
 			filters.SearchTerm = searchTerm
 		}
 
-		// Filtro por fecha desde
+		// Filtro por fecha desde (con zona horaria de Colombia)
 		if dateFromStr := request.QueryStringParameters["date_from"]; dateFromStr != "" {
-			dateFrom, err := time.Parse("2006-01-02", dateFromStr)
+			dateFrom, err := time.ParseInLocation("2006-01-02", dateFromStr, guideColombiaLoc)
 			if err == nil {
 				filters.DateFrom = &dateFrom
 			}
 		}
 
-		// Filtro por fecha hasta
+		// Filtro por fecha hasta (con zona horaria de Colombia)
 		if dateToStr := request.QueryStringParameters["date_to"]; dateToStr != "" {
-			dateTo, err := time.Parse("2006-01-02", dateToStr)
+			dateTo, err := time.ParseInLocation("2006-01-02", dateToStr, guideColombiaLoc)
 			if err == nil {
+				// Agregar 23:59:59 para incluir todo el día
+				dateTo = dateTo.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
 				filters.DateTo = &dateTo
 			}
 		}

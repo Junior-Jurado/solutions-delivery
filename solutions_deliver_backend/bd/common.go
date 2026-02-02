@@ -31,8 +31,16 @@ func DbConnect() error {
 		fmt.Println(err.Error())
 		return err
 	}
+
+	// Establecer zona horaria de Colombia para la sesión MySQL
+	_, err = Db.Exec("SET time_zone = '-05:00'")
+	if err != nil {
+		fmt.Println("Advertencia: No se pudo establecer timezone de sesión:", err.Error())
+		// No retornamos error, continuamos con la conexión
+	}
+
 	fmt.Println("Conexión exitosa de la BD")
-	return err
+	return nil
 }
 
 func ConnStr(claves models.SecretRDSJson) string {

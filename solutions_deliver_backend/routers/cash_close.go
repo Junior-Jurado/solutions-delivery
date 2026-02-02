@@ -12,6 +12,18 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
+// Zona horaria de Colombia (UTC-5)
+var colombiaLoc *time.Location
+
+func init() {
+	var err error
+	colombiaLoc, err = time.LoadLocation("America/Bogota")
+	if err != nil {
+		// Fallback: crear zona horaria fija UTC-5
+		colombiaLoc = time.FixedZone("COT", -5*60*60)
+	}
+}
+
 // GenerateCashClose generates a cash close
 func GenerateCashClose(body string, userUUID string) (int, string) {
 	fmt.Println("GenerateCashClose")
@@ -34,7 +46,7 @@ func GenerateCashClose(body string, userUUID string) (int, string) {
 		if request.Year == 0 || request.Month == 0 || request.Day == 0 {
 			return 400, `{"error": "For DAILY, year, month and day are required"}`
 		}
-		startDate = time.Date(request.Year, time.Month(request.Month), request.Day, 0, 0, 0, 0, time.UTC)
+		startDate = time.Date(request.Year, time.Month(request.Month), request.Day, 0, 0, 0, 0, colombiaLoc)
 		endDate = startDate.AddDate(0, 0, 1).Add(-time.Second)
 
 	case "WEEKLY":
@@ -49,14 +61,14 @@ func GenerateCashClose(body string, userUUID string) (int, string) {
 		if request.Year == 0 || request.Month == 0 {
 			return 400, `{"error": "For MONTHLY, year and month are required"}`
 		}
-		startDate = time.Date(request.Year, time.Month(request.Month), 1, 0, 0, 0, 0, time.UTC)
+		startDate = time.Date(request.Year, time.Month(request.Month), 1, 0, 0, 0, 0, colombiaLoc)
 		endDate = startDate.AddDate(0, 1, 0).Add(-time.Second)
 
 	case "YEARLY":
 		if request.Year == 0 {
 			return 400, `{"error": "For YEARLY, year is required"}`
 		}
-		startDate = time.Date(request.Year, 1, 1, 0, 0, 0, 0, time.UTC)
+		startDate = time.Date(request.Year, 1, 1, 0, 0, 0, 0, colombiaLoc)
 		endDate = startDate.AddDate(1, 0, 0).Add(-time.Second)
 	}
 
@@ -150,8 +162,8 @@ func GenerateCashClose(body string, userUUID string) (int, string) {
 // getStartOfWeek calcula el inicio de una semana específica del año
 // Semana 1 = Primera semana con al menos 4 días en el año (ISO 8601)
 func getStartOfWeek(year, week int) time.Time {
-	// Primer día del año
-	jan1 := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
+	// Primer día del año (usando zona horaria de Colombia)
+	jan1 := time.Date(year, 1, 1, 0, 0, 0, 0, colombiaLoc)
 
 	// Calcular el lunes de la primera semana
 	// Si el 1 de enero es lunes a jueves, está en la semana 1
