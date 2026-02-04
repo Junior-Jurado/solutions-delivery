@@ -278,14 +278,24 @@ export class DeliveryService {
     // ==========================================
 
     /**
-     * Obtiene las estadísticas de rendimiento (calculadas desde las asignaciones)
+     * Obtiene las estadísticas de rendimiento del repartidor
      */
     async getPerformanceStats(): Promise<PerformanceStats> {
+        const headers = this.getHeaders();
+
         try {
+            const response = await firstValueFrom(
+                this.http.get<PerformanceStats>(
+                    `${this.BASE_URL}/my/performance`,
+                    { headers }
+                )
+            );
+            return response;
+        } catch (error) {
+            console.error('Error al obtener estadísticas de rendimiento:', error);
+            // Fallback a datos calculados si el endpoint falla
             const myAssignments = await this.getMyAssignments();
             const stats = myAssignments.stats;
-
-            // Calcular estadísticas de rendimiento basadas en los datos disponibles
             const totalCompleted = stats.completed_this_week;
             const totalPending = stats.pending_pickups + stats.pending_deliveries;
             const totalInProgress = stats.in_progress_pickups + stats.in_progress_deliveries;
@@ -294,14 +304,11 @@ export class DeliveryService {
             return {
                 deliveries_this_week: stats.completed_this_week,
                 success_rate: total > 0 ? Math.round((totalCompleted / total) * 100) : 100,
-                avg_time_minutes: 0, // No disponible en el backend actual
-                avg_rating: 0, // No disponible en el backend actual
-                daily_performance: [], // No disponible en el backend actual
-                recent_reviews: [] // No disponible en el backend actual
+                avg_time_minutes: 0,
+                avg_rating: 0,
+                daily_performance: [],
+                recent_reviews: []
             };
-        } catch (error) {
-            console.error('Error al obtener estadísticas de rendimiento:', error);
-            throw error;
         }
     }
 

@@ -15,19 +15,19 @@
 
     <div class="stat-card">
       <div class="stat-label">Tasa de Éxito</div>
-      <div class="stat-value success">{{ performanceStats.success_rate }}%</div>
+      <div class="stat-value success">{{ performanceStats.success_rate | number:'1.0-2' }}%</div>
       <div class="stat-detail success">Entregas exitosas</div>
     </div>
 
     <div class="stat-card">
       <div class="stat-label">Tiempo Promedio</div>
-      <div class="stat-value warning">{{ performanceStats.avg_time_minutes }}min</div>
+      <div class="stat-value warning">{{ performanceStats.avg_time_minutes | number:'1.0-0' }}min</div>
       <div class="stat-detail success">-5min vs semana anterior</div>
     </div>
 
     <div class="stat-card">
       <div class="stat-label">Calificación Promedio</div>
-      <div class="stat-value rating">{{ performanceStats.avg_rating }}⭐</div>
+      <div class="stat-value rating">{{ performanceStats.avg_rating | number:'1.0-2' }}⭐</div>
       <div class="stat-detail success">+0.2 vs mes anterior</div>
     </div>
   </div>
@@ -67,11 +67,11 @@
         <div class="reviews-list">
           <div *ngFor="let review of performanceStats.recent_reviews" class="review-item">
             <div class="review-header">
-              <div class="review-stars">
-                <span *ngFor="let filled of getStarArray(review.rating)" class="star" [class.filled]="filled">
-                  ⭐
-                </span>
-              </div>
+              <app-star-rating
+                [rating]="review.rating"
+                [readonly]="true"
+                size="small">
+              </app-star-rating>
               <div class="review-date">{{ review.date }}</div>
             </div>
             <div class="review-comment">"{{ review.comment }}"</div>

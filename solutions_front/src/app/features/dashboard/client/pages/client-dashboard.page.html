@@ -9,6 +9,20 @@
     (logout)="logout()">
   </app-dashboard-header>
 
+  <!-- Rating Banner -->
+  <div class="rating-banner" *ngIf="pendingRatings.length > 0">
+    <div class="rating-banner-content">
+      <app-icon category="common" name="star" size="24px"></app-icon>
+      <div class="rating-banner-text">
+        <strong>Tienes {{ pendingRatings.length }} entrega{{ pendingRatings.length > 1 ? 's' : '' }} pendiente{{ pendingRatings.length > 1 ? 's' : '' }} de calificar</strong>
+        <span>Tu opinión nos ayuda a mejorar</span>
+      </div>
+      <button class="rating-banner-btn" (click)="openRatingModal(pendingRatings[0])">
+        Calificar ahora
+      </button>
+    </div>
+  </div>
+
   <!-- Main Content -->
   <main class="dashboard-main">
     <div class="dashboard-container">
@@ -139,6 +153,18 @@
     (closeModal)="closeDetailsModal()"
     (downloadPDFEvent)="downloadGuidePDF($event)">
   </app-guide-details-modal>
+
+  <!-- Rating Modal -->
+  <app-rating-modal
+    [isOpen]="showRatingModal"
+    [deliveryUserName]="selectedRating?.delivery_user_name || ''"
+    [guideId]="selectedRating?.guide_id || 0"
+    [assignmentId]="selectedRating?.assignment_id || 0"
+    [serviceType]="selectedRating?.service_type || ''"
+    [isSubmitting]="isSubmittingRating"
+    (closeModal)="closeRatingModal()"
+    (submitRating)="submitRating($event)">
+  </app-rating-modal>
 
   <!-- Footer Component -->
   <app-dashboard-footer></app-dashboard-footer>

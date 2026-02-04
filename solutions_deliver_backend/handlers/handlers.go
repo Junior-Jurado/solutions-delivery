@@ -252,6 +252,14 @@ func ProccessClient(body string, path string, method string, user string, id str
 	case path == "/client/stats" && method == "GET":
 		return routers.GetClientStats(user)
 
+	// GET /client/ratings/pending - Obtener entregas pendientes de calificar
+	case path == "/client/ratings/pending" && method == "GET":
+		return routers.GetClientPendingRatings(user)
+
+	// POST /client/ratings - Crear calificación (alternativa)
+	case path == "/client/ratings" && method == "POST":
+		return routers.CreateDeliveryRating(body, user)
+
 	default:
 		return 400, "Method Invalid"
 	}
@@ -389,6 +397,10 @@ func ProccessAssignments(body string, path string, method string, user string, r
 	case path == "/assignments/my" && method == "GET":
 		return routers.GetMyAssignments(user)
 
+	// GET /assignments/my/performance - Estadísticas de rendimiento (DELIVERY)
+	case path == "/assignments/my/performance" && method == "GET":
+		return routers.GetMyPerformanceStats(user)
+
 	// GET /assignments/delivery-users - Listar repartidores
 	case path == "/assignments/delivery-users" && method == "GET":
 		return routers.GetDeliveryUsers()
@@ -417,6 +429,18 @@ func ProccessAssignments(body string, path string, method string, user string, r
 	case strings.Contains(path, "/history") && method == "GET":
 		return routers.GetAssignmentHistory(user, path)
 
+	// POST /assignments/{id}/rate - Crear calificación (CLIENT)
+	case strings.Contains(path, "/rate") && method == "POST":
+		return routers.CreateDeliveryRating(body, user)
+
+	// GET /assignments/{id}/rating - Obtener calificación
+	case strings.Contains(path, "/rating") && method == "GET":
+		assignmentID := extractAssignmentIDFromPath(path, "/rating")
+		if assignmentID == 0 {
+			return 400, `{"error": "ID de asignación inválido"}`
+		}
+		return routers.GetAssignmentRating(user, assignmentID)
+
 	// GET /assignments/{id} - obtener asignación (debe ser la última ruta con prefijo)
 	case strings.HasPrefix(path, "/assignments/") && method == "GET":
 		return routers.GetAssignmentByID(user, path)
@@ -425,4 +449,15 @@ func ProccessAssignments(body string, path string, method string, user string, r
 		return 404, `{"error": "Ruta no encontrada"}`
 	}
 
+}
+
+// extractAssignmentIDFromPath extrae el ID de asignación del path
+func extractAssignmentIDFromPath(path string, suffix string) int64 {
+	path = strings.TrimPrefix(path, "/assignments/")
+	path = strings.TrimSuffix(path, suffix)
+	id, err := strconv.ParseInt(path, 10, 64)
+	if err != nil {
+		return 0
+	}
+	return id
 }

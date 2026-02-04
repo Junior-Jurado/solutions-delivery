@@ -1,0 +1,15 @@
+<div class="star-rating" [class.readonly]="readonly" [class]="size">
+  <span
+    *ngFor="let star of stars"
+    [class]="getStarClass(star)"
+    (click)="onStarClick(star)"
+    (mouseenter)="onStarHover(star)"
+    (mouseleave)="onStarLeave()">
+    <app-icon
+      category="common"
+      [name]="isStarFilled(star) ? 'star-filled' : 'star'"
+      [size]="getIconSize()"
+      [preserveColors]="false">
+    </app-icon>
+  </span>
+</div>

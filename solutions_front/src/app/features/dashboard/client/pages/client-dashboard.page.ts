@@ -8,6 +8,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 import { ClientService, ClientProfile } from '@core/services/client.service';
 import { GuideService, ShippingGuide, CreateGuideRequest } from '@core/services/guide.service';
+import { RatingService, PendingRating } from '@core/services/rating.service';
 import { ToastService } from '@shared/services/toast.service';
 import { TranslationService } from '@shared/services/translation.service';
 import { DeviceDetectionService } from '@shared/services/device-detection.service';
@@ -23,6 +24,7 @@ import { HistoryComponent } from '../components/history/history.component';
 import { QuoteComponent, QuoteData } from '../components/quote/quote.component';
 import { DashboardHeaderComponent } from '@shared/components/dashboard-header/dashboard-header.component';
 import { DashboardFooterComponent } from '../components/dashboard-footer/dashboard-footer.component';
+import { RatingModalComponent, RatingSubmitData } from '@shared/components/rating-modal/rating-modal.component';
 
 interface GuidePreview {
   senderName: string;
@@ -61,7 +63,8 @@ interface GuidePreview {
     QuoteComponent,
     DashboardHeaderComponent,
     DashboardFooterComponent,
-    GuidePreviewModalComponent
+    GuidePreviewModalComponent,
+    RatingModalComponent
   ]
 })
 export class ClientDashboardPage implements OnInit, OnDestroy {
@@ -113,10 +116,17 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   // Device detection
   isMobile: boolean = false;
 
+  // Rating
+  pendingRatings: PendingRating[] = [];
+  showRatingModal: boolean = false;
+  selectedRating: PendingRating | null = null;
+  isSubmittingRating: boolean = false;
+
   constructor(
     private authService: AuthService,
     private clientService: ClientService,
     private guideService: GuideService,
+    private ratingService: RatingService,
     private toastService: ToastService,
     public translationService: TranslationService,
     private deviceService: DeviceDetectionService,
@@ -128,6 +138,7 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
     this.detectDevice();
     await this.loadUserProfile();
     await this.loadMyGuides();
+    await this.loadPendingRatings();
   }
 
   ngOnDestroy(): void {
@@ -512,6 +523,74 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
 
   formatPrice(price: number): string {
     return this.translationService.formatCurrency(price);
+  }
+
+  // ==========================================
+  // RATINGS
+  // ==========================================
+
+  /**
+   * Carga las entregas pendientes de calificar
+   */
+  private async loadPendingRatings(): Promise<void> {
+    try {
+      const response = await this.ratingService.getPendingRatings();
+      this.pendingRatings = response.pending_ratings || [];
+      this.cdr.detectChanges();
+    } catch (error) {
+      console.error('Error loading pending ratings:', error);
+    }
+  }
+
+  /**
+   * Abre el modal de calificación
+   */
+  openRatingModal(pending: PendingRating): void {
+    this.selectedRating = pending;
+    this.showRatingModal = true;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Cierra el modal de calificación
+   */
+  closeRatingModal(): void {
+    this.showRatingModal = false;
+    this.selectedRating = null;
+    this.cdr.detectChanges();
+  }
+
+  /**
+   * Envía la calificación
+   */
+  async submitRating(data: RatingSubmitData): Promise<void> {
+    this.isSubmittingRating = true;
+    this.cdr.detectChanges();
+
+    try {
+      await this.ratingService.createRating({
+        assignment_id: data.assignmentId,
+        guide_id: data.guideId,
+        rating: data.rating,
+        comment: data.comment
+      });
+
+      this.toastService.success('¡Gracias por tu calificación!');
+      this.closeRatingModal();
+
+      // Remover de la lista de pendientes
+      this.pendingRatings = this.pendingRatings.filter(
+        p => p.assignment_id !== data.assignmentId
+      );
+      this.cdr.detectChanges();
+
+    } catch (error: any) {
+      console.error('Error submitting rating:', error);
+      this.toastService.error(error.message || 'Error al enviar la calificación');
+    } finally {
+      this.isSubmittingRating = false;
+      this.cdr.detectChanges();
+    }
   }
 
   // ==========================================

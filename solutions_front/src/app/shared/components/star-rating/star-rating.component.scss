@@ -1,0 +1,40 @@
+@use "colors" as *;
+@use "variables" as *;
+
+.star-rating {
+  display: inline-flex;
+  gap: 4px;
+
+  &:not(.readonly) {
+    .star {
+      cursor: pointer;
+      transition: transform 0.1s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  &.readonly {
+    .star {
+      cursor: default;
+    }
+  }
+}
+
+.star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #d1d5db; // Gray-300 - estrellas vacías
+  transition: color 0.2s ease, transform 0.1s ease;
+
+  &.filled {
+    color: #fbbf24; // Amber-400 - estrellas llenas
+  }
+
+  app-icon {
+    display: flex;
+  }
+}

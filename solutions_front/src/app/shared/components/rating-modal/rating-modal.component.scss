@@ -1,0 +1,219 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: $spacing-md;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-lg;
+  width: 100%;
+  max-width: 480px;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  border-bottom: 1px solid $border-color;
+
+  .modal-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: $font-xl;
+    font-weight: $font-bold;
+    color: $text-primary;
+    margin: 0;
+
+    app-icon {
+      color: #fbbf24;
+    }
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    padding: $spacing-xs;
+    cursor: pointer;
+    color: $text-secondary;
+    border-radius: $radius-base;
+    transition: all $transition-base;
+
+    &:hover {
+      background: $bg-secondary;
+      color: $text-primary;
+    }
+  }
+}
+
+.modal-body {
+  padding: $spacing-lg;
+}
+
+.delivery-info {
+  background: $bg-secondary;
+  border-radius: $radius-base;
+  padding: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: $spacing-xs;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .label {
+      color: $text-secondary;
+      font-size: $font-sm;
+    }
+
+    .value {
+      color: $text-primary;
+      font-weight: $font-medium;
+      font-size: $font-sm;
+    }
+  }
+}
+
+.rating-section {
+  text-align: center;
+  margin-bottom: $spacing-lg;
+
+  .rating-label {
+    color: $text-primary;
+    font-weight: $font-medium;
+    margin-bottom: $spacing-md;
+  }
+
+  app-star-rating {
+    display: inline-block;
+  }
+
+  .rating-hint {
+    margin-top: $spacing-sm;
+    color: #fbbf24;
+    font-weight: $font-medium;
+    font-size: $font-sm;
+  }
+}
+
+.comment-section {
+  label {
+    display: block;
+    color: $text-primary;
+    font-weight: $font-medium;
+    font-size: $font-sm;
+    margin-bottom: $spacing-sm;
+  }
+
+  textarea {
+    width: 100%;
+    padding: $spacing-md;
+    border: 1px solid $border-color;
+    border-radius: $radius-base;
+    font-size: $font-base;
+    font-family: inherit;
+    resize: vertical;
+    transition: all $transition-base;
+
+    &:focus {
+      outline: none;
+      border-color: $brand-blue;
+      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+    }
+
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  border-top: 1px solid $border-color;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  border: none;
+  border-radius: $radius-base;
+  font-weight: $font-medium;
+  font-size: $font-base;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.btn-primary {
+    background: $brand-blue;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: darken($brand-blue, 10%);
+    }
+  }
+
+  &.btn-secondary {
+    background: $bg-secondary;
+    color: $text-primary;
+
+    &:hover:not(:disabled) {
+      background: darken($bg-secondary, 5%);
+    }
+  }
+}
+
+:host ::ng-deep .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

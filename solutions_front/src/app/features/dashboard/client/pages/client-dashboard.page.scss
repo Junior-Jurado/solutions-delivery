@@ -9,6 +9,65 @@
   background: linear-gradient(135deg, $gray-50 0%, $gray-200 100%);
 }
 
+// ===== RATING BANNER =====
+.rating-banner {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-bottom: 1px solid #f59e0b;
+
+  .rating-banner-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: $spacing-md $spacing-lg;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    @include respond-to($breakpoint-md) {
+      flex-direction: column;
+      text-align: center;
+      padding: $spacing-md;
+    }
+
+    app-icon {
+      color: #f59e0b;
+      flex-shrink: 0;
+    }
+
+    .rating-banner-text {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+
+      strong {
+        color: #92400e;
+        font-size: $font-base;
+      }
+
+      span {
+        color: #a16207;
+        font-size: $font-sm;
+      }
+    }
+
+    .rating-banner-btn {
+      background: #f59e0b;
+      color: white;
+      border: none;
+      padding: $spacing-sm $spacing-lg;
+      border-radius: $radius-base;
+      font-weight: $font-medium;
+      cursor: pointer;
+      transition: all $transition-base;
+      white-space: nowrap;
+
+      &:hover {
+        background: #d97706;
+      }
+    }
+  }
+}
+
 // ===== MAIN CONTENT =====
 .dashboard-main {
   flex: 1;

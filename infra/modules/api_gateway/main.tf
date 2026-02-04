@@ -301,6 +301,26 @@ resource "aws_apigatewayv2_route" "get_guides_stats" {
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id 
 }
 
+// GET /client/ratings/pending
+resource "aws_apigatewayv2_route" "get_ratings_pending" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/client/ratings/pending"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// POST /client/ratings
+resource "aws_apigatewayv2_route" "post_ratings" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "POST /api/v1/client/ratings"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
 # -----------------------------------------
 # Frequent Parties
 
@@ -381,6 +401,16 @@ resource "aws_apigatewayv2_route" "assignments" {
 resource "aws_apigatewayv2_route" "assignments_my" {
   api_id = aws_apigatewayv2_api.api.id
   route_key = "GET /api/v1/assignments/my"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /assignments/my/performance
+resource "aws_apigatewayv2_route" "assignments_my_performance" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/assignments/my/performance"
 
   target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
   authorization_type = "JWT"

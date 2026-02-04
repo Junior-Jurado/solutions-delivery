@@ -1,0 +1,72 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal-content">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <app-icon category="common" name="star" size="24px"></app-icon>
+        Calificar Entrega
+      </h2>
+      <button class="close-btn" (click)="onClose()">
+        <app-icon category="common" name="x" size="24px"></app-icon>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      <div class="delivery-info">
+        <div class="info-row">
+          <span class="label">Guía:</span>
+          <span class="value">#{{ guideId }}</span>
+        </div>
+        <div class="info-row" *ngIf="deliveryUserName">
+          <span class="label">Repartidor:</span>
+          <span class="value">{{ deliveryUserName }}</span>
+        </div>
+        <div class="info-row" *ngIf="serviceType">
+          <span class="label">Servicio:</span>
+          <span class="value">{{ serviceType }}</span>
+        </div>
+      </div>
+
+      <div class="rating-section">
+        <p class="rating-label">¿Cómo calificarías esta entrega?</p>
+        <app-star-rating
+          [rating]="rating"
+          [readonly]="false"
+          size="large"
+          (ratingChange)="onRatingChange($event)">
+        </app-star-rating>
+        <p class="rating-hint" *ngIf="rating > 0">
+          {{ rating === 5 ? 'Excelente' : rating === 4 ? 'Muy bueno' : rating === 3 ? 'Bueno' : rating === 2 ? 'Regular' : 'Malo' }}
+        </p>
+      </div>
+
+      <div class="comment-section">
+        <label for="comment">Comentario (opcional)</label>
+        <textarea
+          id="comment"
+          [(ngModel)]="comment"
+          placeholder="Cuéntanos tu experiencia con esta entrega..."
+          rows="3">
+        </textarea>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="onClose()" [disabled]="isSubmitting">
+        Cancelar
+      </button>
+      <button class="btn btn-primary" (click)="onSubmit()" [disabled]="!canSubmit">
+        <app-icon
+          *ngIf="isSubmitting"
+          category="common"
+          name="loader"
+          size="16px"
+          customClass="spinner">
+        </app-icon>
+        {{ isSubmitting ? 'Enviando...' : 'Enviar Calificación' }}
+      </button>
+    </div>
+  </div>
+</div>
