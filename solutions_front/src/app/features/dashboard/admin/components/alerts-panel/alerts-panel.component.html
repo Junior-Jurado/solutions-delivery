@@ -1,0 +1,15 @@
+<div class="alerts-container">
+  <div *ngIf="alerts.length === 0" class="no-alerts">
+    <p>No hay alertas activas</p>
+  </div>
+
+  <div *ngFor="let alert of alerts" class="alert-item" [ngClass]="getAlertClass(alert.type)">
+    <div class="alert-content">
+      <div class="alert-title">{{ alert.title }}</div>
+      <div class="alert-description">{{ alert.description }}</div>
+    </div>
+    <button class="alert-button" (click)="onAction(alert.id)">
+      {{ getActionLabel(alert.type) }}
+    </button>
+  </div>
+</div>

@@ -42,16 +42,13 @@ export const DASHBOARD_ROUTES: Routes = [
                 loadComponent: () =>
                     import('../delivery/pages/delivery-dashboard.page').then(m => m.DeliveryDashboardPage)
             },
-
-            // {
-            //     path: 'admin',
-            //     loadComponent: () =>
-            //         import('./admin/admin-dashboard.component').then(m => m.AdminDashboardComponent)
-            // },
-
-            
-
-            
+            {
+                path: 'admin',
+                canActivate: [RoleGuard],
+                data: { roles: ['ADMIN'] },
+                loadChildren: () =>
+                    import('../admin/admin.routes').then(m => m.ADMIN_ROUTES)
+            },
         ]
     }
 ]

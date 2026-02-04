@@ -1,0 +1,21 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-item" *ngFor="let i of [1, 2, 3, 4]">
+    <div class="loading-shimmer"></div>
+  </div>
+</div>
+
+<!-- Worker List -->
+<div *ngIf="!isLoading" class="worker-list">
+  <div *ngFor="let worker of workers" class="worker-item">
+    <div class="worker-info">
+      <div class="worker-name">{{ worker.name }}</div>
+      <div class="worker-deliveries">{{ worker.deliveries }} entregas</div>
+    </div>
+    <div class="worker-badge">
+      <span class="badge" [ngClass]="getBadgeClass(worker.efficiency)">
+        {{ worker.efficiency }}% eficiencia
+      </span>
+    </div>
+  </div>
+</div>

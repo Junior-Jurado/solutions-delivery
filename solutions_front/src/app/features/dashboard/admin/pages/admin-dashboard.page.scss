@@ -1,0 +1,221 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+// ===============================
+// DASHBOARD CONTAINER
+// ===============================
+.dashboard-container {
+  min-height: 100vh;
+  background-color: $bg-secondary;
+}
+
+// ===============================
+// ADMIN PANEL
+// ===============================
+.admin-panel {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: $spacing-xl $spacing-lg;
+
+  @include respond-to($breakpoint-md) {
+    padding: $spacing-lg $spacing-md;
+  }
+
+  @include respond-to($breakpoint-xs) {
+    padding: $spacing-md;
+  }
+}
+
+// ===============================
+// TABS NAVIGATION
+// ===============================
+.tabs-navigation {
+  display: flex;
+  gap: $spacing-sm;
+  border-bottom: 2px solid $border-color;
+  margin-bottom: $spacing-xl;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $gray-50;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $gray-300;
+    border-radius: 2px;
+  }
+
+  @include respond-to($breakpoint-md) {
+    gap: 0.25rem;
+    margin-bottom: $spacing-lg;
+  }
+
+  .tab-button {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-lg;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    cursor: pointer;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $text-muted;
+    transition: all $transition-base;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    @include respond-to($breakpoint-md) {
+      padding: 0.625rem $spacing-md;
+      font-size: $font-sm;
+    }
+
+    @include respond-to($breakpoint-xs) {
+      padding: $spacing-sm;
+      gap: $spacing-xs;
+
+      span {
+        font-size: $font-xs;
+      }
+    }
+
+    &:hover {
+      color: $brand-blue;
+      background: $bg-light;
+    }
+
+    &.active {
+      color: $brand-blue;
+      border-bottom-color: $brand-blue;
+    }
+  }
+}
+
+// ===============================
+// TAB CONTENT
+// ===============================
+.tab-content {
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ===============================
+// GRID LAYOUTS
+// ===============================
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  @include respond-to($breakpoint-lg) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.two-column-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-lg;
+
+  @include respond-to($breakpoint-lg) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ===============================
+// CARD STYLES
+// ===============================
+.card {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  box-shadow: $shadow-sm;
+
+  &.mb-6 {
+    margin-bottom: $spacing-lg;
+  }
+
+  .card-header {
+    padding: $spacing-lg;
+    border-bottom: 1px solid $border-color;
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-md;
+    }
+
+    @include respond-to($breakpoint-xs) {
+      padding: $spacing-md;
+    }
+
+    .card-title {
+      font-size: $font-xl;
+      font-weight: $font-semibold;
+      color: $text-primary;
+      margin: 0 0 $spacing-sm 0;
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+
+      @include respond-to($breakpoint-md) {
+        font-size: $font-lg;
+      }
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-base;
+      }
+
+      &.alert-title {
+        color: $warning-color;
+      }
+    }
+
+    .card-description {
+      font-size: $font-sm;
+      color: $text-muted;
+      margin: 0;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: $font-xs;
+      }
+    }
+  }
+
+  .card-content {
+    padding: $spacing-lg;
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-md;
+    }
+
+    @include respond-to($breakpoint-xs) {
+      padding: $spacing-md;
+    }
+  }
+}
+
+// ===============================
+// UTILITY CLASSES
+// ===============================
+.mb-6 {
+  margin-bottom: $spacing-lg;
+}

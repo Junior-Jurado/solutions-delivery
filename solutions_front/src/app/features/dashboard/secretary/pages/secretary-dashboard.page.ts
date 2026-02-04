@@ -11,12 +11,6 @@ import {
     GuideStatsResponse
 } from "@core/services/guide.service";
 import { LocationService, City } from "@core/services/location.service";
-import { 
-    CashClose, 
-    CashCloseRequest, 
-    CashCloseService, 
-    CashCloseStatsResponse
-} from "@core/services/cash-close.service";
 import { ToastService } from "@shared/services/toast.service";
 import { TranslationService } from "@shared/services/translation.service";
 
@@ -27,11 +21,8 @@ import { GuideListComponent } from "../components/guide-list/guide-list.componen
 import { GuideFiltersComponent, GuideFilterValues } from "../components/guide-filters/guide-filters.component";
 import { StatsCardsComponent } from "../components/stats-cards/stats-cards.component";
 import { GuideDetailsModalComponent } from "@shared/components/guide-details-modal.component";
-import { CashCloseFormComponent, CashCloseFormData } from "../components/cash-close-form/cash-close-form.component";
-import { CashCloseListComponent } from "../components/cash-close-list/cash-close-list.component";
 import { GuideSearchComponent } from "../components/guide-search/guide-search.component";
 import { StatusDistributionComponent } from "../components/status-distribution/status-distribution.component";
-import { CashCloseStatsComponent } from "../components/cash-close-stats/cash-close-stats.component";
 import { AssignmentPanelComponent } from "../components/assignment-panel/assignment-panel.component";
 import { IconComponent } from "@shared/components/icon/icon.component";
 import { DashboardHeaderComponent } from "@shared/components/dashboard-header/dashboard-header.component";
@@ -70,9 +61,6 @@ interface GuidePreview {
         StatsCardsComponent,
         StatusDistributionComponent,
         GuideDetailsModalComponent,
-        CashCloseFormComponent,
-        CashCloseListComponent,
-        CashCloseStatsComponent,
         AssignmentPanelComponent,
         IconComponent,
         GuidePreviewModalComponent,
@@ -146,25 +134,12 @@ export class SecretaryDashboardPage implements OnInit {
     isDetailsModalOpen: boolean = false;
 
     // ==========================================
-    // CASH CLOSE
-    // ==========================================
-    isGeneratingClose: boolean = false;
-    cashCloses: CashClose[] = [];
-    isLoadingCloses: boolean = false;
-    totalCloses: number = 0;
-    currentClosePage: number = 0;
-    closePageSize: number = 10;
-    cashCloseStats: CashCloseStatsResponse | null = null;
-    isLoadingCloseStats: boolean = false;
-
-    // ==========================================
     // CONSTRUCTOR
     // ==========================================
     constructor(
         private router: Router,
         private guideService: GuideService,
         private locationService: LocationService,
-        private cashCloseService: CashCloseService,
         private translationService: TranslationService,
         private toast: ToastService,
         private cdr: ChangeDetectorRef
@@ -243,9 +218,6 @@ export class SecretaryDashboardPage implements OnInit {
             this.loadGuides();
         } else if (tab === 'reports') {
             this.loadStats();
-        } else if (tab === 'cash-close') {
-            this.loadCashCloses();
-            this.loadCashCloseStats();
         }
     }
 
@@ -536,119 +508,11 @@ export class SecretaryDashboardPage implements OnInit {
         }
     }
 
-    async downloadClosePDF(closeId: number): Promise<void> {
-        try {
-            await this.cashCloseService.downloadCashClosePDF(closeId);
-        } catch (error) {
-            console.error('Error al descargar PDF:', error);
-            this.toast.error('Error al descargar el PDF del cierre');
-        }
-    }
-
     // ==========================================
     // HELPERS
     // ==========================================
     formatPrice(price: number): string {
         return this.translationService.formatCurrency(price);
-    }
-
-    // ==========================================
-    // CASH CLOSE
-    // ==========================================
-    async handleCashCloseGenerate(formData: CashCloseFormData): Promise<void> {
-        const request: CashCloseRequest = {
-            period_type: formData.periodType,
-            year: formData.year
-        };
-
-        if (formData.month) request.month = formData.month;
-        if (formData.day) request.day = formData.day;
-        if (formData.week) request.week = formData.week;
-
-        this.isGeneratingClose = true;
-
-        try {
-            const response = await this.cashCloseService.generateCashClose(request);
-
-            this.toast.success(
-                `¡Cierre de caja generado exitosamente!\n\n` +
-                `Total: $${response.close.total_amount.toLocaleString()}\n` +
-                `Guías: ${response.close.total_guides}`
-            );
-
-            if (response.close.pdf_url) {
-                await this.cashCloseService.downloadCashClosePDF(response.close.close_id);
-            }
-
-            await this.loadCashCloses();
-            await this.loadCashCloseStats();
-
-        } catch (error: any) {
-            console.error('Error al generar cierre:', error);
-            this.toast.error(error.message || 'Error al generar el cierre de caja');
-        } finally {
-            this.isGeneratingClose = false;
-            this.cdr.detectChanges();
-        }
-    }
-
-    async loadCashCloses(): Promise<void> {
-        this.isLoadingCloses = true;
-        this.cdr.detectChanges();
-
-        try {
-            const response = await this.cashCloseService.listCashCloses(
-                this.closePageSize,
-                this.currentClosePage * this.closePageSize
-            );
-
-            // Manejar caso cuando response.closes es null o undefined
-            this.cashCloses = response.closes || [];
-            this.totalCloses = response.total || 0;
-
-            if (this.cashCloses.length === 0) {
-                console.log('No hay cierres de caja registrados');
-            } else {
-                console.log('Cierres de caja cargados:', this.cashCloses.length);
-            }
-        } catch (error) {
-            console.error('Error al cargar cierres:', error);
-            this.cashCloses = [];
-            this.totalCloses = 0;
-            this.toast.error('Error al cargar los cierres de caja');
-        } finally {
-            this.isLoadingCloses = false;
-            this.cdr.detectChanges();
-        }
-    }
-
-    async loadCashCloseStats(): Promise<void> {
-        this.isLoadingCloseStats = true;
-        this.cdr.detectChanges();
-
-        try {
-            this.cashCloseStats = await this.cashCloseService.getCashCloseStats();
-            console.log('Estadísticas de cierres cargadas:', this.cashCloseStats);
-        } catch (error) {
-            console.error('Error al cargar estadísticas de cierres:', error);
-            this.toast.error('Error al cargar las estadísticas');
-        } finally {
-            this.isLoadingCloseStats = false;
-            this.cdr.detectChanges();
-        }
-    }
-
-    handleClosePageChange(direction: 'prev' | 'next'): void {
-        if (direction === 'prev' && this.currentClosePage > 0) {
-            this.currentClosePage--;
-            this.loadCashCloses();
-        } else if (direction === 'next') {
-            const totalPages = Math.ceil(this.totalCloses / this.closePageSize);
-            if (this.currentClosePage < totalPages - 1) {
-                this.currentClosePage++;
-                this.loadCashCloses();
-            }
-        }
     }
 
     // ==========================================

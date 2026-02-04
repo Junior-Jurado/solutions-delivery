@@ -1,0 +1,282 @@
+<div class="dashboard-container">
+  <!-- ========================================
+       HEADER
+       ======================================== -->
+  <app-dashboard-header
+    userRole="Administrador"
+    userDescription="Panel de administración"
+    [userName]="userName"
+    [showUserName]="true"
+    (logout)="handleLogout()">
+  </app-dashboard-header>
+
+  <!-- ========================================
+       MAIN PANEL
+       ======================================== -->
+  <div class="admin-panel">
+    <!-- Tabs Navigation -->
+    <nav class="tabs-navigation">
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'stats'"
+        (click)="setActiveTab('stats')">
+        <app-icon category="common" name="bar-chart" size="20px"></app-icon>
+        <span>Dashboard</span>
+      </button>
+
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'employees'"
+        (click)="setActiveTab('employees')">
+        <app-icon category="common" name="users" size="20px"></app-icon>
+        <span>Empleados</span>
+      </button>
+
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'deliveries'"
+        (click)="setActiveTab('deliveries')">
+        <app-icon category="common" name="package" size="20px"></app-icon>
+        <span>Entregas</span>
+      </button>
+
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'routes'"
+        (click)="setActiveTab('routes')">
+        <app-icon category="common" name="truck" size="20px"></app-icon>
+        <span>Rutas</span>
+      </button>
+
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'cash-close'"
+        (click)="setActiveTab('cash-close')">
+        <app-icon category="common" name="credit-card" size="20px"></app-icon>
+        <span>Cierre de Caja</span>
+      </button>
+    </nav>
+
+    <!-- ========================================
+         TAB 1: STATS (Dashboard)
+         ======================================== -->
+    <div class="tab-content" *ngIf="activeTab === 'stats'">
+      <!-- KPI Stats Cards -->
+      <app-admin-stats-cards
+        [isLoading]="isLoadingStats"
+        [shipmentsToday]="stats.shipmentsToday"
+        [shipmentsChange]="calculatePercentageChange(stats.shipmentsToday, stats.shipmentsYesterday)"
+        [delivered]="stats.delivered"
+        [deliverySuccessRate]="stats.deliverySuccessRate"
+        [pending]="stats.pending"
+        [pendingInRoute]="stats.pendingInRoute"
+        [pendingInOffice]="stats.pendingInOffice"
+        [revenueToday]="stats.revenueToday"
+        [revenueChange]="calculatePercentageChange(stats.revenueToday, stats.revenueYesterday)">
+      </app-admin-stats-cards>
+
+      <!-- Performance Charts Row -->
+      <div class="charts-grid">
+        <!-- Worker Performance -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Rendimiento por Entregador</h2>
+            <p class="card-description">Entregas completadas hoy</p>
+          </div>
+          <div class="card-content">
+            <app-worker-performance
+              [workers]="workers"
+              [isLoading]="isLoadingStats">
+            </app-worker-performance>
+          </div>
+        </div>
+
+        <!-- Status Distribution -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Estados de Envíos</h2>
+            <p class="card-description">Distribución actual</p>
+          </div>
+          <div class="card-content">
+            <app-admin-status-distribution
+              [statusData]="statusDistribution"
+              [isLoading]="isLoadingStats">
+            </app-admin-status-distribution>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alerts Panel -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title alert-title">
+            <app-icon category="common" name="alert-triangle" size="20px" color="#ca8a04"></app-icon>
+            Alertas del Sistema
+          </h2>
+        </div>
+        <div class="card-content">
+          <app-alerts-panel
+            [alerts]="alerts"
+            (alertAction)="handleAlertAction($event)">
+          </app-alerts-panel>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================
+         TAB 2: EMPLOYEES
+         ======================================== -->
+    <div class="tab-content" *ngIf="activeTab === 'employees'">
+      <div class="two-column-grid">
+        <!-- Employee Form -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <app-icon category="common" name="plus" size="20px" color="#3b82f6"></app-icon>
+              Crear Empleado
+            </h2>
+            <p class="card-description">Agregar nuevo personal al sistema</p>
+          </div>
+          <div class="card-content">
+            <app-employee-form
+              (formSubmit)="handleEmployeeCreate($event)">
+            </app-employee-form>
+          </div>
+        </div>
+
+        <!-- Employee List -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Lista de Empleados</h2>
+            <p class="card-description">Personal activo en el sistema</p>
+          </div>
+          <div class="card-content">
+            <app-employee-list
+              [employees]="employees"
+              [isLoading]="isLoadingEmployees"
+              (editEmployee)="handleEmployeeEdit($event)">
+            </app-employee-list>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================
+         TAB 3: DELIVERIES
+         ======================================== -->
+    <div class="tab-content" *ngIf="activeTab === 'deliveries'">
+      <!-- Delivery Overview Stats -->
+      <app-delivery-overview
+        [deliveriesToday]="stats.shipmentsToday"
+        [completed]="stats.delivered"
+        [pending]="stats.pending"
+        [averageTime]="2.4"
+        [satisfaction]="98.5">
+      </app-delivery-overview>
+
+      <!-- Realtime Deliveries -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Entregas en Tiempo Real</h2>
+          <p class="card-description">Estado actual de todas las entregas</p>
+        </div>
+        <div class="card-content">
+          <app-realtime-deliveries
+            [deliveries]="deliveries"
+            [isLoading]="isLoadingDeliveries">
+          </app-realtime-deliveries>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================
+         TAB 4: ROUTES
+         ======================================== -->
+    <div class="tab-content" *ngIf="activeTab === 'routes'">
+      <div class="two-column-grid">
+        <!-- Route Assignment Form -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Asignar Ruta</h2>
+            <p class="card-description">Asignar entregas a entregadores</p>
+          </div>
+          <div class="card-content">
+            <app-route-assignment-form
+              [deliveryPersons]="deliveryPersons"
+              [availablePackages]="availablePackages"
+              (assignRoute)="handleRouteAssignment($event)">
+            </app-route-assignment-form>
+          </div>
+        </div>
+
+        <!-- Active Routes -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Rutas Activas</h2>
+            <p class="card-description">Entregadores en servicio</p>
+          </div>
+          <div class="card-content">
+            <app-active-routes
+              [routes]="activeRoutes"
+              [isLoading]="isLoadingRoutes">
+            </app-active-routes>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================
+         TAB 5: CASH CLOSE
+         ======================================== -->
+    <div class="tab-content" *ngIf="activeTab === 'cash-close'">
+      <!-- Cash Close Stats -->
+      <app-cash-close-stats
+        [stats]="cashCloseStats"
+        [isLoading]="isLoadingCloseStats">
+      </app-cash-close-stats>
+
+      <!-- Cash Close Form Card -->
+      <div class="card mb-6">
+        <div class="card-header">
+          <h2 class="card-title">
+            <app-icon category="common" name="credit-card" size="20px" color="#3b82f6"></app-icon>
+            Generar Nuevo Cierre de Caja
+          </h2>
+          <p class="card-description">Selecciona el tipo de período y las fechas para generar un cierre</p>
+        </div>
+        <div class="card-content">
+          <app-cash-close-form
+            [isGenerating]="isGeneratingClose"
+            (generateClose)="handleCashCloseGenerate($event)">
+          </app-cash-close-form>
+        </div>
+      </div>
+
+      <!-- Cash Close List Card -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Historial de Cierres de Caja</h2>
+          <p class="card-description">
+            <ng-container *ngIf="cashCloses && cashCloses.length > 0; else noCierres">
+              Mostrando {{ cashCloses.length }} de {{ totalCloses }} cierres
+            </ng-container>
+            <ng-template #noCierres>
+              No hay cierres de caja registrados
+            </ng-template>
+          </p>
+        </div>
+        <div class="card-content">
+          <app-cash-close-list
+            [closes]="cashCloses"
+            [isLoading]="isLoadingCloses"
+            [totalCloses]="totalCloses"
+            [currentPage]="currentClosePage"
+            [pageSize]="closePageSize"
+            (downloadPDF)="downloadClosePDF($event)"
+            (pageChange)="handleClosePageChange($event)">
+          </app-cash-close-list>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

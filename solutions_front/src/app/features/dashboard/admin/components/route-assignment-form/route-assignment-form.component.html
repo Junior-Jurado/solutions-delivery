@@ -1,0 +1,57 @@
+<form class="route-form" (ngSubmit)="onSubmit()">
+  <!-- Delivery Person Select -->
+  <div class="form-group">
+    <label for="deliveryPerson">Entregador</label>
+    <select
+      id="deliveryPerson"
+      [(ngModel)]="selectedDeliveryPerson"
+      name="deliveryPerson">
+      <option value="" disabled>Seleccionar entregador</option>
+      <option *ngFor="let person of deliveryPersons" [value]="person.id">
+        {{ person.name }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Available Packages -->
+  <div class="form-group">
+    <label>Paquetes a asignar ({{ availablePackages.length }} disponibles)</label>
+    <div class="packages-list">
+      <div
+        *ngFor="let pkg of availablePackages"
+        class="package-item"
+        (click)="togglePackage(pkg)">
+        <input
+          type="checkbox"
+          [id]="'package-' + pkg.id"
+          [checked]="pkg.selected"
+          (change)="togglePackage(pkg)">
+        <label [for]="'package-' + pkg.id">
+          {{ pkg.id }} - {{ pkg.address }}
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Priority Select -->
+  <div class="form-group">
+    <label for="priority">Prioridad</label>
+    <select
+      id="priority"
+      [(ngModel)]="selectedPriority"
+      name="priority">
+      <option value="" disabled>Seleccionar prioridad</option>
+      <option *ngFor="let priority of priorities" [value]="priority.value">
+        {{ priority.label }}
+      </option>
+    </select>
+  </div>
+
+  <!-- Submit Button -->
+  <button
+    type="submit"
+    class="submit-button"
+    [disabled]="!selectedDeliveryPerson">
+    Asignar Ruta
+  </button>
+</form>

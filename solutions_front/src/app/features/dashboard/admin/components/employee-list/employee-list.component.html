@@ -1,0 +1,24 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-item" *ngFor="let i of [1, 2, 3, 4]">
+    <div class="loading-shimmer"></div>
+  </div>
+</div>
+
+<!-- Employee List -->
+<div *ngIf="!isLoading" class="employee-list">
+  <div *ngFor="let employee of employees" class="employee-item">
+    <div class="employee-info">
+      <div class="employee-name">{{ employee.name }}</div>
+      <div class="employee-role">{{ employee.role }}</div>
+    </div>
+    <div class="employee-actions">
+      <span class="badge" [ngClass]="getStatusClass(employee.status)">
+        {{ employee.status }}
+      </span>
+      <button class="edit-button" (click)="onEdit(employee.id)">
+        Editar
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,75 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+
+  @include respond-to($breakpoint-lg) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-to($breakpoint-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.overview-card {
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+
+  .card-header {
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $border-color;
+
+    h3 {
+      font-size: $font-lg;
+      font-weight: $font-semibold;
+      color: $text-primary;
+      margin: 0;
+    }
+  }
+
+  .card-content {
+    padding: $spacing-lg;
+
+    .big-number {
+      font-size: 2rem;
+      font-weight: $font-bold;
+      margin-bottom: $spacing-sm;
+
+      @include respond-to($breakpoint-xs) {
+        font-size: 1.75rem;
+      }
+    }
+
+    .sub-text {
+      font-size: $font-sm;
+      color: $text-muted;
+    }
+  }
+
+  &.primary {
+    .card-content .big-number {
+      color: $brand-blue;
+    }
+  }
+
+  &.warning {
+    .card-content .big-number {
+      color: $brand-red;
+    }
+  }
+
+  &.success {
+    .card-content .big-number {
+      color: $success-color;
+    }
+  }
+}

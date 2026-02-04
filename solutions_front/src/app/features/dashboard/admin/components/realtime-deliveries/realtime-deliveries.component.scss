@@ -1,0 +1,133 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.deliveries-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.delivery-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  transition: all $transition-base;
+
+  @include respond-to($breakpoint-md) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  &:hover {
+    background-color: $bg-light;
+  }
+
+  .delivery-info {
+    .delivery-id {
+      font-weight: $font-medium;
+      color: $text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    .delivery-customer {
+      font-size: $font-sm;
+      color: $text-muted;
+      margin-bottom: $spacing-xs;
+    }
+
+    .delivery-address {
+      font-size: $font-sm;
+      color: $text-muted;
+    }
+  }
+
+  .delivery-status {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    @include respond-to($breakpoint-md) {
+      text-align: left;
+      width: 100%;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: $spacing-xs $spacing-sm;
+      font-size: $font-xs;
+      font-weight: $font-medium;
+      border-radius: $radius-full;
+
+      &.badge-success {
+        background-color: $success-light;
+        color: $success-color;
+      }
+
+      &.badge-secondary {
+        background-color: $gray-100;
+        color: $gray-600;
+      }
+
+      &.badge-error {
+        background-color: $error-light;
+        color: $error-color;
+      }
+    }
+
+    .delivery-person {
+      font-size: $font-sm;
+      color: $text-muted;
+    }
+
+    .delivery-time {
+      font-size: $font-xs;
+      color: $text-muted;
+    }
+  }
+}
+
+// Loading State
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  .loading-item {
+    height: 100px;
+    background: $bg-primary;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    position: relative;
+    overflow: hidden;
+
+    .loading-shimmer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba($brand-blue, 0.05) 50%,
+        transparent 100%
+      );
+      animation: shimmer 1.5s infinite;
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}

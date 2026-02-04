@@ -1,0 +1,20 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-item" *ngFor="let i of [1, 2, 3, 4]">
+    <div class="loading-shimmer"></div>
+  </div>
+</div>
+
+<!-- Status Distribution -->
+<div *ngIf="!isLoading" class="status-list">
+  <div *ngFor="let item of statusData" class="status-item">
+    <div class="status-info">
+      <div class="status-dot" [ngClass]="getColorClass(item.color)"></div>
+      <span class="status-name">{{ item.status }}</span>
+    </div>
+    <div class="status-values">
+      <div class="status-count">{{ item.count }}</div>
+      <div class="status-percentage">{{ item.percentage }}%</div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.employee-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+
+  @include respond-to($breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $text-primary;
+  }
+
+  input,
+  select {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-base;
+    color: $text-primary;
+    background-color: $white;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    transition: all $transition-base;
+
+    &::placeholder {
+      color: $text-disabled;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $brand-blue;
+      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+    }
+
+    &.invalid {
+      border-color: $error-color;
+
+      &:focus {
+        box-shadow: 0 0 0 3px rgba($error-color, 0.1);
+      }
+    }
+  }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $spacing-sm center;
+    background-size: 16px;
+    padding-right: $spacing-xl;
+  }
+
+  .error-message {
+    font-size: $font-xs;
+    color: $error-color;
+  }
+}
+
+.submit-button {
+  width: 100%;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-base;
+  font-weight: $font-medium;
+  color: $white;
+  background-color: $brand-blue;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  margin-top: $spacing-sm;
+
+  &:hover:not(:disabled) {
+    background-color: $brand-blue-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

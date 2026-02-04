@@ -1,0 +1,24 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-item" *ngFor="let i of [1, 2, 3]">
+    <div class="loading-shimmer"></div>
+  </div>
+</div>
+
+<!-- Deliveries List -->
+<div *ngIf="!isLoading" class="deliveries-list">
+  <div *ngFor="let delivery of deliveries" class="delivery-item">
+    <div class="delivery-info">
+      <div class="delivery-id">{{ delivery.id }}</div>
+      <div class="delivery-customer">{{ delivery.customer }}</div>
+      <div class="delivery-address">{{ delivery.address }}</div>
+    </div>
+    <div class="delivery-status">
+      <span class="badge" [ngClass]="getStatusClass(delivery.status)">
+        {{ delivery.status }}
+      </span>
+      <div class="delivery-person">{{ delivery.deliveryPerson }}</div>
+      <div class="delivery-time">{{ delivery.time }}</div>
+    </div>
+  </div>
+</div>

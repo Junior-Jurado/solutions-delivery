@@ -1,0 +1,103 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.route-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  label {
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $text-primary;
+  }
+
+  select {
+    padding: $spacing-sm $spacing-md;
+    font-size: $font-base;
+    color: $text-primary;
+    background-color: $white;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    transition: all $transition-base;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $spacing-sm center;
+    background-size: 16px;
+    padding-right: $spacing-xl;
+
+    &:focus {
+      outline: none;
+      border-color: $brand-blue;
+      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+    }
+  }
+}
+
+.packages-list {
+  max-height: 160px;
+  overflow-y: auto;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  padding: $spacing-sm;
+
+  .package-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-xs;
+    cursor: pointer;
+    border-radius: $radius-sm;
+    transition: background-color $transition-base;
+
+    &:hover {
+      background-color: $bg-light;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: $brand-blue;
+    }
+
+    label {
+      font-size: $font-sm;
+      color: $text-primary;
+      cursor: pointer;
+      flex: 1;
+    }
+  }
+}
+
+.submit-button {
+  width: 100%;
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-base;
+  font-weight: $font-medium;
+  color: $white;
+  background-color: $brand-blue;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-base;
+  margin-top: $spacing-sm;
+
+  &:hover:not(:disabled) {
+    background-color: $brand-blue-dark;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}

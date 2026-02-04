@@ -1,0 +1,34 @@
+<div class="overview-grid">
+  <!-- Deliveries Today -->
+  <div class="overview-card primary">
+    <div class="card-header">
+      <h3>Entregas de Hoy</h3>
+    </div>
+    <div class="card-content">
+      <div class="big-number">{{ deliveriesToday }}</div>
+      <div class="sub-text">{{ completed }} completadas, {{ pending }} pendientes</div>
+    </div>
+  </div>
+
+  <!-- Average Time -->
+  <div class="overview-card warning">
+    <div class="card-header">
+      <h3>Tiempo Promedio</h3>
+    </div>
+    <div class="card-content">
+      <div class="big-number">{{ averageTime }}h</div>
+      <div class="sub-text">Por entrega completada</div>
+    </div>
+  </div>
+
+  <!-- Satisfaction -->
+  <div class="overview-card success">
+    <div class="card-header">
+      <h3>Satisfacción</h3>
+    </div>
+    <div class="card-content">
+      <div class="big-number">{{ satisfaction }}%</div>
+      <div class="sub-text">Cliente satisfecho</div>
+    </div>
+  </div>
+</div>

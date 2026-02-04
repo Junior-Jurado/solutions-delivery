@@ -1,0 +1,30 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-container">
+  <div class="loading-item" *ngFor="let i of [1, 2, 3]">
+    <div class="loading-shimmer"></div>
+  </div>
+</div>
+
+<!-- Routes List -->
+<div *ngIf="!isLoading" class="routes-list">
+  <div *ngFor="let route of routes" class="route-item">
+    <div class="route-header">
+      <div class="route-name">{{ route.name }}</div>
+      <span class="badge" [ngClass]="getStatusClass(route.status)">
+        {{ route.status }}
+      </span>
+    </div>
+    <div class="route-details">
+      <div class="route-zone">Zona: {{ route.zone }}</div>
+      <div class="route-progress-text">
+        Progreso: {{ route.completed }}/{{ route.packages }} paquetes
+      </div>
+      <div class="progress-bar">
+        <div
+          class="progress-fill"
+          [style.width.%]="getProgressPercentage(route.completed, route.packages)">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
