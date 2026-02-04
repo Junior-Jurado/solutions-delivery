@@ -1,0 +1,179 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.card {
+  background: white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+
+  .card-header {
+    padding: $spacing-xl;
+    border-bottom: 1px solid $border-color;
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-lg;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: $font-xl;
+      font-weight: $font-bold;
+      color: $text-primary;
+      margin: 0 0 $spacing-xs 0;
+    }
+
+    .card-description {
+      color: $text-secondary;
+      font-size: $font-sm;
+      margin: 0;
+    }
+  }
+
+  .card-content {
+    padding: $spacing-xl;
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-lg;
+    }
+  }
+}
+
+.issue-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  label {
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $text-primary;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: $spacing-md;
+    border: 1px solid $border-color;
+    border-radius: $radius-base;
+    font-size: $font-base;
+    transition: all $transition-base;
+
+    &:focus {
+      outline: none;
+      border-color: $brand-blue;
+      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+    }
+
+    &:disabled {
+      background: $bg-secondary;
+      cursor: not-allowed;
+    }
+  }
+
+  .form-textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+}
+
+.upload-area {
+  border: 2px dashed $border-color;
+  border-radius: $radius-base;
+  padding: $spacing-xl;
+  text-align: center;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $brand-blue;
+    background: rgba($brand-blue, 0.02);
+  }
+
+  app-icon {
+    color: $text-muted;
+    margin-bottom: $spacing-md;
+  }
+
+  p {
+    color: $text-secondary;
+    margin-bottom: $spacing-md;
+    font-size: $font-sm;
+  }
+}
+
+.photos-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+  margin-top: $spacing-md;
+
+  img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: $radius-base;
+    border: 1px solid $border-color;
+  }
+}
+
+// Buttons
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  border: none;
+  border-radius: $radius-base;
+  font-weight: $font-medium;
+  font-size: $font-base;
+  cursor: pointer;
+  transition: all $transition-base;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.btn-full {
+    width: 100%;
+  }
+
+  &.btn-danger {
+    background: $error-color;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: darken($error-color, 10%);
+    }
+  }
+
+  &.btn-outline {
+    background: transparent;
+    border: 1px solid $border-color;
+    color: $text-primary;
+
+    &:hover:not(:disabled) {
+      background: $bg-secondary;
+    }
+  }
+}
+
+:host ::ng-deep .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

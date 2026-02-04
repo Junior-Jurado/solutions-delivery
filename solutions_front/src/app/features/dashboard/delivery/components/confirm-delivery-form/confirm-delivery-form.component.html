@@ -1,0 +1,134 @@
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">
+      <app-icon category="common" name="check-circle" size="24px"></app-icon>
+      Completar Asignación
+    </h2>
+    <p class="card-description">
+      Marca como completada una recogida o entrega
+    </p>
+  </div>
+
+  <div class="card-content">
+    <form (ngSubmit)="onSubmit()" class="confirm-form">
+      <!-- Select Assignment -->
+      <div class="form-field">
+        <label for="guide-select">Seleccionar asignación a completar *</label>
+        <select
+          id="guide-select"
+          [ngModel]="selectedAssignmentId"
+          (ngModelChange)="onAssignmentChange($event)"
+          name="selectedAssignmentId"
+          class="form-select"
+          required>
+          <option [ngValue]="null">Seleccionar...</option>
+          <option *ngFor="let assignment of assignmentsInProgress" [ngValue]="assignment.assignment_id">
+            {{ getAssignmentTypeLabel(assignment.assignment_type) }} - Guía #{{ assignment.guide_id }} - {{ getContactName(assignment) }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Selected Assignment Info -->
+      <div class="info-banner" *ngIf="selectedAssignmentData">
+        <div class="info-title">Información de la asignación:</div>
+        <div class="info-details">
+          <div>Tipo: {{ getAssignmentTypeLabel(selectedAssignmentData.assignment_type) }}</div>
+          <div>Contacto: {{ getContactName(selectedAssignmentData) }}</div>
+          <div>Dirección: {{ getContactAddress(selectedAssignmentData) }}</div>
+          <div>Ruta: {{ selectedAssignmentData.guide?.origin_city_name }} → {{ selectedAssignmentData.guide?.destination_city_name }}</div>
+        </div>
+        <div class="info-status-update">
+          <app-icon category="common" name="info" size="16px"></app-icon>
+          <span *ngIf="selectedAssignmentData.assignment_type === 'PICKUP'">
+            Al completar, la guía pasará a estado "En ruta"
+          </span>
+          <span *ngIf="selectedAssignmentData.assignment_type === 'DELIVERY'">
+            Al completar, la guía pasará a estado "Entregada"
+          </span>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <!-- Left Column -->
+        <div class="form-column">
+          <!-- Delivery Notes -->
+          <div class="form-field">
+            <label for="delivery-notes">Notas de completado</label>
+            <textarea
+              id="delivery-notes"
+              [(ngModel)]="deliveryNotes"
+              name="deliveryNotes"
+              placeholder="Entregado/Recogido en perfectas condiciones..."
+              class="form-textarea"></textarea>
+          </div>
+
+          <!-- Package Condition -->
+          <div class="form-field">
+            <label for="package-condition">Estado del paquete</label>
+            <select
+              id="package-condition"
+              [(ngModel)]="packageCondition"
+              name="packageCondition"
+              class="form-select">
+              <option value="perfect">Perfecto estado</option>
+              <option value="minor-damage">Daño menor</option>
+              <option value="damaged">Dañado</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="form-column">
+          <!-- Delivery Photo -->
+          <div class="form-field">
+            <label>Imagen de evidencia (opcional)</label>
+            <div class="upload-area">
+              <app-icon category="common" name="camera" size="48px"></app-icon>
+              <p>Toma una foto como evidencia</p>
+              <div class="upload-buttons">
+                <button type="button" class="btn btn-outline" (click)="openCamera()">
+                  <app-icon category="common" name="camera" size="16px"></app-icon>
+                  Abrir Cámara
+                </button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  (change)="onDeliveryPhotoChange($event)"
+                  style="display: none;"
+                  #photoInput>
+                <button type="button" class="btn btn-ghost" (click)="photoInput.click()">
+                  <app-icon category="common" name="upload" size="16px"></app-icon>
+                  Subir desde Galería
+                </button>
+              </div>
+              <div *ngIf="deliveryPhotoBase64" class="upload-preview">
+                <img [src]="deliveryPhotoBase64" alt="Preview">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-large btn-full"
+        [disabled]="isConfirming || !selectedAssignmentId">
+        <app-icon
+          *ngIf="isConfirming"
+          category="common"
+          name="loader"
+          size="20px"
+          customClass="spinner">
+        </app-icon>
+        <app-icon
+          *ngIf="!isConfirming"
+          category="common"
+          name="check-circle"
+          size="20px">
+        </app-icon>
+        <span>{{ isConfirming ? 'Completando...' : 'Marcar como Completado' }}</span>
+      </button>
+    </form>
+  </div>
+</div>

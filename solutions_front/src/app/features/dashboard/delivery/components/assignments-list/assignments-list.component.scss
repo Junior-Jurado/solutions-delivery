@@ -1,0 +1,78 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+  color: $text-secondary;
+
+  p {
+    margin-top: $spacing-md;
+    font-size: $font-base;
+  }
+}
+
+.card {
+  background: white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  margin-bottom: $spacing-lg;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .card-header {
+    padding: $spacing-xl;
+    border-bottom: 1px solid $border-color;
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-lg;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: $font-xl;
+      font-weight: $font-bold;
+      color: $text-primary;
+      margin: 0 0 $spacing-xs 0;
+    }
+
+    .card-description {
+      color: $text-secondary;
+      font-size: $font-sm;
+      margin: 0;
+    }
+  }
+
+  .card-content {
+    padding: $spacing-xl;
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-lg;
+    }
+  }
+}
+
+.deliveries-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+:host ::ng-deep .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

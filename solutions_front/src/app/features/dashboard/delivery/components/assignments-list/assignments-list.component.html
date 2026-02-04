@@ -1,0 +1,61 @@
+<!-- Loading -->
+<div *ngIf="isLoading" class="loading-state">
+  <app-icon category="common" name="loader" size="48px" customClass="spinner"></app-icon>
+  <p>Cargando asignaciones...</p>
+</div>
+
+<!-- Pickups Section -->
+<div class="card" *ngIf="!isLoading">
+  <div class="card-header">
+    <h2 class="card-title">Paquetes por Recoger</h2>
+    <p class="card-description">Ir a recoger paquetes del remitente</p>
+  </div>
+
+  <div class="card-content">
+    <!-- Empty State -->
+    <div *ngIf="pendingPickups.length === 0" class="empty-state">
+      <app-icon category="common" name="package" size="64px"></app-icon>
+      <p>No hay paquetes por recoger</p>
+    </div>
+
+    <!-- Pickups -->
+    <div class="deliveries-list" *ngIf="pendingPickups.length > 0">
+      <app-assignment-card
+        *ngFor="let assignment of pendingPickups"
+        [assignment]="assignment"
+        (startRoute)="onStartRoute($event)"
+        (confirmDelivery)="onConfirmDelivery($event)"
+        (viewOnMap)="onViewOnMap($event)"
+        (callRecipient)="onCallRecipient($event)">
+      </app-assignment-card>
+    </div>
+  </div>
+</div>
+
+<!-- Deliveries Section -->
+<div class="card" *ngIf="!isLoading">
+  <div class="card-header">
+    <h2 class="card-title">Paquetes por Entregar</h2>
+    <p class="card-description">Paquetes para entregar al destinatario</p>
+  </div>
+
+  <div class="card-content">
+    <!-- Empty State -->
+    <div *ngIf="pendingDeliveries.length === 0" class="empty-state">
+      <app-icon category="common" name="package" size="64px"></app-icon>
+      <p>No hay paquetes por entregar</p>
+    </div>
+
+    <!-- Deliveries -->
+    <div class="deliveries-list" *ngIf="pendingDeliveries.length > 0">
+      <app-assignment-card
+        *ngFor="let assignment of pendingDeliveries"
+        [assignment]="assignment"
+        (startRoute)="onStartRoute($event)"
+        (confirmDelivery)="onConfirmDelivery($event)"
+        (viewOnMap)="onViewOnMap($event)"
+        (callRecipient)="onCallRecipient($event)">
+      </app-assignment-card>
+    </div>
+  </div>
+</div>

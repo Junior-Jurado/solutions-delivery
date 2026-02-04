@@ -1,0 +1,81 @@
+<div class="delivery-card">
+  <!-- Header -->
+  <div class="delivery-header">
+    <div class="delivery-info">
+      <div class="delivery-id">Guía #{{ assignment.guide_id }}</div>
+      <div class="delivery-time">
+        <app-icon category="common" name="clock" size="16px"></app-icon>
+        <span>{{ assignment.guide?.service_type || 'Estándar' }}</span>
+      </div>
+    </div>
+    <div class="delivery-badges">
+      <span class="badge" [ngClass]="isPickup ? 'badge-info' : 'badge-warning'">
+        {{ isPickup ? 'RECOGER' : 'ENTREGAR' }}
+      </span>
+      <span class="badge" [ngClass]="getStatusBadgeClass(assignment.status)">
+        {{ getStatusLabel(assignment.status) }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Details Grid -->
+  <div class="delivery-details">
+    <div class="detail-section">
+      <div class="detail-label">
+        <app-icon category="common" name="map-pin" size="16px"></app-icon>
+        {{ isPickup ? 'Remitente:' : 'Destinatario:' }}
+      </div>
+      <div class="detail-value">{{ getContactName() }}</div>
+      <div class="detail-value muted">{{ getContactAddress() }}</div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-label">
+        <app-icon category="common" name="phone" size="16px"></app-icon>
+        Contacto:
+      </div>
+      <div class="detail-value">{{ getContactPhone() || 'Sin teléfono' }}</div>
+      <div class="detail-value muted">{{ assignment.guide?.origin_city_name }} → {{ assignment.guide?.destination_city_name }}</div>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="delivery-instructions" *ngIf="assignment.notes">
+    <div class="instructions-label">Notas:</div>
+    <div class="instructions-text">{{ assignment.notes }}</div>
+  </div>
+
+  <!-- Actions -->
+  <div class="delivery-actions">
+    <button class="btn btn-outline" (click)="onViewOnMap()">
+      <app-icon category="common" name="navigation" size="16px"></app-icon>
+      <span>Ver Mapa</span>
+    </button>
+
+    <button class="btn btn-outline" (click)="onCallRecipient()" [disabled]="!getContactPhone()">
+      <app-icon category="common" name="phone" size="16px"></app-icon>
+      <span>Llamar</span>
+    </button>
+
+    <button
+      class="btn btn-action-main"
+      [ngClass]="isInProgress ? 'btn-primary' : 'btn-secondary'"
+      (click)="onMainAction()">
+      <app-icon category="common" [name]="isInProgress ? 'check-circle' : 'play'" size="16px"></app-icon>
+      <span class="btn-action-text">
+        <ng-container *ngIf="isPickup">
+          {{ isInProgress ? 'Completar Recogida' : 'Iniciar Recogida' }}
+        </ng-container>
+        <ng-container *ngIf="!isPickup">
+          {{ isInProgress ? 'Confirmar Entrega' : 'Iniciar Entrega' }}
+        </ng-container>
+      </span>
+    </button>
+  </div>
+
+  <!-- Info sobre cambio de estado -->
+  <div class="status-change-info" *ngIf="isPending">
+    <app-icon category="common" name="info" size="14px"></app-icon>
+    <span>Al iniciar, la guía pasará a estado "{{ isPickup ? 'En ruta' : 'En reparto' }}"</span>
+  </div>
+</div>

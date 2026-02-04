@@ -17,609 +17,110 @@
   <div class="delivery-panel">
     <!-- Tabs Navigation -->
     <nav class="tabs-navigation">
-    <button 
-      class="tab-button" 
-      [class.active]="activeTab === 'deliveries'"
-      (click)="setActiveTab('deliveries')">
-      <app-icon category="common" name="package" size="20px"></app-icon>
-      <span>Mis Entregas</span>
-    </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'deliveries'"
+        (click)="setActiveTab('deliveries')">
+        <app-icon category="common" name="package" size="20px"></app-icon>
+        <span>Mis Entregas</span>
+      </button>
 
-    <button 
-      class="tab-button" 
-      [class.active]="activeTab === 'confirm'"
-      (click)="setActiveTab('confirm')">
-      <app-icon category="common" name="check-circle" size="20px"></app-icon>
-      <span>Confirmar Entrega</span>
-    </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'confirm'"
+        (click)="setActiveTab('confirm')">
+        <app-icon category="common" name="check-circle" size="20px"></app-icon>
+        <span>Confirmar Entrega</span>
+      </button>
 
-    <button 
-      class="tab-button" 
-      [class.active]="activeTab === 'issues'"
-      (click)="setActiveTab('issues')">
-      <app-icon category="common" name="alert-triangle" size="20px"></app-icon>
-      <span>Reportar Problema</span>
-    </button>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'issues'"
+        (click)="setActiveTab('issues')">
+        <app-icon category="common" name="alert-triangle" size="20px"></app-icon>
+        <span>Reportar Problema</span>
+      </button>
 
-    <button 
-      class="tab-button" 
-      [class.active]="activeTab === 'performance'"
-      (click)="setActiveTab('performance')">
-      <app-icon category="common" name="star" size="20px"></app-icon>
-      <span>Mi Rendimiento</span>
-    </button>
-  </nav>
+      <button
+        class="tab-button"
+        [class.active]="activeTab === 'performance'"
+        (click)="setActiveTab('performance')">
+        <app-icon category="common" name="star" size="20px"></app-icon>
+        <span>Mi Rendimiento</span>
+      </button>
+    </nav>
 
-  <!-- ========================================
-       TAB 1: DELIVERIES
-       ======================================== -->
-  <div class="tab-content" *ngIf="activeTab === 'deliveries'">
-    <div class="content-wrapper">
-      <!-- Stats Cards -->
-      <div class="stats-grid" *ngIf="stats">
-        <div class="stat-card">
-          <div class="stat-label">Recoger Pendientes</div>
-          <div class="stat-value primary">{{ stats.pending_pickups }}</div>
-          <div class="stat-detail">{{ stats.in_progress_pickups }} en progreso</div>
-        </div>
+    <!-- ========================================
+         TAB 1: DELIVERIES
+         ======================================== -->
+    <div class="tab-content" *ngIf="activeTab === 'deliveries'">
+      <div class="content-wrapper">
+        <!-- Stats Cards -->
+        <app-delivery-stats
+          [stats]="stats"
+          [isLoading]="isLoadingDeliveries">
+        </app-delivery-stats>
 
-        <div class="stat-card">
-          <div class="stat-label">Entregar Pendientes</div>
-          <div class="stat-value warning">{{ stats.pending_deliveries }}</div>
-          <div class="stat-detail">{{ stats.in_progress_deliveries }} en progreso</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">Completadas Hoy</div>
-          <div class="stat-value success">{{ stats.completed_today }}</div>
-          <div class="stat-detail success">Asignaciones completadas</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">Esta Semana</div>
-          <div class="stat-value rating">{{ stats.completed_this_week }}</div>
-          <div class="stat-detail">Total completadas</div>
-        </div>
-      </div>
-
-      <!-- Loading -->
-      <div *ngIf="isLoadingDeliveries" class="loading-state">
-        <app-icon category="common" name="loader" size="48px" customClass="spinner"></app-icon>
-        <p>Cargando asignaciones...</p>
-      </div>
-
-      <!-- Pickups Section -->
-      <div class="card" *ngIf="!isLoadingDeliveries">
-        <div class="card-header">
-          <h2 class="card-title">Paquetes por Recoger</h2>
-          <p class="card-description">Ir a recoger paquetes del remitente</p>
-        </div>
-
-        <div class="card-content">
-          <!-- Empty State -->
-          <div *ngIf="pendingPickups.length === 0" class="empty-state">
-            <app-icon category="common" name="package" size="64px"></app-icon>
-            <p>No hay paquetes por recoger</p>
-          </div>
-
-          <!-- Pickups -->
-          <div class="deliveries-list" *ngIf="pendingPickups.length > 0">
-            <div *ngFor="let assignment of pendingPickups" class="delivery-card">
-              <!-- Header -->
-              <div class="delivery-header">
-                <div class="delivery-info">
-                  <div class="delivery-id">Guía #{{ assignment.guide_id }}</div>
-                  <div class="delivery-time">
-                    <app-icon category="common" name="clock" size="16px"></app-icon>
-                    <span>{{ assignment.guide?.service_type || 'Estándar' }}</span>
-                  </div>
-                </div>
-                <div class="delivery-badges">
-                  <span class="badge badge-info">RECOGER</span>
-                  <span class="badge" [ngClass]="getStatusBadgeClass(assignment.status)">
-                    {{ getStatusLabel(assignment.status) }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Details Grid -->
-              <div class="delivery-details">
-                <div class="detail-section">
-                  <div class="detail-label">
-                    <app-icon category="common" name="map-pin" size="16px"></app-icon>
-                    Remitente:
-                  </div>
-                  <div class="detail-value">{{ getContactName(assignment) }}</div>
-                  <div class="detail-value muted">{{ getContactAddress(assignment) }}</div>
-                </div>
-
-                <div class="detail-section">
-                  <div class="detail-label">
-                    <app-icon category="common" name="phone" size="16px"></app-icon>
-                    Contacto:
-                  </div>
-                  <div class="detail-value">{{ getContactPhone(assignment) || 'Sin teléfono' }}</div>
-                  <div class="detail-value muted">{{ assignment.guide?.origin_city_name }} → {{ assignment.guide?.destination_city_name }}</div>
-                </div>
-              </div>
-
-              <!-- Notes -->
-              <div class="delivery-instructions" *ngIf="assignment.notes">
-                <div class="instructions-label">Notas:</div>
-                <div class="instructions-text">{{ assignment.notes }}</div>
-              </div>
-
-              <!-- Actions -->
-              <div class="delivery-actions">
-                <button class="btn btn-outline" (click)="viewOnMap(assignment)">
-                  <app-icon category="common" name="navigation" size="16px"></app-icon>
-                  <span>Ver Mapa</span>
-                </button>
-
-                <button class="btn btn-outline" (click)="callRecipient(assignment)" [disabled]="!getContactPhone(assignment)">
-                  <app-icon category="common" name="phone" size="16px"></app-icon>
-                  <span>Llamar</span>
-                </button>
-
-                <button
-                  class="btn"
-                  [ngClass]="assignment.status === 'IN_PROGRESS' ? 'btn-primary' : 'btn-secondary'"
-                  (click)="assignment.status === 'IN_PROGRESS' ? goToConfirmTab(assignment) : startRoute(assignment)">
-                  <span>{{ assignment.status === 'IN_PROGRESS' ? 'Completar Recogida' : 'Iniciar Recogida' }}</span>
-                </button>
-              </div>
-              <!-- Info sobre cambio de estado -->
-              <div class="status-change-info" *ngIf="assignment.status === 'PENDING'">
-                <app-icon category="common" name="info" size="14px"></app-icon>
-                <span>Al iniciar, la guía pasará a estado "En ruta"</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Deliveries Section -->
-      <div class="card" *ngIf="!isLoadingDeliveries">
-        <div class="card-header">
-          <h2 class="card-title">Paquetes por Entregar</h2>
-          <p class="card-description">Paquetes para entregar al destinatario</p>
-        </div>
-
-        <div class="card-content">
-          <!-- Empty State -->
-          <div *ngIf="pendingDeliveries.length === 0" class="empty-state">
-            <app-icon category="common" name="package" size="64px"></app-icon>
-            <p>No hay paquetes por entregar</p>
-          </div>
-
-          <!-- Deliveries -->
-          <div class="deliveries-list" *ngIf="pendingDeliveries.length > 0">
-            <div *ngFor="let assignment of pendingDeliveries" class="delivery-card">
-              <!-- Header -->
-              <div class="delivery-header">
-                <div class="delivery-info">
-                  <div class="delivery-id">Guía #{{ assignment.guide_id }}</div>
-                  <div class="delivery-time">
-                    <app-icon category="common" name="clock" size="16px"></app-icon>
-                    <span>{{ assignment.guide?.service_type || 'Estándar' }}</span>
-                  </div>
-                </div>
-                <div class="delivery-badges">
-                  <span class="badge badge-warning">ENTREGAR</span>
-                  <span class="badge" [ngClass]="getStatusBadgeClass(assignment.status)">
-                    {{ getStatusLabel(assignment.status) }}
-                  </span>
-                </div>
-              </div>
-
-              <!-- Details Grid -->
-              <div class="delivery-details">
-                <div class="detail-section">
-                  <div class="detail-label">
-                    <app-icon category="common" name="map-pin" size="16px"></app-icon>
-                    Destinatario:
-                  </div>
-                  <div class="detail-value">{{ getContactName(assignment) }}</div>
-                  <div class="detail-value muted">{{ getContactAddress(assignment) }}</div>
-                </div>
-
-                <div class="detail-section">
-                  <div class="detail-label">
-                    <app-icon category="common" name="phone" size="16px"></app-icon>
-                    Contacto:
-                  </div>
-                  <div class="detail-value">{{ getContactPhone(assignment) || 'Sin teléfono' }}</div>
-                  <div class="detail-value muted">{{ assignment.guide?.origin_city_name }} → {{ assignment.guide?.destination_city_name }}</div>
-                </div>
-              </div>
-
-              <!-- Notes -->
-              <div class="delivery-instructions" *ngIf="assignment.notes">
-                <div class="instructions-label">Notas:</div>
-                <div class="instructions-text">{{ assignment.notes }}</div>
-              </div>
-
-              <!-- Actions -->
-              <div class="delivery-actions">
-                <button class="btn btn-outline" (click)="viewOnMap(assignment)">
-                  <app-icon category="common" name="navigation" size="16px"></app-icon>
-                  <span>Ver Mapa</span>
-                </button>
-
-                <button class="btn btn-outline" (click)="callRecipient(assignment)" [disabled]="!getContactPhone(assignment)">
-                  <app-icon category="common" name="phone" size="16px"></app-icon>
-                  <span>Llamar</span>
-                </button>
-
-                <button
-                  class="btn"
-                  [ngClass]="assignment.status === 'IN_PROGRESS' ? 'btn-primary' : 'btn-secondary'"
-                  (click)="assignment.status === 'IN_PROGRESS' ? goToConfirmTab(assignment) : startRoute(assignment)">
-                  <span>{{ assignment.status === 'IN_PROGRESS' ? 'Confirmar Entrega' : 'Iniciar Entrega' }}</span>
-                </button>
-              </div>
-              <!-- Info sobre cambio de estado -->
-              <div class="status-change-info" *ngIf="assignment.status === 'PENDING'">
-                <app-icon category="common" name="info" size="14px"></app-icon>
-                <span>Al iniciar, la guía pasará a estado "En reparto"</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <!-- Assignments List -->
+        <app-assignments-list
+          [pickups]="pickups"
+          [deliveries]="deliveries"
+          [isLoading]="isLoadingDeliveries"
+          (startRoute)="handleStartRoute($event)"
+          (confirmDelivery)="handleConfirmDelivery($event)"
+          (viewOnMap)="handleViewOnMap($event)"
+          (callRecipient)="handleCallRecipient($event)">
+        </app-assignments-list>
       </div>
     </div>
-  </div>
 
-  <!-- ========================================
-       TAB 2: CONFIRM DELIVERY
-       ======================================== -->
-  <div class="tab-content" *ngIf="activeTab === 'confirm'">
-    <div class="content-wrapper">
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">
-            <app-icon category="common" name="check-circle" size="24px"></app-icon>
-            Completar Asignación
-          </h2>
-          <p class="card-description">
-            Marca como completada una recogida o entrega
-          </p>
-        </div>
-
-        <div class="card-content">
-          <form (ngSubmit)="confirmDelivery()" class="confirm-form">
-            <!-- Select Assignment -->
-            <div class="form-field">
-              <label for="guide-select">Seleccionar asignación a completar *</label>
-              <select
-                id="guide-select"
-                [(ngModel)]="selectedAssignmentId"
-                name="selectedAssignmentId"
-                class="form-select"
-                required>
-                <option [ngValue]="null">Seleccionar...</option>
-                <option *ngFor="let assignment of assignmentsInProgress" [ngValue]="assignment.assignment_id">
-                  {{ getAssignmentTypeLabel(assignment.assignment_type) }} - Guía #{{ assignment.guide_id }} - {{ getContactName(assignment) }}
-                </option>
-              </select>
-            </div>
-
-            <!-- Selected Assignment Info -->
-            <div class="info-banner" *ngIf="selectedAssignmentData">
-              <div class="info-title">Información de la asignación:</div>
-              <div class="info-details">
-                <div>Tipo: {{ getAssignmentTypeLabel(selectedAssignmentData.assignment_type) }}</div>
-                <div>Contacto: {{ getContactName(selectedAssignmentData) }}</div>
-                <div>Dirección: {{ getContactAddress(selectedAssignmentData) }}</div>
-                <div>Ruta: {{ selectedAssignmentData.guide?.origin_city_name }} → {{ selectedAssignmentData.guide?.destination_city_name }}</div>
-              </div>
-              <div class="info-status-update">
-                <app-icon category="common" name="info" size="16px"></app-icon>
-                <span *ngIf="selectedAssignmentData.assignment_type === 'PICKUP'">
-                  Al completar, la guía pasará a estado "En ruta"
-                </span>
-                <span *ngIf="selectedAssignmentData.assignment_type === 'DELIVERY'">
-                  Al completar, la guía pasará a estado "Entregada"
-                </span>
-              </div>
-            </div>
-
-            <div class="form-grid">
-              <!-- Left Column -->
-              <div class="form-column">
-                <!-- Delivery Notes -->
-                <div class="form-field">
-                  <label for="delivery-notes">Notas de completado</label>
-                  <textarea
-                    id="delivery-notes"
-                    [(ngModel)]="deliveryNotes"
-                    name="deliveryNotes"
-                    placeholder="Entregado/Recogido en perfectas condiciones..."
-                    class="form-textarea"></textarea>
-                </div>
-
-                <!-- Package Condition -->
-                <div class="form-field">
-                  <label for="package-condition">Estado del paquete</label>
-                  <select
-                    id="package-condition"
-                    [(ngModel)]="packageCondition"
-                    name="packageCondition"
-                    class="form-select">
-                    <option value="perfect">Perfecto estado</option>
-                    <option value="minor-damage">Daño menor</option>
-                    <option value="damaged">Dañado</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Right Column -->
-              <div class="form-column">
-                <!-- Delivery Photo -->
-                <div class="form-field">
-                  <label>Imagen de evidencia (opcional)</label>
-                  <div class="upload-area">
-                    <app-icon category="common" name="camera" size="48px"></app-icon>
-                    <p>Toma una foto como evidencia</p>
-                    <div class="upload-buttons">
-                      <button type="button" class="btn btn-outline" (click)="openCamera()">
-                        <app-icon category="common" name="camera" size="16px"></app-icon>
-                        Abrir Cámara
-                      </button>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        (change)="onDeliveryPhotoChange($event)"
-                        style="display: none;"
-                        #photoInput>
-                      <button type="button" class="btn btn-ghost" (click)="photoInput.click()">
-                        <app-icon category="common" name="upload" size="16px"></app-icon>
-                        Subir desde Galería
-                      </button>
-                    </div>
-                    <div *ngIf="deliveryPhotoBase64" class="upload-preview">
-                      <img [src]="deliveryPhotoBase64" alt="Preview">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Submit Button -->
-            <button
-              type="submit"
-              class="btn btn-primary btn-large btn-full"
-              [disabled]="isConfirming || !selectedAssignmentId">
-              <app-icon
-                *ngIf="isConfirming"
-                category="common"
-                name="loader"
-                size="20px"
-                customClass="spinner">
-              </app-icon>
-              <app-icon
-                *ngIf="!isConfirming"
-                category="common"
-                name="check-circle"
-                size="20px">
-              </app-icon>
-              <span>{{ isConfirming ? 'Completando...' : 'Marcar como Completado' }}</span>
-            </button>
-          </form>
-        </div>
+    <!-- ========================================
+         TAB 2: CONFIRM DELIVERY
+         ======================================== -->
+    <div class="tab-content" *ngIf="activeTab === 'confirm'">
+      <div class="content-wrapper">
+        <app-confirm-delivery-form
+          [assignmentsInProgress]="assignmentsInProgress"
+          [selectedAssignmentId]="selectedAssignmentId"
+          [isConfirming]="isConfirming"
+          (assignmentSelected)="onAssignmentSelected($event)"
+          (confirm)="handleConfirmSubmit($event)">
+        </app-confirm-delivery-form>
       </div>
     </div>
-  </div>
 
-  <!-- ========================================
-       TAB 3: REPORT ISSUE
-       ======================================== -->
-  <div class="tab-content" *ngIf="activeTab === 'issues'">
-    <div class="content-wrapper">
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">
-            <app-icon category="common" name="alert-triangle" size="24px"></app-icon>
-            Reportar Problema
-          </h2>
-          <p class="card-description">
-            Reporta cualquier inconveniente durante la recogida o entrega
-          </p>
-        </div>
-
-        <div class="card-content">
-          <form (ngSubmit)="reportIssue()" class="issue-form">
-            <!-- Assignment Select -->
-            <div class="form-field">
-              <label for="problem-guide">Seleccionar asignación *</label>
-              <select
-                id="problem-guide"
-                [(ngModel)]="selectedIssueAssignmentId"
-                name="selectedIssueAssignmentId"
-                class="form-select"
-                required>
-                <option [ngValue]="null">Seleccionar...</option>
-                <optgroup label="Recogidas">
-                  <option *ngFor="let assignment of pendingPickups" [ngValue]="assignment.assignment_id">
-                    Guía #{{ assignment.guide_id }} - {{ getContactName(assignment) }} ({{ getStatusLabel(assignment.status) }})
-                  </option>
-                </optgroup>
-                <optgroup label="Entregas">
-                  <option *ngFor="let assignment of pendingDeliveries" [ngValue]="assignment.assignment_id">
-                    Guía #{{ assignment.guide_id }} - {{ getContactName(assignment) }} ({{ getStatusLabel(assignment.status) }})
-                  </option>
-                </optgroup>
-              </select>
-            </div>
-
-            <!-- Issue Type -->
-            <div class="form-field">
-              <label for="issue-type">Tipo de problema *</label>
-              <select
-                id="issue-type"
-                [(ngModel)]="issueType"
-                name="issueType"
-                class="form-select"
-                required>
-                <option value="">Seleccionar...</option>
-                <option value="address-incorrect">Dirección incorrecta</option>
-                <option value="recipient-unavailable">Destinatario no disponible</option>
-                <option value="access-denied">Acceso denegado al edificio</option>
-                <option value="package-damaged">Paquete dañado</option>
-                <option value="payment-issue">Problema con el pago</option>
-                <option value="other">Otro</option>
-              </select>
-            </div>
-
-            <!-- Description -->
-            <div class="form-field">
-              <label for="issue-description">Descripción del problema *</label>
-              <textarea
-                id="issue-description"
-                [(ngModel)]="issueDescription"
-                name="issueDescription"
-                placeholder="Describe detalladamente lo que ocurrió..."
-                class="form-textarea"
-                required></textarea>
-            </div>
-
-            <!-- Evidence Photos -->
-            <div class="form-field">
-              <label>Evidencia fotográfica</label>
-              <div class="upload-area">
-                <app-icon category="common" name="camera" size="32px"></app-icon>
-                <p>Opcional: Sube fotos que sustenten el reporte</p>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  (change)="onIssuePhotoChange($event)"
-                  style="display: none;"
-                  #issuePhotoInput>
-                <button type="button" class="btn btn-outline" (click)="issuePhotoInput.click()">
-                  Agregar Fotos
-                </button>
-              </div>
-            </div>
-
-            <!-- Attempted Resolution -->
-            <div class="form-field">
-              <label for="attempted-resolution">¿Qué intentaste hacer para resolver el problema?</label>
-              <textarea
-                id="attempted-resolution"
-                [(ngModel)]="attemptedResolution"
-                name="attemptedResolution"
-                placeholder="Llamé al cliente, pregunté al portero, etc..."
-                class="form-textarea"></textarea>
-            </div>
-
-            <!-- Submit Button -->
-            <button
-              type="submit"
-              class="btn btn-danger btn-full"
-              [disabled]="isReporting || !selectedIssueAssignmentId || !issueType || !issueDescription">
-              <app-icon
-                *ngIf="isReporting"
-                category="common"
-                name="loader"
-                size="16px"
-                customClass="spinner">
-              </app-icon>
-              <app-icon
-                *ngIf="!isReporting"
-                category="common"
-                name="alert-triangle"
-                size="16px">
-              </app-icon>
-              <span>{{ isReporting ? 'Enviando...' : 'Cancelar Asignación y Reportar' }}</span>
-            </button>
-          </form>
-        </div>
+    <!-- ========================================
+         TAB 3: REPORT ISSUE
+         ======================================== -->
+    <div class="tab-content" *ngIf="activeTab === 'issues'">
+      <div class="content-wrapper">
+        <app-report-issue-form
+          [pendingPickups]="pendingPickups"
+          [pendingDeliveries]="pendingDeliveries"
+          [isReporting]="isReporting"
+          (report)="handleReportSubmit($event)">
+        </app-report-issue-form>
       </div>
     </div>
-  </div>
 
-  <!-- ========================================
-       TAB 4: PERFORMANCE
-       ======================================== -->
-  <div class="tab-content" *ngIf="activeTab === 'performance'">
-    <div class="content-wrapper">
-      <!-- Performance Stats -->
-      <div class="stats-grid" *ngIf="performanceStats">
-        <div class="stat-card">
-          <div class="stat-label">Entregas Esta Semana</div>
-          <div class="stat-value primary">{{ performanceStats.deliveries_this_week }}</div>
-          <div class="stat-detail success">+15% vs semana anterior</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">Tasa de Éxito</div>
-          <div class="stat-value success">{{ performanceStats.success_rate }}%</div>
-          <div class="stat-detail success">Entregas exitosas</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">Tiempo Promedio</div>
-          <div class="stat-value warning">{{ performanceStats.avg_time_minutes }}min</div>
-          <div class="stat-detail success">-5min vs semana anterior</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-label">Calificación Promedio</div>
-          <div class="stat-value rating">{{ performanceStats.avg_rating }}⭐</div>
-          <div class="stat-detail success">+0.2 vs mes anterior</div>
-        </div>
-      </div>
-
-      <div class="performance-grid">
-        <!-- Daily Performance -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Rendimiento Diario</h3>
-            <p class="card-description">Entregas completadas por día</p>
-          </div>
-          <div class="card-content">
-            <div class="performance-list" *ngIf="performanceStats">
-              <div *ngFor="let day of performanceStats.daily_performance" class="performance-item">
-                <div class="performance-day">{{ day.day }}</div>
-                <div class="performance-stats">
-                  <div class="performance-count">
-                    <span class="value">{{ day.deliveries }}</span>
-                    <span class="target">/{{ day.target }}</span>
-                  </div>
-                  <span class="badge" [ngClass]="day.efficiency >= 100 ? 'badge-success' : 'badge-secondary'">
-                    {{ day.efficiency }}%
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Customer Reviews -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">Comentarios de Clientes</h3>
-            <p class="card-description">Últimas calificaciones recibidas</p>
-          </div>
-          <div class="card-content">
-            <div class="reviews-list" *ngIf="performanceStats">
-              <div *ngFor="let review of performanceStats.recent_reviews" class="review-item">
-                <div class="review-header">
-                  <div class="review-stars">
-                    <span *ngFor="let filled of getStarArray(review.rating)" class="star" [class.filled]="filled">
-                      ⭐
-                    </span>
-                  </div>
-                  <div class="review-date">{{ review.date }}</div>
-                </div>
-                <div class="review-comment">"{{ review.comment }}"</div>
-                <div class="review-client">- {{ review.client }}</div>
-              </div>
-            </div>
-          </div>
-        </div>
+    <!-- ========================================
+         TAB 4: PERFORMANCE
+         ======================================== -->
+    <div class="tab-content" *ngIf="activeTab === 'performance'">
+      <div class="content-wrapper">
+        <app-performance-panel
+          [performanceStats]="performanceStats"
+          [isLoading]="isLoadingPerformance">
+        </app-performance-panel>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Map Modal -->
+<app-map-modal
+  [isOpen]="isMapModalOpen"
+  [location]="selectedMapLocation"
+  [isMobile]="isMobile"
+  (closeModal)="closeMapModal()">
+</app-map-modal>

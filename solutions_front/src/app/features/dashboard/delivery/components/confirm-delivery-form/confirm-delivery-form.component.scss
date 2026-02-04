@@ -1,0 +1,253 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.card {
+  background: white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+
+  .card-header {
+    padding: $spacing-xl;
+    border-bottom: 1px solid $border-color;
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-lg;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: $font-xl;
+      font-weight: $font-bold;
+      color: $text-primary;
+      margin: 0 0 $spacing-xs 0;
+    }
+
+    .card-description {
+      color: $text-secondary;
+      font-size: $font-sm;
+      margin: 0;
+    }
+  }
+
+  .card-content {
+    padding: $spacing-xl;
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-lg;
+    }
+  }
+}
+
+.confirm-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-xl;
+
+  @include respond-to($breakpoint-lg) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-column {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  label {
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $text-primary;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    padding: $spacing-md;
+    border: 1px solid $border-color;
+    border-radius: $radius-base;
+    font-size: $font-base;
+    transition: all $transition-base;
+
+    &:focus {
+      outline: none;
+      border-color: $brand-blue;
+      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+    }
+
+    &:disabled {
+      background: $bg-secondary;
+      cursor: not-allowed;
+    }
+  }
+
+  .form-textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+}
+
+.info-banner {
+  background: $info-light;
+  border: 1px solid $info-color;
+  border-radius: $radius-base;
+  padding: $spacing-md;
+
+  .info-title {
+    font-weight: $font-medium;
+    color: $info-dark;
+    margin-bottom: $spacing-sm;
+  }
+
+  .info-details {
+    font-size: $font-sm;
+    color: $info-dark;
+
+    div {
+      margin-bottom: $spacing-xs;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .info-status-update {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-top: $spacing-md;
+    padding-top: $spacing-md;
+    border-top: 1px solid rgba($info-color, 0.3);
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $info-dark;
+
+    app-icon {
+      color: $info-color;
+      flex-shrink: 0;
+    }
+  }
+}
+
+.upload-area {
+  border: 2px dashed $border-color;
+  border-radius: $radius-base;
+  padding: $spacing-xl;
+  text-align: center;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $brand-blue;
+    background: rgba($brand-blue, 0.02);
+  }
+
+  app-icon {
+    color: $text-muted;
+    margin-bottom: $spacing-md;
+  }
+
+  p {
+    color: $text-secondary;
+    margin-bottom: $spacing-md;
+  }
+
+  .upload-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  .upload-preview {
+    margin-top: $spacing-md;
+
+    img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: $radius-base;
+    }
+  }
+}
+
+// Buttons
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  border: none;
+  border-radius: $radius-base;
+  font-weight: $font-medium;
+  font-size: $font-base;
+  cursor: pointer;
+  transition: all $transition-base;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.btn-large {
+    padding: $spacing-md $spacing-xl;
+    font-size: $font-lg;
+  }
+
+  &.btn-full {
+    width: 100%;
+  }
+
+  &.btn-primary {
+    background: $brand-blue;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: darken($brand-blue, 10%);
+    }
+  }
+
+  &.btn-outline {
+    background: transparent;
+    border: 1px solid $border-color;
+    color: $text-primary;
+
+    &:hover:not(:disabled) {
+      background: $bg-secondary;
+    }
+  }
+
+  &.btn-ghost {
+    background: transparent;
+    color: $text-secondary;
+
+    &:hover:not(:disabled) {
+      background: $bg-secondary;
+      color: $text-primary;
+    }
+  }
+}
+
+:host ::ng-deep .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

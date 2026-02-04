@@ -1,0 +1,84 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-state">
+  <app-icon category="common" name="loader" size="48px" customClass="spinner"></app-icon>
+  <p>Cargando estadísticas de rendimiento...</p>
+</div>
+
+<ng-container *ngIf="!isLoading && performanceStats">
+  <!-- Performance Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">Entregas Esta Semana</div>
+      <div class="stat-value primary">{{ performanceStats.deliveries_this_week }}</div>
+      <div class="stat-detail success">+15% vs semana anterior</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Tasa de Éxito</div>
+      <div class="stat-value success">{{ performanceStats.success_rate }}%</div>
+      <div class="stat-detail success">Entregas exitosas</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Tiempo Promedio</div>
+      <div class="stat-value warning">{{ performanceStats.avg_time_minutes }}min</div>
+      <div class="stat-detail success">-5min vs semana anterior</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">Calificación Promedio</div>
+      <div class="stat-value rating">{{ performanceStats.avg_rating }}⭐</div>
+      <div class="stat-detail success">+0.2 vs mes anterior</div>
+    </div>
+  </div>
+
+  <div class="performance-grid">
+    <!-- Daily Performance -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Rendimiento Diario</h3>
+        <p class="card-description">Entregas completadas por día</p>
+      </div>
+      <div class="card-content">
+        <div class="performance-list">
+          <div *ngFor="let day of performanceStats.daily_performance" class="performance-item">
+            <div class="performance-day">{{ day.day }}</div>
+            <div class="performance-stats">
+              <div class="performance-count">
+                <span class="value">{{ day.deliveries }}</span>
+                <span class="target">/{{ day.target }}</span>
+              </div>
+              <span class="badge" [ngClass]="day.efficiency >= 100 ? 'badge-success' : 'badge-secondary'">
+                {{ day.efficiency }}%
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Reviews -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">Comentarios de Clientes</h3>
+        <p class="card-description">Últimas calificaciones recibidas</p>
+      </div>
+      <div class="card-content">
+        <div class="reviews-list">
+          <div *ngFor="let review of performanceStats.recent_reviews" class="review-item">
+            <div class="review-header">
+              <div class="review-stars">
+                <span *ngFor="let filled of getStarArray(review.rating)" class="star" [class.filled]="filled">
+                  ⭐
+                </span>
+              </div>
+              <div class="review-date">{{ review.date }}</div>
+            </div>
+            <div class="review-comment">"{{ review.comment }}"</div>
+            <div class="review-client">- {{ review.client }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

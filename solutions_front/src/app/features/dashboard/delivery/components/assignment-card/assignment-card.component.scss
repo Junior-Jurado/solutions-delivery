@@ -1,0 +1,228 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+.delivery-card {
+  border: 1px solid $border-color;
+  border-radius: $radius-base;
+  padding: $spacing-lg;
+  transition: all $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  .delivery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-md;
+
+    @include respond-to($breakpoint-md) {
+      flex-direction: column;
+      gap: $spacing-md;
+    }
+
+    .delivery-info {
+      .delivery-id {
+        font-size: $font-lg;
+        font-weight: $font-semibold;
+        color: $text-primary;
+        margin-bottom: $spacing-xs;
+      }
+
+      .delivery-time {
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+        font-size: $font-sm;
+        color: $text-secondary;
+      }
+    }
+
+    .delivery-badges {
+      display: flex;
+      gap: $spacing-sm;
+      flex-wrap: wrap;
+    }
+  }
+
+  .delivery-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-lg;
+    margin-bottom: $spacing-lg;
+
+    @include respond-to($breakpoint-md) {
+      grid-template-columns: 1fr;
+      gap: $spacing-md;
+    }
+
+    .detail-section {
+      .detail-label {
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+        font-size: $font-sm;
+        font-weight: $font-medium;
+        color: $text-primary;
+        margin-bottom: $spacing-xs;
+      }
+
+      .detail-value {
+        font-size: $font-sm;
+        color: $text-primary;
+        margin-bottom: $spacing-xs;
+
+        &.muted {
+          color: $text-secondary;
+        }
+      }
+    }
+  }
+
+  .delivery-instructions {
+    background: $warning-light;
+    border: 1px solid $warning-color;
+    border-radius: $radius-base;
+    padding: $spacing-md;
+    margin-bottom: $spacing-lg;
+
+    .instructions-label {
+      font-size: $font-sm;
+      font-weight: $font-medium;
+      color: $warning-dark;
+      margin-bottom: $spacing-xs;
+    }
+
+    .instructions-text {
+      font-size: $font-sm;
+      color: $warning-dark;
+    }
+  }
+
+  .delivery-actions {
+    display: flex;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+
+    @include respond-to($breakpoint-md) {
+      flex-direction: column;
+    }
+
+    .btn-action-main {
+      min-width: 140px;
+
+      .btn-action-text {
+        display: inline !important;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  .status-change-info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-top: $spacing-md;
+    padding: $spacing-sm $spacing-md;
+    background: rgba($info-color, 0.1);
+    border-radius: $radius-sm;
+    font-size: $font-xs;
+    color: $info-dark;
+
+    app-icon {
+      color: $info-color;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Badges
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-xs;
+  font-weight: $font-medium;
+
+  &.badge-primary {
+    background: rgba($brand-blue, 0.1);
+    color: $brand-blue;
+  }
+
+  &.badge-success {
+    background: rgba($success-color, 0.1);
+    color: $success-color;
+  }
+
+  &.badge-warning {
+    background: rgba($warning-color, 0.1);
+    color: $warning-color;
+  }
+
+  &.badge-error {
+    background: rgba($error-color, 0.1);
+    color: $error-color;
+  }
+
+  &.badge-info {
+    background: rgba($info-color, 0.1);
+    color: $info-color;
+  }
+
+  &.badge-secondary {
+    background: $bg-secondary;
+    color: $text-secondary;
+  }
+}
+
+// Buttons
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-lg;
+  border: none;
+  border-radius: $radius-base;
+  font-weight: $font-medium;
+  font-size: $font-base;
+  cursor: pointer;
+  transition: all $transition-base;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.btn-primary {
+    background: $brand-blue;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: darken($brand-blue, 10%);
+    }
+  }
+
+  &.btn-secondary {
+    background: $bg-secondary;
+    color: $text-primary;
+
+    &:hover:not(:disabled) {
+      background: darken($bg-secondary, 5%);
+    }
+  }
+
+  &.btn-outline {
+    background: transparent;
+    border: 1px solid $border-color;
+    color: $text-primary;
+
+    &:hover:not(:disabled) {
+      background: $bg-secondary;
+    }
+  }
+}

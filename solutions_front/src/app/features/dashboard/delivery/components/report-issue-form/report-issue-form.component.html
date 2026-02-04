@@ -1,0 +1,123 @@
+<div class="card">
+  <div class="card-header">
+    <h2 class="card-title">
+      <app-icon category="common" name="alert-triangle" size="24px"></app-icon>
+      Reportar Problema
+    </h2>
+    <p class="card-description">
+      Reporta cualquier inconveniente durante la recogida o entrega
+    </p>
+  </div>
+
+  <div class="card-content">
+    <form (ngSubmit)="onSubmit()" class="issue-form">
+      <!-- Assignment Select -->
+      <div class="form-field">
+        <label for="problem-guide">Seleccionar asignación *</label>
+        <select
+          id="problem-guide"
+          [(ngModel)]="selectedIssueAssignmentId"
+          name="selectedIssueAssignmentId"
+          class="form-select"
+          required>
+          <option [ngValue]="null">Seleccionar...</option>
+          <optgroup label="Recogidas">
+            <option *ngFor="let assignment of pendingPickups" [ngValue]="assignment.assignment_id">
+              Guía #{{ assignment.guide_id }} - {{ getContactName(assignment) }} ({{ getStatusLabel(assignment.status) }})
+            </option>
+          </optgroup>
+          <optgroup label="Entregas">
+            <option *ngFor="let assignment of pendingDeliveries" [ngValue]="assignment.assignment_id">
+              Guía #{{ assignment.guide_id }} - {{ getContactName(assignment) }} ({{ getStatusLabel(assignment.status) }})
+            </option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Issue Type -->
+      <div class="form-field">
+        <label for="issue-type">Tipo de problema *</label>
+        <select
+          id="issue-type"
+          [(ngModel)]="issueType"
+          name="issueType"
+          class="form-select"
+          required>
+          <option value="">Seleccionar...</option>
+          <option value="address-incorrect">Dirección incorrecta</option>
+          <option value="recipient-unavailable">Destinatario no disponible</option>
+          <option value="access-denied">Acceso denegado al edificio</option>
+          <option value="package-damaged">Paquete dañado</option>
+          <option value="payment-issue">Problema con el pago</option>
+          <option value="other">Otro</option>
+        </select>
+      </div>
+
+      <!-- Description -->
+      <div class="form-field">
+        <label for="issue-description">Descripción del problema *</label>
+        <textarea
+          id="issue-description"
+          [(ngModel)]="issueDescription"
+          name="issueDescription"
+          placeholder="Describe detalladamente lo que ocurrió..."
+          class="form-textarea"
+          required></textarea>
+      </div>
+
+      <!-- Evidence Photos -->
+      <div class="form-field">
+        <label>Evidencia fotográfica</label>
+        <div class="upload-area">
+          <app-icon category="common" name="camera" size="32px"></app-icon>
+          <p>Opcional: Sube fotos que sustenten el reporte</p>
+          <input
+            type="file"
+            multiple
+            accept="image/*"
+            (change)="onIssuePhotoChange($event)"
+            style="display: none;"
+            #issuePhotoInput>
+          <button type="button" class="btn btn-outline" (click)="issuePhotoInput.click()">
+            Agregar Fotos
+          </button>
+        </div>
+        <div class="photos-preview" *ngIf="issuePhotos.length > 0">
+          <img *ngFor="let photo of issuePhotos" [src]="photo" alt="Evidence photo">
+        </div>
+      </div>
+
+      <!-- Attempted Resolution -->
+      <div class="form-field">
+        <label for="attempted-resolution">¿Qué intentaste hacer para resolver el problema?</label>
+        <textarea
+          id="attempted-resolution"
+          [(ngModel)]="attemptedResolution"
+          name="attemptedResolution"
+          placeholder="Llamé al cliente, pregunté al portero, etc..."
+          class="form-textarea"></textarea>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="btn btn-danger btn-full"
+        [disabled]="isReporting || !isFormValid">
+        <app-icon
+          *ngIf="isReporting"
+          category="common"
+          name="loader"
+          size="16px"
+          customClass="spinner">
+        </app-icon>
+        <app-icon
+          *ngIf="!isReporting"
+          category="common"
+          name="alert-triangle"
+          size="16px">
+        </app-icon>
+        <span>{{ isReporting ? 'Enviando...' : 'Cancelar Asignación y Reportar' }}</span>
+      </button>
+    </form>
+  </div>
+</div>

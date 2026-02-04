@@ -1,0 +1,32 @@
+<!-- Loading State -->
+<div *ngIf="isLoading" class="loading-state">
+  <app-icon category="common" name="loader" size="48px" customClass="spinner"></app-icon>
+  <p>Cargando estadísticas...</p>
+</div>
+
+<!-- Stats Grid -->
+<div class="stats-grid" *ngIf="!isLoading && stats">
+  <div class="stat-card">
+    <div class="stat-label">Recoger Pendientes</div>
+    <div class="stat-value primary">{{ stats.pending_pickups }}</div>
+    <div class="stat-detail">{{ stats.in_progress_pickups }} en progreso</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Entregar Pendientes</div>
+    <div class="stat-value warning">{{ stats.pending_deliveries }}</div>
+    <div class="stat-detail">{{ stats.in_progress_deliveries }} en progreso</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Completadas Hoy</div>
+    <div class="stat-value success">{{ stats.completed_today }}</div>
+    <div class="stat-detail success">Asignaciones completadas</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-label">Esta Semana</div>
+    <div class="stat-value rating">{{ stats.completed_this_week }}</div>
+    <div class="stat-detail">Total completadas</div>
+  </div>
+</div>
