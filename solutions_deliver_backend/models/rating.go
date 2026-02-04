@@ -34,13 +34,19 @@ type CreateRatingResponse struct {
 
 // DeliveryPerformanceStats estadísticas de rendimiento del repartidor
 type DeliveryPerformanceStats struct {
-	DeliveriesThisWeek int                `json:"deliveries_this_week"`
-	SuccessRate        float64            `json:"success_rate"`
-	AvgTimeMinutes     int                `json:"avg_time_minutes"`
-	AvgRating          float64            `json:"avg_rating"`
-	TotalRatings       int                `json:"total_ratings"`
-	DailyPerformance   []DailyPerformance `json:"daily_performance"`
-	RecentReviews      []CustomerReview   `json:"recent_reviews"`
+	DeliveriesThisWeek    int                `json:"deliveries_this_week"`
+	DeliveriesLastWeek    int                `json:"deliveries_last_week"`
+	DeliveriesChangePercent float64          `json:"deliveries_change_percent"`
+	SuccessRate           float64            `json:"success_rate"`
+	AvgTimeMinutes        int                `json:"avg_time_minutes"`
+	AvgTimeLastWeek       int                `json:"avg_time_last_week"`
+	AvgTimeChange         int                `json:"avg_time_change"`
+	AvgRating             float64            `json:"avg_rating"`
+	AvgRatingLastMonth    float64            `json:"avg_rating_last_month"`
+	AvgRatingChange       float64            `json:"avg_rating_change"`
+	TotalRatings          int                `json:"total_ratings"`
+	DailyPerformance      []DailyPerformance `json:"daily_performance"`
+	RecentReviews         []CustomerReview   `json:"recent_reviews"`
 }
 
 // DailyPerformance rendimiento diario

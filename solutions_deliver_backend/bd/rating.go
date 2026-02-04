@@ -338,10 +338,18 @@ func GetDeliveryPerformanceStats(deliveryUserID string) (models.DeliveryPerforma
 	}
 	now := time.Now().In(loc)
 
-	// Entregas esta semana
+	// Calcular fechas
 	weekStart := now.AddDate(0, 0, -int(now.Weekday()))
 	weekStartStr := weekStart.Format("2006-01-02")
+	lastWeekStart := weekStart.AddDate(0, 0, -7)
+	lastWeekStartStr := lastWeekStart.Format("2006-01-02")
+	lastWeekEndStr := weekStart.AddDate(0, 0, -1).Format("2006-01-02")
+	monthStart := time.Date(now.Year(), now.Month(), 1, 0, 0, 0, 0, loc)
+	lastMonthStart := monthStart.AddDate(0, -1, 0)
+	lastMonthStartStr := lastMonthStart.Format("2006-01-02")
+	lastMonthEndStr := monthStart.AddDate(0, 0, -1).Format("2006-01-02")
 
+	// Entregas esta semana
 	weekQuery := `
 		SELECT COUNT(*)
 		FROM delivery_assignments
@@ -352,6 +360,28 @@ func GetDeliveryPerformanceStats(deliveryUserID string) (models.DeliveryPerforma
 	err = Db.QueryRow(weekQuery, deliveryUserID, weekStartStr).Scan(&stats.DeliveriesThisWeek)
 	if err != nil {
 		stats.DeliveriesThisWeek = 0
+	}
+
+	// Entregas semana pasada
+	lastWeekQuery := `
+		SELECT COUNT(*)
+		FROM delivery_assignments
+		WHERE delivery_user_id = ?
+		AND status = 'COMPLETED'
+		AND DATE(completed_at) >= ? AND DATE(completed_at) <= ?
+	`
+	err = Db.QueryRow(lastWeekQuery, deliveryUserID, lastWeekStartStr, lastWeekEndStr).Scan(&stats.DeliveriesLastWeek)
+	if err != nil {
+		stats.DeliveriesLastWeek = 0
+	}
+
+	// Calcular porcentaje de cambio en entregas
+	if stats.DeliveriesLastWeek > 0 {
+		stats.DeliveriesChangePercent = ((float64(stats.DeliveriesThisWeek) - float64(stats.DeliveriesLastWeek)) / float64(stats.DeliveriesLastWeek)) * 100
+	} else if stats.DeliveriesThisWeek > 0 {
+		stats.DeliveriesChangePercent = 100
+	} else {
+		stats.DeliveriesChangePercent = 0
 	}
 
 	// Tasa de éxito (completadas vs total)
@@ -370,7 +400,38 @@ func GetDeliveryPerformanceStats(deliveryUserID string) (models.DeliveryPerforma
 		stats.SuccessRate = float64(completedAssignments) / float64(totalAssignments) * 100
 	}
 
-	// Promedio de calificaciones
+	// Tiempo promedio esta semana (en minutos, entre assigned_at y completed_at)
+	avgTimeQuery := `
+		SELECT COALESCE(AVG(TIMESTAMPDIFF(MINUTE, assigned_at, completed_at)), 0)
+		FROM delivery_assignments
+		WHERE delivery_user_id = ?
+		AND status = 'COMPLETED'
+		AND DATE(completed_at) >= ?
+		AND assigned_at IS NOT NULL
+	`
+	err = Db.QueryRow(avgTimeQuery, deliveryUserID, weekStartStr).Scan(&stats.AvgTimeMinutes)
+	if err != nil {
+		stats.AvgTimeMinutes = 0
+	}
+
+	// Tiempo promedio semana pasada
+	avgTimeLastWeekQuery := `
+		SELECT COALESCE(AVG(TIMESTAMPDIFF(MINUTE, assigned_at, completed_at)), 0)
+		FROM delivery_assignments
+		WHERE delivery_user_id = ?
+		AND status = 'COMPLETED'
+		AND DATE(completed_at) >= ? AND DATE(completed_at) <= ?
+		AND assigned_at IS NOT NULL
+	`
+	err = Db.QueryRow(avgTimeLastWeekQuery, deliveryUserID, lastWeekStartStr, lastWeekEndStr).Scan(&stats.AvgTimeLastWeek)
+	if err != nil {
+		stats.AvgTimeLastWeek = 0
+	}
+
+	// Cambio en tiempo (negativo es mejor)
+	stats.AvgTimeChange = stats.AvgTimeMinutes - stats.AvgTimeLastWeek
+
+	// Promedio de calificaciones (este mes)
 	ratingQuery := `
 		SELECT COALESCE(AVG(rating), 0), COUNT(*)
 		FROM delivery_ratings
@@ -382,8 +443,20 @@ func GetDeliveryPerformanceStats(deliveryUserID string) (models.DeliveryPerforma
 		stats.TotalRatings = 0
 	}
 
-	// Tiempo promedio (por ahora hardcoded, se puede calcular con timestamps)
-	stats.AvgTimeMinutes = 35
+	// Promedio de calificaciones mes pasado
+	ratingLastMonthQuery := `
+		SELECT COALESCE(AVG(rating), 0)
+		FROM delivery_ratings
+		WHERE delivery_user_id = ?
+		AND DATE(created_at) >= ? AND DATE(created_at) <= ?
+	`
+	err = Db.QueryRow(ratingLastMonthQuery, deliveryUserID, lastMonthStartStr, lastMonthEndStr).Scan(&stats.AvgRatingLastMonth)
+	if err != nil {
+		stats.AvgRatingLastMonth = 0
+	}
+
+	// Cambio en calificación
+	stats.AvgRatingChange = stats.AvgRating - stats.AvgRatingLastMonth
 
 	// Rendimiento diario (últimos 7 días)
 	stats.DailyPerformance = make([]models.DailyPerformance, 0)

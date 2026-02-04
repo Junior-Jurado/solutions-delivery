@@ -10,7 +10,9 @@
     <div class="stat-card">
       <div class="stat-label">Entregas Esta Semana</div>
       <div class="stat-value primary">{{ performanceStats.deliveries_this_week }}</div>
-      <div class="stat-detail success">+15% vs semana anterior</div>
+      <div class="stat-detail" [ngClass]="performanceStats.deliveries_change_percent >= 0 ? 'success' : 'danger'">
+        {{ performanceStats.deliveries_change_percent >= 0 ? '+' : '' }}{{ performanceStats.deliveries_change_percent | number:'1.0-1' }}% vs semana anterior
+      </div>
     </div>
 
     <div class="stat-card">
@@ -22,13 +24,17 @@
     <div class="stat-card">
       <div class="stat-label">Tiempo Promedio</div>
       <div class="stat-value warning">{{ performanceStats.avg_time_minutes | number:'1.0-0' }}min</div>
-      <div class="stat-detail success">-5min vs semana anterior</div>
+      <div class="stat-detail" [ngClass]="performanceStats.avg_time_change <= 0 ? 'success' : 'danger'">
+        {{ performanceStats.avg_time_change > 0 ? '+' : '' }}{{ performanceStats.avg_time_change }}min vs semana anterior
+      </div>
     </div>
 
     <div class="stat-card">
       <div class="stat-label">Calificación Promedio</div>
       <div class="stat-value rating">{{ performanceStats.avg_rating | number:'1.0-2' }}⭐</div>
-      <div class="stat-detail success">+0.2 vs mes anterior</div>
+      <div class="stat-detail" [ngClass]="performanceStats.avg_rating_change >= 0 ? 'success' : 'danger'">
+        {{ performanceStats.avg_rating_change >= 0 ? '+' : '' }}{{ performanceStats.avg_rating_change | number:'1.0-1' }} vs mes anterior
+      </div>
     </div>
   </div>
 

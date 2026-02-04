@@ -72,9 +72,16 @@ export interface ReportIssueResponse {
 
 export interface PerformanceStats {
     deliveries_this_week: number;
+    deliveries_last_week: number;
+    deliveries_change_percent: number;
     success_rate: number;
     avg_time_minutes: number;
+    avg_time_last_week: number;
+    avg_time_change: number;
     avg_rating: number;
+    avg_rating_last_month: number;
+    avg_rating_change: number;
+    total_ratings: number;
     daily_performance: DailyPerfomance[];
     recent_reviews: CustomerReview[];
 }
@@ -303,9 +310,16 @@ export class DeliveryService {
 
             return {
                 deliveries_this_week: stats.completed_this_week,
+                deliveries_last_week: 0,
+                deliveries_change_percent: 0,
                 success_rate: total > 0 ? Math.round((totalCompleted / total) * 100) : 100,
                 avg_time_minutes: 0,
+                avg_time_last_week: 0,
+                avg_time_change: 0,
                 avg_rating: 0,
+                avg_rating_last_month: 0,
+                avg_rating_change: 0,
+                total_ratings: 0,
                 daily_performance: [],
                 recent_reviews: []
             };
