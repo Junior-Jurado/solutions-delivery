@@ -1,6 +1,6 @@
 <!-- Loading -->
 <div *ngIf="isLoading" class="loading-state">
-  <app-icon category="common" name="loader" size="48px" customClass="spinner"></app-icon>
+  <app-icon category="status" name="loader" size="48px" customClass="spinner"></app-icon>
   <p>Cargando asignaciones...</p>
 </div>
 
@@ -14,7 +14,7 @@
   <div class="card-content">
     <!-- Empty State -->
     <div *ngIf="pendingPickups.length === 0" class="empty-state">
-      <app-icon category="common" name="package" size="64px"></app-icon>
+      <app-icon category="delivery" name="package" size="64px"></app-icon>
       <p>No hay paquetes por recoger</p>
     </div>
 
@@ -42,7 +42,7 @@
   <div class="card-content">
     <!-- Empty State -->
     <div *ngIf="pendingDeliveries.length === 0" class="empty-state">
-      <app-icon category="common" name="package" size="64px"></app-icon>
+      <app-icon category="delivery" name="package" size="64px"></app-icon>
       <p>No hay paquetes por entregar</p>
     </div>
 

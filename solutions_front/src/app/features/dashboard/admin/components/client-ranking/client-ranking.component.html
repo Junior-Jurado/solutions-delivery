@@ -1,0 +1,180 @@
+<div class="client-ranking">
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="filters-row">
+      <!-- Date Range -->
+      <div class="filter-group">
+        <label class="filter-label">Desde</label>
+        <input
+          type="date"
+          [(ngModel)]="dateFrom"
+          class="filter-input"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Hasta</label>
+        <input
+          type="date"
+          [(ngModel)]="dateTo"
+          class="filter-input"
+        />
+      </div>
+
+      <!-- Sort By -->
+      <div class="filter-group">
+        <label class="filter-label">Ordenar por</label>
+        <div class="sort-control">
+          <select [(ngModel)]="filters.sort_by" class="filter-select">
+            <option *ngFor="let opt of sortOptions" [value]="opt.value">
+              {{ opt.label }}
+            </option>
+          </select>
+          <button
+            class="sort-order-btn"
+            (click)="toggleSortOrder()"
+            [title]="filters.order === 'desc' ? 'Mayor a menor' : 'Menor a mayor'">
+            <app-icon
+              category="stats"
+              [name]="filters.order === 'desc' ? 'trending-down' : 'trending-up'"
+              size="18px">
+            </app-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Min Guides -->
+      <div class="filter-group">
+        <label class="filter-label">Min. Guias</label>
+        <select [(ngModel)]="filters.min_guides" class="filter-select small">
+          <option *ngFor="let opt of minGuidesOptions" [value]="opt">
+            {{ opt }}+
+          </option>
+        </select>
+      </div>
+
+      <!-- Limit -->
+      <div class="filter-group">
+        <label class="filter-label">Mostrar</label>
+        <select [(ngModel)]="filters.limit" class="filter-select small">
+          <option *ngFor="let opt of limitOptions" [value]="opt">
+            Top {{ opt }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filters-actions">
+      <button class="btn btn-secondary" (click)="resetFilters()">
+        <app-icon category="navigation" name="x" size="16px"></app-icon>
+        Limpiar
+      </button>
+      <button class="btn btn-primary" (click)="applyFilters()" [disabled]="isLoading">
+        <app-icon
+          *ngIf="isLoading"
+          category="status"
+          name="loader"
+          size="16px"
+          customClass="spin">
+        </app-icon>
+        <app-icon
+          *ngIf="!isLoading"
+          category="navigation"
+          name="search"
+          size="16px">
+        </app-icon>
+        Aplicar Filtros
+      </button>
+    </div>
+  </div>
+
+  <!-- Results Summary -->
+  <div class="results-summary" *ngIf="!isLoading && clients.length > 0">
+    <span class="summary-count">{{ clients.length }}</span>
+    <span class="summary-label">clientes encontrados</span>
+    <span class="summary-total" *ngIf="totalClients > clients.length">
+      de {{ totalClients }} total
+    </span>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="loading-spinner">
+      <app-icon category="status" name="loader" size="32px" customClass="spin"></app-icon>
+    </div>
+    <p>Cargando ranking de clientes...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && clients.length === 0" class="empty-state">
+    <app-icon category="users" name="users" size="48px" color="#d1d5db"></app-icon>
+    <p>No se encontraron clientes con los filtros seleccionados</p>
+    <button class="btn btn-secondary" (click)="resetFilters()">
+      Restablecer filtros
+    </button>
+  </div>
+
+  <!-- Client Ranking List -->
+  <div *ngIf="!isLoading && clients.length > 0" class="ranking-list">
+    <div
+      *ngFor="let client of clients; let i = index"
+      class="ranking-card"
+      [class.top-three]="i < 3">
+
+      <!-- Rank Badge -->
+      <div class="rank-badge" [ngClass]="getRankBadgeClass(i + 1)">
+        <span *ngIf="i < 3" class="rank-icon">
+          <app-icon
+            category="misc"
+            [name]="i === 0 ? 'award' : 'star'"
+            size="16px">
+          </app-icon>
+        </span>
+        <span class="rank-number">{{ i + 1 }}</span>
+      </div>
+
+      <!-- Client Avatar -->
+      <div class="client-avatar">
+        {{ getInitials(client.full_name) }}
+      </div>
+
+      <!-- Client Info -->
+      <div class="client-info">
+        <div class="client-name">{{ client.full_name || 'Sin nombre' }}</div>
+        <div class="client-email">{{ client.email }}</div>
+        <div class="client-phone" *ngIf="client.phone">
+          <app-icon category="communication" name="phone" size="12px"></app-icon>
+          {{ client.phone }}
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="client-stats">
+        <div class="stat-item">
+          <span class="stat-value">{{ client.total_guides }}</span>
+          <span class="stat-label">Guias</span>
+        </div>
+        <div class="stat-item highlight">
+          <span class="stat-value">{{ formatCurrency(client.total_spent) }}</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">{{ formatCurrency(client.avg_value) }}</span>
+          <span class="stat-label">Promedio</span>
+        </div>
+      </div>
+
+      <!-- Activity Status -->
+      <div class="client-activity">
+        <span
+          class="activity-badge"
+          [ngClass]="getActivityStatus(client.last_activity).class">
+          {{ getActivityStatus(client.last_activity).label }}
+        </span>
+        <span class="last-activity-date" *ngIf="client.last_activity">
+          {{ formatDate(client.last_activity) }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -5,89 +5,212 @@
 .deliveries-list {
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: $spacing-sm;
 }
 
-.delivery-item {
+.list-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $spacing-lg;
-  border: 1px solid $border-color;
+  padding: $spacing-sm $spacing-md;
+  background: $bg-light;
   border-radius: $radius-md;
+  margin-bottom: $spacing-sm;
+
+  .total-count {
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $text-muted;
+  }
+}
+
+// Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3xl;
+  text-align: center;
+
+  h3 {
+    margin: $spacing-md 0 $spacing-sm;
+    font-size: $font-lg;
+    font-weight: $font-semibold;
+    color: $text-primary;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-sm;
+    color: $text-muted;
+    max-width: 300px;
+    line-height: 1.5;
+  }
+}
+
+.delivery-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  background: $white;
   transition: all $transition-base;
+  gap: $spacing-lg;
 
   @include respond-to($breakpoint-md) {
-    flex-direction: column;
-    align-items: flex-start;
+    grid-template-columns: 1fr;
     gap: $spacing-md;
   }
 
   &:hover {
-    background-color: $bg-light;
+    border-color: $brand-blue;
+    box-shadow: 0 4px 12px rgba($brand-blue, 0.1);
   }
 
-  .delivery-info {
-    .delivery-id {
-      font-weight: $font-medium;
-      color: $text-primary;
-      margin-bottom: $spacing-xs;
+  .delivery-main {
+    min-width: 0;
+
+    .delivery-header {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      margin-bottom: $spacing-sm;
+
+      .delivery-id {
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+        font-weight: $font-semibold;
+        color: $text-primary;
+
+        span {
+          color: $brand-blue;
+        }
+      }
+
+      .service-badge {
+        padding: 2px $spacing-sm;
+        font-size: $font-xs;
+        font-weight: $font-medium;
+        background: $bg-light;
+        color: $text-muted;
+        border-radius: $radius-full;
+      }
     }
 
-    .delivery-customer {
-      font-size: $font-sm;
-      color: $text-muted;
-      margin-bottom: $spacing-xs;
-    }
-
+    .delivery-customer,
     .delivery-address {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
       font-size: $font-sm;
       color: $text-muted;
+      margin-bottom: $spacing-xs;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 
-  .delivery-status {
-    text-align: right;
+  .delivery-meta {
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
     gap: $spacing-xs;
+    min-width: 140px;
 
     @include respond-to($breakpoint-md) {
-      text-align: left;
-      width: 100%;
+      flex-direction: row;
+      align-items: center;
+      flex-wrap: wrap;
+      min-width: auto;
     }
 
     .badge {
-      display: inline-block;
-      padding: $spacing-xs $spacing-sm;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: $spacing-xs $spacing-md;
       font-size: $font-xs;
-      font-weight: $font-medium;
+      font-weight: $font-semibold;
       border-radius: $radius-full;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
 
       &.badge-success {
-        background-color: $success-light;
-        color: $success-color;
+        background: #d1fae5;
+        color: #047857;
+      }
+
+      &.badge-info {
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+
+      &.badge-warning {
+        background: #fef3c7;
+        color: #b45309;
       }
 
       &.badge-secondary {
-        background-color: $gray-100;
-        color: $gray-600;
-      }
-
-      &.badge-error {
-        background-color: $error-light;
-        color: $error-color;
+        background: $gray-200;
+        color: $gray-700;
       }
     }
 
     .delivery-person {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
       font-size: $font-sm;
-      color: $text-muted;
+      color: $text-primary;
+      font-weight: $font-medium;
     }
 
     .delivery-time {
+      display: flex;
+      align-items: center;
+      gap: 4px;
       font-size: $font-xs;
+      color: $text-disabled;
+    }
+  }
+
+  .delivery-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    @include respond-to($breakpoint-md) {
+      width: 100%;
+      justify-content: flex-end;
+      padding-top: $spacing-sm;
+      border-top: 1px solid $border-color;
+    }
+
+    .btn-view {
+      width: 40px;
+      height: 40px;
+      border-radius: $radius-lg;
+      border: 1px solid $border-color;
+      background: $white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: $text-muted;
+      transition: all $transition-base;
+
+      &:hover {
+        background: $brand-blue;
+        border-color: $brand-blue;
+        color: $white;
+        transform: scale(1.05);
+      }
     }
   }
 }
@@ -96,13 +219,13 @@
 .loading-container {
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: $spacing-sm;
 
   .loading-item {
-    height: 100px;
-    background: $bg-primary;
+    height: 90px;
+    background: $white;
     border: 1px solid $border-color;
-    border-radius: $radius-md;
+    border-radius: $radius-lg;
     position: relative;
     overflow: hidden;
 

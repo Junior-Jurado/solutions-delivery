@@ -24,10 +24,10 @@
 
     @include respond-to($breakpoint-md) {
       padding: 0 $spacing-md;
-      height: auto;
-      min-height: 4rem;
-      flex-wrap: wrap;
-      gap: $spacing-md;
+    }
+
+    @include respond-to($breakpoint-xs) {
+      padding: 0 $spacing-sm;
     }
   }
 
@@ -49,6 +49,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
+
+      @include respond-to($breakpoint-xs) {
+        padding: $spacing-xs;
+
+        app-icon {
+          width: 18px;
+          height: 18px;
+        }
+      }
     }
 
     .logo-text {
@@ -57,7 +66,7 @@
       color: $text-primary;
 
       @include respond-to($breakpoint-xs) {
-        font-size: $font-lg;
+        font-size: $font-sm;
       }
     }
   }
@@ -68,10 +77,11 @@
     gap: $spacing-lg;
 
     @include respond-to($breakpoint-md) {
+      gap: $spacing-md;
+    }
+
+    @include respond-to($breakpoint-xs) {
       gap: $spacing-sm;
-      width: 100%;
-      justify-content: space-between;
-      padding: $spacing-sm 0;
     }
   }
 
@@ -87,23 +97,103 @@
       display: flex;
       align-items: center;
       justify-content: center;
-    }
 
-    .user-details {
       @include respond-to($breakpoint-xs) {
         display: none;
       }
+    }
 
+    .user-details {
       .user-role {
         font-weight: $font-semibold;
         font-size: $font-sm;
         color: $text-primary;
+
+        @include respond-to($breakpoint-xs) {
+          color: $brand-blue;
+          font-size: $font-xs;
+        }
       }
 
       .user-description {
         font-size: $font-xs;
         color: $text-muted;
+
+        @include respond-to($breakpoint-xs) {
+          display: none;
+        }
       }
+    }
+  }
+
+  // ===============================
+  // REFRESH BUTTON
+  // ===============================
+  .btn-refresh {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-md;
+    background: linear-gradient(135deg, $brand-blue 0%, $brand-blue-dark 100%);
+    border: none;
+    border-radius: $radius-base;
+    cursor: pointer;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    color: $white;
+    transition: all $transition-base;
+    box-shadow: 0 2px 8px rgba($brand-blue, 0.3);
+
+    @include respond-to($breakpoint-md) {
+      padding: $spacing-sm;
+    }
+
+    @include respond-to($breakpoint-xs) {
+      display: none;
+    }
+
+    app-icon {
+      flex-shrink: 0;
+      transition: transform 0.3s ease;
+
+      &.spin {
+        animation: spin 1s linear infinite;
+      }
+    }
+
+    .refresh-text {
+      @include respond-to($breakpoint-md) {
+        display: none;
+      }
+    }
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, $brand-blue-dark 0%, darken($brand-blue-dark, 5%) 100%);
+      box-shadow: 0 4px 12px rgba($brand-blue, 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba($brand-blue, 0.3);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+
+    &.refreshing {
+      background: linear-gradient(135deg, $brand-blue-light 0%, $brand-blue 100%);
+    }
+  }
+
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
     }
   }
 
@@ -121,8 +211,14 @@
     color: $text-primary;
     transition: all $transition-base;
 
-    @include respond-to($breakpoint-xs) {
+    @include respond-to($breakpoint-md) {
       padding: $spacing-sm;
+    }
+
+    @include respond-to($breakpoint-xs) {
+      padding: $spacing-xs;
+      border: none;
+      background: transparent;
     }
 
     app-icon {
@@ -130,7 +226,7 @@
     }
 
     .logout-text {
-      @include respond-to($breakpoint-xs) {
+      @include respond-to($breakpoint-md) {
         display: none;
       }
     }

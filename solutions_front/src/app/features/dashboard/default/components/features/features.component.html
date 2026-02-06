@@ -2,39 +2,49 @@
   <div class="container">
     <div class="section-header">
       <h2 class="section-title">
-        ¿Por qué elegir Soluciones?
+        Por que elegir Soluciones?
       </h2>
       <p class="section-description">
-        Más de 10 años conectando a Colombia con excelencia
+        Mas de 10 años conectando a Colombia con excelencia
       </p>
     </div>
 
     <div class="features-grid">
-      <div 
-        *ngFor="let feature of features" 
+      <div
+        *ngFor="let feature of features"
         class="feature-card"
-        [class.border-blue]="feature.color === 'blue'"
-        [class.border-red]="feature.color === 'red'"
-        [class.border-black]="feature.color === 'black'">
-        
-        <div 
+        [class.border-amarillo]="feature.color === 'amarillo'"
+        [class.border-azul]="feature.color === 'azul'"
+        [class.border-rojo]="feature.color === 'rojo'"
+        [class.border-verde]="feature.color === 'verde'">
+
+        <!-- Guacamaya decorativa -->
+        <img
+          [src]="feature.guacamayaImage"
+          alt=""
+          class="feature-guacamaya guacamaya-hover"
+        />
+
+        <div
           class="feature-icon"
-          [class.bg-blue]="feature.color === 'blue'"
-          [class.bg-red]="feature.color === 'red'"
-          [class.bg-black]="feature.color === 'black'">
-          
-          <app-icon 
-            category="common" 
-            [name]="feature.icon" 
+          [class.bg-amarillo]="feature.color === 'amarillo'"
+          [class.bg-azul]="feature.color === 'azul'"
+          [class.bg-rojo]="feature.color === 'rojo'"
+          [class.bg-verde]="feature.color === 'verde'">
+
+          <app-icon
+            [category]="feature.iconCategory"
+            [name]="feature.icon"
             size="32px">
           </app-icon>
         </div>
 
-        <h3 
+        <h3
           class="feature-title"
-          [class.text-blue]="feature.color === 'blue'"
-          [class.text-red]="feature.color === 'red'"
-          [class.text-black]="feature.color === 'black'">
+          [class.text-amarillo]="feature.color === 'amarillo'"
+          [class.text-azul]="feature.color === 'azul'"
+          [class.text-rojo]="feature.color === 'rojo'"
+          [class.text-verde]="feature.color === 'verde'">
           {{ feature.title }}
         </h3>
 

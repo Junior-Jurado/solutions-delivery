@@ -9,27 +9,34 @@
   backdrop-filter: blur(10px);
   border-radius: $radius-md;
   box-shadow: $shadow-lg;
+  border-top: 4px solid var(--color-amarillo);
+  transition: all 0.3s ease;
 
   @media (min-width: $breakpoint-lg) {
     margin: 0;
   }
 
+  &:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  }
+
   .card-header {
     padding: $spacing-lg;
-    border-bottom: 1px solid $gray-300;
+    border-bottom: 1px solid var(--border-color);
+    background: linear-gradient(135deg, rgba(0, 102, 204, 0.05), rgba(255, 215, 0, 0.05));
   }
 
   .card-title {
     display: flex;
     align-items: center;
     gap: $spacing-sm;
-    color: $brand-black;
+    color: var(--color-azul);
     font-size: $font-xl;
     font-weight: $font-semibold;
     margin-bottom: $spacing-sm;
 
-    svg {
-      color: $brand-blue;
+    app-icon {
+      color: var(--color-azul);
     }
   }
 
@@ -54,35 +61,99 @@
 
     .form-input {
       width: 100%;
-      padding: 0.625rem;
-      border: 1px solid $border-color;
-      border-radius: $radius-base;
+      padding: 0.75rem;
+      border: 2px solid var(--border-color);
+      border-radius: $radius-md;
       font-size: $font-sm;
-      transition: border-color $transition-base, box-shadow $transition-base;
+      transition: all 0.3s ease;
+      background-color: $white;
 
       &:focus {
-        @include input-focus;
+        outline: none;
+        border-color: var(--color-azul);
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+      }
+
+      &::placeholder {
+        color: $gray-400;
       }
     }
   }
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, $brand-blue, $brand-red);
-  color: $white;
+  background-color: var(--color-amarillo);
+  color: #333333;
   border: none;
-  padding: $spacing-sm $spacing-lg;
+  padding: $spacing-md $spacing-lg;
   border-radius: $radius-md;
-  font-weight: $font-semibold;
+  font-weight: $font-bold;
+  font-size: $font-base;
   cursor: pointer;
-  transition: transform $transition-base, box-shadow $transition-base;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
 
   &:hover {
-    transform: translateY(-1px);
-    box-shadow: $shadow-lg;
+    background-color: var(--color-amarillo-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 }
 
 .w-full {
   width: 100%;
+}
+
+// Dark mode adjustments - card remains light for visibility on dark hero
+@media (prefers-color-scheme: dark) {
+  .tracking-card {
+    background-color: rgba(45, 45, 45, 0.95);
+    border-top-color: #FFE033;
+
+    .card-header {
+      background: linear-gradient(135deg, rgba(77, 154, 255, 0.1), rgba(255, 224, 51, 0.1));
+    }
+
+    .card-title {
+      color: #4D9AFF;
+    }
+
+    .card-description {
+      color: $gray-400;
+    }
+
+    .form-group {
+      label {
+        color: $white;
+      }
+
+      .form-input {
+        background-color: #1A1A1A;
+        border-color: #404040;
+        color: $white;
+
+        &:focus {
+          border-color: #4D9AFF;
+          box-shadow: 0 0 0 3px rgba(77, 154, 255, 0.2);
+        }
+
+        &::placeholder {
+          color: $gray-500;
+        }
+      }
+    }
+  }
+
+  .btn-primary {
+    background-color: #FFE033;
+    box-shadow: 0 4px 12px rgba(255, 224, 51, 0.3);
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba(255, 224, 51, 0.4);
+    }
+  }
 }

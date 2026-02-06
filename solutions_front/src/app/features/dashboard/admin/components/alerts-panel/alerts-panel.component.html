@@ -1,15 +1,57 @@
 <div class="alerts-container">
   <div *ngIf="alerts.length === 0" class="no-alerts">
+    <app-icon category="status" name="check-circle" size="48px" color="#22c55e"></app-icon>
     <p>No hay alertas activas</p>
+    <span class="no-alerts-subtitle">El sistema funciona correctamente</span>
   </div>
 
-  <div *ngFor="let alert of alerts" class="alert-item" [ngClass]="getAlertClass(alert.type)">
-    <div class="alert-content">
-      <div class="alert-title">{{ alert.title }}</div>
-      <div class="alert-description">{{ alert.description }}</div>
+  <div *ngFor="let alert of alerts"
+       class="alert-item"
+       [ngClass]="[getAlertClass(alert.type), isExpanded(alert.id) ? 'expanded' : '']">
+
+    <!-- Alert Header -->
+    <div class="alert-header" (click)="toggleExpand(alert.id)">
+      <div class="alert-icon" [ngClass]="getAlertClass(alert.type)">
+        <app-icon category="status" [name]="getAlertIcon(alert.type)" size="20px"></app-icon>
+      </div>
+
+      <div class="alert-content">
+        <div class="alert-title">{{ alert.title }}</div>
+        <div class="alert-time">{{ formatTimestamp(alert.timestamp) }}</div>
+      </div>
+
+      <div class="alert-actions">
+        <button class="expand-button" [ngClass]="{'rotated': isExpanded(alert.id)}">
+          <app-icon category="navigation" name="chevron-down" size="16px"></app-icon>
+        </button>
+      </div>
     </div>
-    <button class="alert-button" (click)="onAction(alert.id)">
-      {{ getActionLabel(alert.type) }}
-    </button>
+
+    <!-- Alert Details (Expanded) -->
+    <div class="alert-details" *ngIf="isExpanded(alert.id)">
+      <p class="alert-description">{{ alert.description }}</p>
+
+      <div class="alert-meta" *ngIf="alert.guideId || alert.userId">
+        <span *ngIf="alert.guideId" class="meta-item">
+          <app-icon category="documents" name="file-text" size="14px"></app-icon>
+          Guia #{{ alert.guideId }}
+        </span>
+        <span *ngIf="alert.userId" class="meta-item">
+          <app-icon category="users" name="user" size="14px"></app-icon>
+          Usuario relacionado
+        </span>
+      </div>
+
+      <div class="alert-buttons">
+        <button *ngIf="alert.guideId" class="btn-primary" (click)="onViewGuide(alert.guideId)">
+          <app-icon category="navigation" name="eye" size="14px"></app-icon>
+          Ver Guia
+        </button>
+        <button class="btn-dismiss" (click)="onDismiss(alert.id, $event)">
+          <app-icon category="actions" name="trash" size="14px"></app-icon>
+          Descartar
+        </button>
+      </div>
+    </div>
   </div>
 </div>

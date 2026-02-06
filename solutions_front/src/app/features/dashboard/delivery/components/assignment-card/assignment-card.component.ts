@@ -95,4 +95,12 @@ export class AssignmentCardComponent {
       this.onStartRoute();
     }
   }
+
+  getMainActionIcon(): string {
+    return this.isInProgress ? 'check-circle' : 'play';
+  }
+
+  getMainActionIconCategory(): string {
+    return this.isInProgress ? 'status' : 'delivery';
+  }
 }

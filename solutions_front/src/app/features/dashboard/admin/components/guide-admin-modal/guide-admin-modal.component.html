@@ -1,0 +1,228 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="close()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>
+        <app-icon category="documents" name="file-text" size="24px"></app-icon>
+        <span *ngIf="guide">Guía #{{ guide.guide_id }}</span>
+        <span *ngIf="!guide && isLoading">Cargando...</span>
+      </h2>
+      <button class="btn-close" (click)="close()">
+        <app-icon category="navigation" name="x" size="24px"></app-icon>
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div class="modal-body loading-state" *ngIf="isLoading">
+      <div class="loading-spinner">
+        <app-icon category="status" name="loader" size="48px"></app-icon>
+      </div>
+      <p>Cargando información de la guía...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="modal-body error-state" *ngIf="!isLoading && errorMessage">
+      <div class="error-icon">
+        <app-icon category="status" name="x-circle" size="48px"></app-icon>
+      </div>
+      <p class="error-message">{{ errorMessage }}</p>
+      <button class="btn btn-primary" (click)="loadGuide()">Reintentar</button>
+    </div>
+
+    <!-- Content -->
+    <div class="modal-body" *ngIf="!isLoading && !errorMessage && guide">
+      <!-- Status Update Section -->
+      <div class="status-section">
+        <h3>Estado de la Guía</h3>
+        <div class="current-status">
+          <span class="label">Estado actual:</span>
+          <span class="badge" [ngClass]="getStatusBadgeClass(guide.current_status)">
+            {{ getStatusLabel(guide.current_status) }}
+          </span>
+        </div>
+
+        <div class="status-update-form">
+          <label for="newStatus">Cambiar estado a:</label>
+          <div class="status-select-wrapper">
+            <select
+              id="newStatus"
+              [(ngModel)]="selectedStatus"
+              [disabled]="isUpdatingStatus">
+              <option *ngFor="let status of availableStatuses" [ngValue]="status.value">
+                {{ status.label }}
+              </option>
+            </select>
+            <button
+              class="btn btn-primary"
+              (click)="updateStatus()"
+              [disabled]="isUpdatingStatus || selectedStatus === guide.current_status">
+              <app-icon
+                category="status"
+                [name]="isUpdatingStatus ? 'loader' : 'check'"
+                size="16px">
+              </app-icon>
+              {{ isUpdatingStatus ? 'Actualizando...' : 'Actualizar Estado' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guide Info Grid -->
+      <div class="info-grid">
+        <!-- Sender Info -->
+        <div class="info-card">
+          <div class="info-header">
+            <app-icon category="users" name="user" size="20px"></app-icon>
+            <h4>Remitente</h4>
+          </div>
+          <div class="info-content">
+            <div class="info-row">
+              <span class="info-label">Nombre:</span>
+              <span class="info-value">{{ guide.sender?.full_name || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Documento:</span>
+              <span class="info-value">{{ guide.sender?.document_type }} {{ guide.sender?.document_number || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Teléfono:</span>
+              <span class="info-value">{{ guide.sender?.phone || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Dirección:</span>
+              <span class="info-value">{{ guide.sender?.address || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Ciudad:</span>
+              <span class="info-value">{{ guide.origin_city_name || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Receiver Info -->
+        <div class="info-card">
+          <div class="info-header">
+            <app-icon category="delivery" name="map-pin" size="20px"></app-icon>
+            <h4>Destinatario</h4>
+          </div>
+          <div class="info-content">
+            <div class="info-row">
+              <span class="info-label">Nombre:</span>
+              <span class="info-value">{{ guide.receiver?.full_name || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Documento:</span>
+              <span class="info-value">{{ guide.receiver?.document_type }} {{ guide.receiver?.document_number || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Teléfono:</span>
+              <span class="info-value">{{ guide.receiver?.phone || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Dirección:</span>
+              <span class="info-value">{{ guide.receiver?.address || 'N/A' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Ciudad:</span>
+              <span class="info-value">{{ guide.destination_city_name || 'N/A' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Package Info -->
+        <div class="info-card">
+          <div class="info-header">
+            <app-icon category="delivery" name="package" size="20px"></app-icon>
+            <h4>Paquete</h4>
+          </div>
+          <div class="info-content">
+            <div class="info-row">
+              <span class="info-label">Peso:</span>
+              <span class="info-value">{{ guide.package?.weight_kg || 0 }} kg</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Piezas:</span>
+              <span class="info-value">{{ guide.package?.pieces || 1 }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Dimensiones:</span>
+              <span class="info-value">
+                {{ guide.package?.length_cm || 0 }}x{{ guide.package?.width_cm || 0 }}x{{ guide.package?.height_cm || 0 }} cm
+              </span>
+            </div>
+            <div class="info-row" *ngIf="guide.package?.description">
+              <span class="info-label">Contenido:</span>
+              <span class="info-value">{{ guide.package?.description }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Asegurado:</span>
+              <span class="info-value">{{ guide.package?.insured ? 'Sí' : 'No' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Financial Info -->
+        <div class="info-card">
+          <div class="info-header">
+            <app-icon category="finance" name="dollar-sign" size="20px"></app-icon>
+            <h4>Información Financiera</h4>
+          </div>
+          <div class="info-content">
+            <div class="info-row">
+              <span class="info-label">Tipo de servicio:</span>
+              <span class="info-value">{{ translation.translateServiceType(guide.service_type) }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Método de pago:</span>
+              <span class="info-value badge-small" [ngClass]="translation.getPaymentMethodBadgeClass(guide.payment_method)">
+                {{ translation.translatePaymentMethod(guide.payment_method) }}
+              </span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Valor declarado:</span>
+              <span class="info-value price">${{ guide.declared_value?.toLocaleString() || 0 }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Precio del envío:</span>
+              <span class="info-value price">${{ guide.price?.toLocaleString() || 0 }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Creada:</span>
+              <span class="info-value">{{ formatDate(guide.created_at) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status History -->
+      <div class="history-section" *ngIf="guide.history && guide.history.length > 0">
+        <h3>
+          <app-icon category="delivery" name="clock" size="20px"></app-icon>
+          Historial de Estados
+        </h3>
+        <div class="history-timeline">
+          <div *ngFor="let item of guide.history; let first = first" class="history-item">
+            <div class="history-dot" [class.active]="first"></div>
+            <div class="history-content">
+              <span class="history-status" [ngClass]="getStatusBadgeClass(item.status)">
+                {{ getStatusLabel(item.status) }}
+              </span>
+              <span class="history-date">{{ formatDate(item.updated_at) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer" *ngIf="!isLoading && guide">
+      <button class="btn btn-outline" (click)="close()">
+        Cerrar
+      </button>
+      <button class="btn btn-secondary" (click)="downloadPDF()" *ngIf="guide.pdf_url">
+        <app-icon category="documents" name="download" size="16px"></app-icon>
+        Descargar PDF
+      </button>
+    </div>
+  </div>
+</div>

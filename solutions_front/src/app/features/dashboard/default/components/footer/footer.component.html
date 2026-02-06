@@ -1,24 +1,54 @@
 <footer class="footer">
   <div class="container">
     <div class="footer-content">
-      <div class="footer-logo">
-        <div class="logo-icon">
-          <app-icon category="common" name="package" size="24px"></app-icon>
+      <!-- Logo section -->
+      <div class="footer-logo-section">
+        <div class="footer-logo">
+          <div class="logo-icon">
+            <app-icon category="delivery" name="package" size="24px"></app-icon>
+          </div>
+        </div>
+        <h3 class="footer-title">EnvioExpress</h3>
+        <p class="footer-description">
+          Conectando a Colombia con envios seguros y confiables
+        </p>
+      </div>
+
+      <!-- Guacamaya separator -->
+      <div class="guacamaya-separator">
+        <img src="assets/guacamayas/guacamaya-footer.svg" alt="" class="footer-guacamaya guacamaya-hover" />
+        <div class="separator-line"></div>
+        <img src="assets/guacamayas/guacamaya-footer.svg" alt="" class="footer-guacamaya guacamaya-hover flipped" />
+      </div>
+
+      <!-- Contact info -->
+      <div class="footer-info">
+        <div class="info-item">
+          <app-icon category="delivery" name="map-pin" size="16px"></app-icon>
+          <span>Bogota, Colombia</span>
+        </div>
+        <img src="assets/guacamayas/guacamaya-footer.svg" alt="" class="info-separator guacamaya-hover" />
+        <div class="info-item">
+          <app-icon category="communication" name="mail" size="16px"></app-icon>
+          <span>contacto&#64;envioexpress.co</span>
+        </div>
+        <img src="assets/guacamayas/guacamaya-footer.svg" alt="" class="info-separator guacamaya-hover" />
+        <div class="info-item">
+          <app-icon category="communication" name="phone" size="16px"></app-icon>
+          <span>+57 (1) 234-5678</span>
         </div>
       </div>
-      <h3 class="footer-title">EnvíoExpress</h3>
-      <p class="footer-description">
-        Conectando a Colombia con envíos seguros y confiables
-      </p>
-      <div class="footer-info">
-        <span>Bogotá, Colombia</span>
-        <span>•</span>
-        <span>contacto@envioexpress.co</span>
-        <span>•</span>
-        <span>+57 (1) 234-5678</span>
+
+      <!-- Colombian colors bar -->
+      <div class="colombian-colors">
+        <div class="color-bar amarillo"></div>
+        <div class="color-bar azul"></div>
+        <div class="color-bar rojo"></div>
+        <div class="color-bar verde"></div>
       </div>
+
       <p class="footer-copyright">
-        © {{ currentYear }} EnvíoExpress. Todos los derechos reservados.
+        &copy; {{ currentYear }} EnvioExpress. Todos los derechos reservados.
       </p>
     </div>
   </div>

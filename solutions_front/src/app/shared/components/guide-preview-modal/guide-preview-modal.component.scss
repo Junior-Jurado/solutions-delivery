@@ -107,13 +107,49 @@
     .price-banner {
       display: flex;
       flex-direction: column;
-      align-items: center;
       gap: $spacing-sm;
       padding: $spacing-xl;
       background: linear-gradient(135deg, $success-light 0%, lighten($success-light, 5%) 100%);
       border: 3px solid $success-color;
       border-radius: $radius-lg;
       text-align: center;
+
+      &.editable {
+        border-style: dashed;
+      }
+
+      &.editing {
+        background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 100%);
+        border-color: $warning-color;
+      }
+
+      .price-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-md;
+        width: 100%;
+
+        .btn-edit-price {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          padding: $spacing-xs $spacing-sm;
+          background: rgba($brand-blue, 0.1);
+          border: 1px solid $brand-blue;
+          border-radius: $radius-full;
+          color: $brand-blue;
+          font-size: $font-xs;
+          font-weight: $font-medium;
+          cursor: pointer;
+          transition: all $transition-base;
+
+          &:hover {
+            background: $brand-blue;
+            color: $white;
+          }
+        }
+      }
 
       .price-label {
         display: flex;
@@ -135,15 +171,145 @@
         line-height: 1;
         margin: $spacing-xs 0;
 
+        &.modified {
+          color: $brand-blue;
+        }
+
         @include respond-to($breakpoint-sm) {
           font-size: 2rem;
         }
       }
 
       .price-details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: $spacing-xs;
         font-size: $font-sm;
         color: $success-dark;
         opacity: 0.8;
+      }
+
+      .price-modified-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-xs;
+        padding: 2px $spacing-sm;
+        background: rgba($brand-blue, 0.1);
+        border-radius: $radius-full;
+        color: $brand-blue;
+        font-size: $font-xs;
+        font-weight: $font-medium;
+
+        .btn-reset-price {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 16px;
+          height: 16px;
+          padding: 0;
+          background: rgba($error-color, 0.1);
+          border: none;
+          border-radius: $radius-full;
+          color: $error-color;
+          cursor: pointer;
+          transition: all $transition-base;
+
+          &:hover {
+            background: $error-color;
+            color: $white;
+          }
+        }
+      }
+
+      .original-price {
+        font-size: $font-xs;
+        color: $text-muted;
+        text-decoration: line-through;
+      }
+
+      // Modo edición del precio
+      .price-edit-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: $spacing-md;
+        width: 100%;
+        max-width: 300px;
+        margin: 0 auto;
+
+        .price-input-group {
+          display: flex;
+          align-items: center;
+          gap: $spacing-xs;
+          width: 100%;
+
+          .currency-symbol {
+            font-size: $font-xl;
+            font-weight: $font-bold;
+            color: $text-primary;
+          }
+
+          .price-input {
+            flex: 1;
+            padding: $spacing-md;
+            font-size: $font-xl;
+            font-weight: $font-bold;
+            text-align: center;
+            border: 2px solid $brand-blue;
+            border-radius: $radius-md;
+            outline: none;
+            transition: all $transition-base;
+
+            &:focus {
+              border-color: $brand-blue-dark;
+              box-shadow: 0 0 0 4px rgba($brand-blue, 0.2);
+            }
+          }
+        }
+
+        .price-edit-actions {
+          display: flex;
+          gap: $spacing-sm;
+
+          button {
+            display: flex;
+            align-items: center;
+            gap: $spacing-xs;
+            padding: $spacing-sm $spacing-md;
+            border-radius: $radius-md;
+            font-size: $font-sm;
+            font-weight: $font-medium;
+            cursor: pointer;
+            transition: all $transition-base;
+          }
+
+          .btn-save-price {
+            background: $success-color;
+            border: none;
+            color: $white;
+
+            &:hover {
+              background: darken($success-color, 10%);
+            }
+          }
+
+          .btn-cancel-price {
+            background: $gray-200;
+            border: none;
+            color: $text-muted;
+
+            &:hover {
+              background: $gray-300;
+              color: $text-primary;
+            }
+          }
+        }
+
+        .price-hint {
+          font-size: $font-xs;
+          color: $text-muted;
+        }
       }
     }
 

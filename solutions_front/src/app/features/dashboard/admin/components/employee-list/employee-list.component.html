@@ -1,24 +1,134 @@
+<!-- Filter Bar -->
+<div class="filter-bar">
+  <div class="filter-group">
+    <app-icon category="navigation" name="filter" size="18px"></app-icon>
+    <select [(ngModel)]="filterRole" class="filter-select">
+      <option value="">Todos los roles</option>
+      <option *ngFor="let role of filterRoles" [value]="role.value">
+        {{ role.label }}
+      </option>
+    </select>
+  </div>
+  <div class="employee-count">
+    <span class="count">{{ filteredEmployees.length }}</span>
+    <span class="label">usuarios</span>
+  </div>
+</div>
+
 <!-- Loading State -->
 <div *ngIf="isLoading" class="loading-container">
-  <div class="loading-item" *ngFor="let i of [1, 2, 3, 4]">
+  <div class="loading-item" *ngFor="let i of [1, 2, 3, 4, 5]">
     <div class="loading-shimmer"></div>
   </div>
 </div>
 
+<!-- Empty State -->
+<div *ngIf="!isLoading && filteredEmployees.length === 0" class="empty-state">
+  <app-icon category="users" name="users" size="48px" color="#d1d5db"></app-icon>
+  <p *ngIf="filterRole">No hay usuarios con el rol seleccionado</p>
+  <p *ngIf="!filterRole">No hay usuarios registrados</p>
+</div>
+
 <!-- Employee List -->
-<div *ngIf="!isLoading" class="employee-list">
-  <div *ngFor="let employee of employees" class="employee-item">
-    <div class="employee-info">
-      <div class="employee-name">{{ employee.name }}</div>
-      <div class="employee-role">{{ employee.role }}</div>
+<div *ngIf="!isLoading && filteredEmployees.length > 0" class="employee-list">
+  <div
+    *ngFor="let employee of filteredEmployees"
+    class="employee-card"
+    [class.editing]="editingUserId === employee.user_uuid"
+    [class.is-admin]="employee.role === 'ADMIN'">
+
+    <!-- Avatar -->
+    <div class="employee-avatar" [ngClass]="getRoleBadgeClass(employee.role)">
+      {{ getInitials(employee.full_name) }}
     </div>
-    <div class="employee-actions">
-      <span class="badge" [ngClass]="getStatusClass(employee.status)">
+
+    <!-- Info -->
+    <div class="employee-info">
+      <div class="employee-name">{{ employee.full_name || 'Sin nombre' }}</div>
+      <div class="employee-email">{{ employee.email }}</div>
+      <div class="employee-meta">
+        <span *ngIf="employee.phone">
+          <app-icon category="communication" name="phone" size="12px"></app-icon>
+          {{ employee.phone }}
+        </span>
+        <span>
+          <app-icon category="delivery" name="calendar" size="12px"></app-icon>
+          {{ formatDate(employee.created_at) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Role Badge / Edit -->
+    <div class="employee-role">
+      <!-- View Mode -->
+      <ng-container *ngIf="editingUserId !== employee.user_uuid">
+        <span class="role-badge" [ngClass]="getRoleBadgeClass(employee.role)">
+          {{ getRoleLabel(employee.role) }}
+        </span>
+      </ng-container>
+
+      <!-- Edit Mode -->
+      <ng-container *ngIf="editingUserId === employee.user_uuid">
+        <select
+          [(ngModel)]="editingRole"
+          class="role-select"
+          [disabled]="isUpdating">
+          <option *ngFor="let role of roles" [value]="role.value">
+            {{ role.label }}
+          </option>
+        </select>
+      </ng-container>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="employee-status">
+      <span class="status-badge" [ngClass]="getStatusBadgeClass(employee.status)">
         {{ employee.status }}
       </span>
-      <button class="edit-button" (click)="onEdit(employee.id)">
-        Editar
-      </button>
+      <span *ngIf="employee.role === 'DELIVERY' && employee.total_completed" class="delivery-stats">
+        <app-icon category="status" name="check-circle" size="14px"></app-icon>
+        {{ employee.total_completed }}
+      </span>
+    </div>
+
+    <!-- Actions -->
+    <div class="employee-actions">
+      <!-- View Mode Actions -->
+      <ng-container *ngIf="editingUserId !== employee.user_uuid">
+        <button
+          *ngIf="canEdit(employee)"
+          class="action-btn edit-btn"
+          (click)="startEditing(employee)"
+          title="Editar rol">
+          <app-icon category="actions" name="edit" size="16px"></app-icon>
+        </button>
+        <span *ngIf="!canEdit(employee)" class="admin-shield" title="Administrador">
+          <app-icon category="misc" name="shield" size="16px"></app-icon>
+        </span>
+      </ng-container>
+
+      <!-- Edit Mode Actions -->
+      <ng-container *ngIf="editingUserId === employee.user_uuid">
+        <button
+          class="action-btn save-btn"
+          (click)="saveRole(employee)"
+          [disabled]="isUpdating"
+          title="Guardar">
+          <app-icon
+            category="status"
+            [name]="isUpdating ? 'loader' : 'check'"
+            size="16px"
+            [class.spin]="isUpdating">
+          </app-icon>
+        </button>
+        <button
+          class="action-btn cancel-btn"
+          (click)="cancelEditing()"
+          [disabled]="isUpdating"
+          title="Cancelar">
+          <app-icon category="navigation" name="x" size="16px"></app-icon>
+        </button>
+      </ng-container>
     </div>
   </div>
 </div>

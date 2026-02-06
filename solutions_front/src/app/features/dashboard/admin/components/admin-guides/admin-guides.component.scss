@@ -1,0 +1,493 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+// ===============================
+// SEARCH SECTION
+// ===============================
+.search-section {
+  margin-bottom: $spacing-lg;
+}
+
+.search-row {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @include respond-to($breakpoint-md) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.search-input-wrapper {
+  flex: 1;
+  min-width: 280px;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  app-icon {
+    position: absolute;
+    left: $spacing-md;
+    color: $text-muted;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: $spacing-sm $spacing-lg;
+    padding-left: 44px;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-size: $font-sm;
+    transition: all $transition-base;
+
+    &:focus {
+      outline: none;
+      border-color: $brand-blue;
+      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+    }
+
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: $spacing-sm;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $spacing-xs;
+    color: $text-muted;
+    border-radius: $radius-sm;
+
+    &:hover {
+      color: $text-primary;
+      background: $bg-light;
+    }
+  }
+}
+
+.filter-wrapper {
+  .status-filter {
+    padding: $spacing-sm $spacing-lg;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    font-size: $font-sm;
+    background: $bg-primary;
+    min-width: 180px;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: $brand-blue;
+    }
+  }
+}
+
+.results-info {
+  margin-top: $spacing-md;
+  font-size: $font-sm;
+  color: $text-muted;
+}
+
+// ===============================
+// BUTTONS
+// ===============================
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-size: $font-sm;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  border: none;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-primary {
+  background: $brand-blue;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: $brand-blue-dark;
+  }
+}
+
+.btn-outline {
+  background: $bg-primary;
+  border: 1px solid $border-color;
+  color: $text-secondary;
+
+  &:hover:not(:disabled) {
+    background: $bg-light;
+  }
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: $brand-blue;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: $brand-blue-dark;
+  }
+}
+
+// ===============================
+// LOADING STATE
+// ===============================
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.loading-card {
+  height: 60px;
+  background: $bg-primary;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  position: relative;
+  overflow: hidden;
+
+  .loading-shimmer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba($brand-blue, 0.05) 50%,
+      transparent 100%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+// ===============================
+// EMPTY STATE
+// ===============================
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl * 2;
+  text-align: center;
+  color: $text-muted;
+
+  app-icon {
+    margin-bottom: $spacing-md;
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 $spacing-sm 0;
+    color: $text-secondary;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-sm;
+  }
+}
+
+// ===============================
+// TABLE
+// ===============================
+.guides-table-container {
+  overflow-x: auto;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background: $bg-primary;
+}
+
+.guides-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $font-sm;
+
+  th, td {
+    padding: $spacing-md;
+    text-align: left;
+    border-bottom: 1px solid $border-color;
+  }
+
+  th {
+    background: $bg-secondary;
+    font-weight: $font-semibold;
+    color: $text-secondary;
+    white-space: nowrap;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  tr:hover {
+    background: $bg-light;
+  }
+}
+
+.guide-id {
+  .id-badge {
+    font-weight: $font-semibold;
+    color: $brand-blue;
+  }
+}
+
+.person-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .person-name {
+    font-weight: $font-medium;
+    color: $text-primary;
+  }
+
+  .person-phone {
+    font-size: $font-xs;
+    color: $text-muted;
+  }
+}
+
+.route-cell {
+  .route-info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+
+    .city {
+      font-size: $font-xs;
+      color: $text-secondary;
+    }
+
+    .arrow-icon {
+      color: $text-muted;
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.status-cell {
+  min-width: 180px;
+
+  .status-view {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  .edit-status-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: $spacing-xs;
+    color: $text-muted;
+    border-radius: $radius-sm;
+    opacity: 0;
+    transition: all $transition-base;
+
+    &:hover {
+      color: $brand-blue;
+      background: rgba($brand-blue, 0.1);
+    }
+  }
+
+  tr:hover .edit-status-btn {
+    opacity: 1;
+  }
+
+  .status-edit {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    .status-select {
+      padding: $spacing-xs $spacing-sm;
+      border: 1px solid $brand-blue;
+      border-radius: $radius-sm;
+      font-size: $font-xs;
+      background: $bg-primary;
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .action-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: $radius-sm;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.save {
+        background: $success-color;
+        color: $white;
+
+        &:hover:not(:disabled) {
+          background: $success-dark;
+        }
+      }
+
+      &.cancel {
+        background: $gray-200;
+        color: $text-secondary;
+
+        &:hover:not(:disabled) {
+          background: $gray-300;
+        }
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+.value-cell {
+  .value-amount {
+    font-weight: $font-medium;
+    color: $success-color;
+  }
+}
+
+.date-cell {
+  color: $text-muted;
+  font-size: $font-xs;
+  white-space: nowrap;
+}
+
+.actions-cell {
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-md;
+    border: 1px solid $border-color;
+    background: $bg-primary;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-muted;
+    transition: all $transition-base;
+
+    &:hover {
+      background: $brand-blue;
+      border-color: $brand-blue;
+      color: $white;
+    }
+  }
+}
+
+// ===============================
+// BADGES
+// ===============================
+.badge {
+  display: inline-flex;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-full;
+  font-size: $font-xs;
+  font-weight: $font-medium;
+}
+
+.badge-warning {
+  background: $warning-light;
+  color: $warning-dark;
+}
+
+.badge-info {
+  background: $info-light;
+  color: $info-dark;
+}
+
+.badge-secondary {
+  background: $gray-200;
+  color: $gray-700;
+}
+
+.badge-primary {
+  background: rgba($brand-blue, 0.1);
+  color: $brand-blue-dark;
+}
+
+.badge-success {
+  background: $success-light;
+  color: $success-dark;
+}
+
+// ===============================
+// PAGINATION
+// ===============================
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-lg;
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+  border-top: 1px solid $border-color;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $border-color;
+  border-radius: $radius-md;
+  background: $bg-primary;
+  color: $text-secondary;
+  font-size: $font-sm;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover:not(:disabled) {
+    background: $bg-light;
+    border-color: $brand-blue;
+    color: $brand-blue;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .rotate-180 {
+    transform: rotate(180deg);
+  }
+}
+
+.pagination-info {
+  font-size: $font-sm;
+  color: $text-muted;
+}

@@ -1,7 +1,7 @@
 <div class="tracking-section">
   <div class="tracking-card">
     <div class="card-header">
-      <app-icon category="common" name="search" size="24px"></app-icon>
+      <app-icon category="navigation" name="search" size="24px"></app-icon>
       <h2>Rastrear tu Envío</h2>
     </div>
 
@@ -22,15 +22,15 @@
         class="btn btn-primary btn-track"
         (click)="onTrack()"
         [disabled]="isTracking || !trackingNumber.trim()">
-        <app-icon 
+        <app-icon
           *ngIf="!isTracking"
-          category="common" 
+          category="navigation"
           name="search" 
           size="20px">
         </app-icon>
-        <app-icon 
+        <app-icon
           *ngIf="isTracking"
-          category="common" 
+          category="status"
           name="loader" 
           size="20px"
           customClass="spinner">
@@ -45,10 +45,10 @@
   <!-- Tracking Result -->
   <div class="tracking-result" *ngIf="trackingResult">
     <div class="result-header">
-      <app-icon category="common" name="package" size="24px"></app-icon>
+      <app-icon category="delivery" name="package" size="24px"></app-icon>
       <h3>Información del Envío</h3>
       <button class="btn-close" (click)="onClear()">
-        <app-icon category="common" name="x" size="20px"></app-icon>
+        <app-icon category="navigation" name="x" size="20px"></app-icon>
       </button>
     </div>
 
@@ -78,7 +78,7 @@
       <div class="result-row">
         <span class="label">Origen:</span>
         <span class="value location">
-          <app-icon category="common" name="map-pin" size="16px"></app-icon>
+          <app-icon category="delivery" name="map-pin" size="16px"></app-icon>
           {{ trackingResult.origin_city_name }}
         </span>
       </div>
@@ -86,7 +86,7 @@
       <div class="result-row">
         <span class="label">Destino:</span>
         <span class="value location">
-          <app-icon category="common" name="map-pin" size="16px"></app-icon>
+          <app-icon category="delivery" name="map-pin" size="16px"></app-icon>
           {{ trackingResult.destination_city_name }}
         </span>
       </div>
@@ -97,7 +97,7 @@
       </div>
 
       <button class="btn btn-secondary btn-details" (click)="onViewDetails(trackingResult.guide_id)">
-        <app-icon category="common" name="eye" size="18px"></app-icon>
+        <app-icon category="navigation" name="eye" size="18px"></app-icon>
         <span>Ver Detalles Completos</span>
       </button>
     </div>

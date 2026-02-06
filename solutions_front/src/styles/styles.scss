@@ -7,6 +7,90 @@
 @use "buttons";
 
 // ===============================
+// CSS VARIABLES FOR THEMING
+// ===============================
+:root {
+  // Brand colors (unchanged between themes)
+  --color-amarillo: #FFD700;
+  --color-azul: #0066CC;
+  --color-rojo: #E31E24;
+  --color-verde: #00A651;
+
+  // Brand variants
+  --color-amarillo-dark: #D4A900;
+  --color-amarillo-light: #FFE44D;
+  --color-azul-dark: #004D99;
+  --color-azul-light: #3399FF;
+  --color-rojo-dark: #B5171C;
+  --color-rojo-light: #FF4D52;
+  --color-verde-dark: #007A3D;
+  --color-verde-light: #33D47F;
+
+  // Light mode defaults
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F5F5;
+  --bg-tertiary: #FAFAFA;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+  --border-color: #E0E0E0;
+  --border-light: #F0F0F0;
+
+  // Shadows
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+
+  // Card colors
+  --card-bg: #FFFFFF;
+  --card-border: #E0E0E0;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  // Link colors
+  --link-color: var(--color-azul);
+  --link-hover: var(--color-amarillo);
+
+  // Transition
+  --transition-theme: 0.3s ease-in-out;
+}
+
+// ===============================
+// DARK MODE
+// ===============================
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary: #1A1A1A;
+    --bg-secondary: #2D2D2D;
+    --bg-tertiary: #252525;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0B0B0;
+    --text-muted: #808080;
+    --border-color: #404040;
+    --border-light: #333333;
+
+    // Adjusted shadows for dark mode
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+
+    // Card colors
+    --card-bg: #2D2D2D;
+    --card-border: #404040;
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+    // Brighter brand colors for dark mode
+    --color-amarillo: #FFE033;
+    --color-azul: #4D9AFF;
+    --color-rojo: #FF5C5C;
+    --color-verde: #33D47F;
+  }
+}
+
+// ===============================
 // GLOBAL RESETS
 // ===============================
 html, body {
@@ -14,12 +98,26 @@ html, body {
   padding: 0;
   height: 100%;
   font-family: variables.$font-primary;
-  color: colors.$text-primary;
-  background-color: colors.$bg-secondary;
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  transition: background-color var(--transition-theme), color var(--transition-theme);
 }
 
 * {
   box-sizing: border-box;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+  transition: color var(--transition-theme);
+
+  &:hover {
+    color: var(--color-azul-dark);
+    text-decoration: underline;
+    text-decoration-color: var(--color-amarillo);
+    text-underline-offset: 3px;
+  }
 }
 
 // ===============================
@@ -35,5 +133,188 @@ html, body {
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+// ===============================
+// BUTTON VARIANTS WITH NEW COLORS
+// ===============================
+.btn-primary {
+  background-color: var(--color-amarillo);
+  color: #333333;
+  border: none;
+  padding: variables.$spacing-sm variables.$spacing-lg;
+  border-radius: variables.$radius-md;
+  font-weight: variables.$font-semibold;
+  cursor: pointer;
+  transition: all var(--transition-theme);
+  box-shadow: var(--shadow-base);
+
+  &:hover {
+    background-color: var(--color-amarillo-dark);
+    box-shadow: var(--shadow-md), 0 0 20px rgba(255, 215, 0, 0.3);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-outline-blue {
+  background-color: transparent;
+  color: var(--color-azul);
+  border: 2px solid var(--color-azul);
+  padding: variables.$spacing-sm variables.$spacing-lg;
+  border-radius: variables.$radius-md;
+  font-weight: variables.$font-semibold;
+  cursor: pointer;
+  transition: all var(--transition-theme);
+
+  &:hover {
+    background-color: var(--color-azul);
+    color: white;
+  }
+}
+
+.btn-outline-green {
+  background-color: transparent;
+  color: var(--color-verde);
+  border: 2px solid var(--color-verde);
+  padding: variables.$spacing-sm variables.$spacing-lg;
+  border-radius: variables.$radius-md;
+  font-weight: variables.$font-semibold;
+  cursor: pointer;
+  transition: all var(--transition-theme);
+
+  &:hover {
+    background-color: var(--color-verde);
+    color: white;
+  }
+}
+
+// ===============================
+// BADGE VARIANTS
+// ===============================
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: variables.$radius-full;
+  font-size: variables.$font-xs;
+  font-weight: variables.$font-medium;
+  transition: all var(--transition-theme);
+}
+
+.badge-success {
+  background-color: rgba(0, 166, 81, 0.15);
+  color: var(--color-verde);
+}
+
+.badge-warning {
+  background-color: rgba(255, 215, 0, 0.2);
+  color: var(--color-amarillo-dark);
+}
+
+.badge-error {
+  background-color: rgba(227, 30, 36, 0.15);
+  color: var(--color-rojo);
+}
+
+.badge-info {
+  background-color: rgba(0, 102, 204, 0.15);
+  color: var(--color-azul);
+}
+
+// ===============================
+// CARD BORDER TOP COLORS
+// ===============================
+.card-border-amarillo {
+  border-top: 4px solid var(--color-amarillo);
+}
+
+.card-border-azul {
+  border-top: 4px solid var(--color-azul);
+}
+
+.card-border-rojo {
+  border-top: 4px solid var(--color-rojo);
+}
+
+.card-border-verde {
+  border-top: 4px solid var(--color-verde);
+}
+
+// ===============================
+// GUACAMAYA ANIMATIONS
+// ===============================
+@keyframes guacamayaFlight {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(2deg);
+  }
+  75% {
+    transform: translateY(-15px) rotate(0deg);
+  }
+}
+
+@keyframes featherFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translateY(-8px) rotate(10deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-4px) rotate(-5deg);
+    opacity: 0.9;
+  }
+  75% {
+    transform: translateY(-12px) rotate(5deg);
+    opacity: 1;
+  }
+}
+
+@keyframes wingFlap {
+  0%, 100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.9);
+  }
+}
+
+.guacamaya {
+  animation: guacamayaFlight 4s ease-in-out infinite;
+}
+
+.guacamaya-hover {
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.1) rotate(5deg);
+  }
+}
+
+.feather-float {
+  animation: featherFloat 5s ease-in-out infinite;
+
+  &:nth-child(2) {
+    animation-delay: -1s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: -2s;
+  }
+
+  &:nth-child(4) {
+    animation-delay: -3s;
   }
 }

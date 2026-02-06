@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IconComponent } from '@shared/components/icon/icon.component';
 
 export interface ActiveRoute {
   name: string;
@@ -14,7 +15,7 @@ export interface ActiveRoute {
   standalone: true,
   templateUrl: './active-routes.component.html',
   styleUrls: ['./active-routes.component.scss'],
-  imports: [CommonModule]
+  imports: [CommonModule, IconComponent]
 })
 export class ActiveRoutesComponent {
   @Input() routes: ActiveRoute[] = [];

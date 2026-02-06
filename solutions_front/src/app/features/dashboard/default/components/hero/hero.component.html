@@ -1,44 +1,66 @@
 <section class="hero">
+  <!-- Plumas decorativas flotantes -->
+  <div class="floating-feathers">
+    <img src="assets/guacamayas/feather-yellow.svg" alt="" class="feather feather-float feather-1" />
+    <img src="assets/guacamayas/feather-blue.svg" alt="" class="feather feather-float feather-2" />
+    <img src="assets/guacamayas/feather-red.svg" alt="" class="feather feather-float feather-3" />
+    <img src="assets/guacamayas/feather-green.svg" alt="" class="feather feather-float feather-4" />
+  </div>
+
   <div class="container">
     <div class="hero-grid">
       <div class="hero-content">
         <h1 class="hero-title">
-          Envíos seguros y rápidos por toda Colombia
+          Envios seguros y rapidos por toda Colombia
         </h1>
         <p class="hero-description">
-          La plataforma de mensajería más confiable del país. Rastrea tus envíos en tiempo real.
+          La plataforma de mensajeria mas confiable del pais. Rastrea tus envios en tiempo real.
         </p>
-        
+
         <app-tracking-card (trackingSubmit)="onTrackingSubmit($event)"></app-tracking-card>
       </div>
-      
+
+      <div class="hero-illustration">
+        <!-- Guacamaya grande en vuelo -->
+        <img
+          src="assets/guacamayas/guacamaya-hero.svg"
+          alt="Guacamaya colombiana llevando paquete"
+          class="guacamaya-hero guacamaya"
+        />
+      </div>
+
       <div class="map-section">
         <div class="map-container">
           <h3 class="map-title">Cobertura Nacional</h3>
-          
-          <app-colombia-map 
+
+          <!-- Guacamayas volando sobre el mapa -->
+          <div class="map-guacamayas">
+            <img src="assets/guacamayas/guacamaya-map.svg" alt="" class="map-bird bird-1 guacamaya" />
+            <img src="assets/guacamayas/guacamaya-map.svg" alt="" class="map-bird bird-2 guacamaya" />
+            <img src="assets/guacamayas/guacamaya-map.svg" alt="" class="map-bird bird-3 guacamaya" />
+          </div>
+
+          <app-colombia-map
             [showAnimations]="true"
             (citySelected)="onCitySelected($event)">
           </app-colombia-map>
 
-
           <p class="map-description">
-            <app-icon category="common" name="map-pin" size="20px"></app-icon>
-
-            Conectamos más de 1,100 municipios en todo el territorio colombiano
+            <app-icon category="delivery" name="map-pin" size="20px"></app-icon>
+            Conectamos mas de 1,100 municipios en todo el territorio colombiano
           </p>
 
-          <!-- Estadísticas -->
+          <!-- Estadisticas -->
           <div class="map-stats">
-            <div class="stat-item">
+            <div class="stat-item stat-amarillo">
               <span class="stat-value">32</span>
               <span class="stat-label">Departamentos</span>
             </div>
-            <div class="stat-item">
+            <div class="stat-item stat-azul">
               <span class="stat-value">1,100+</span>
               <span class="stat-label">Municipios</span>
             </div>
-            <div class="stat-item">
+            <div class="stat-item stat-verde">
               <span class="stat-value">24/7</span>
               <span class="stat-label">Cobertura</span>
             </div>

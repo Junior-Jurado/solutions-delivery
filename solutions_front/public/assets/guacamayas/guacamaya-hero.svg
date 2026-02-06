@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 280" fill="none">
+  <!-- Guacamaya grande en vuelo llevando paquete - 200-300px -->
+
+  <!-- Ala izquierda extendida -->
+  <g class="wing-left">
+    <path d="M80 100 Q40 80 20 120 Q30 140 60 150 Q50 130 70 120 Z" fill="#0066CC"/>
+    <path d="M60 150 Q30 160 15 200 Q40 190 70 170 Z" fill="#00A651"/>
+    <path d="M70 170 Q50 180 45 210 Q65 195 80 180 Z" fill="#FFD700"/>
+    <path d="M20 120 Q10 100 25 85 Q40 95 40 110 Z" fill="#E31E24"/>
+  </g>
+
+  <!-- Cuerpo principal -->
+  <ellipse cx="150" cy="120" rx="45" ry="55" fill="#E31E24"/>
+
+  <!-- Pecho con degradado -->
+  <ellipse cx="150" cy="130" rx="25" ry="35" fill="#FFD700"/>
+  <ellipse cx="150" cy="140" rx="18" ry="25" fill="#FFE44D" opacity="0.7"/>
+
+  <!-- Ala derecha extendida -->
+  <g class="wing-right">
+    <path d="M220 100 Q260 80 280 120 Q270 140 240 150 Q250 130 230 120 Z" fill="#0066CC"/>
+    <path d="M240 150 Q270 160 285 200 Q260 190 230 170 Z" fill="#00A651"/>
+    <path d="M230 170 Q250 180 255 210 Q235 195 220 180 Z" fill="#FFD700"/>
+    <path d="M280 120 Q290 100 275 85 Q260 95 260 110 Z" fill="#E31E24"/>
+  </g>
+
+  <!-- Cabeza -->
+  <circle cx="150" cy="70" r="35" fill="#FFD700"/>
+
+  <!-- Mejilla roja -->
+  <circle cx="165" cy="75" r="8" fill="#E31E24" opacity="0.6"/>
+
+  <!-- Ojo -->
+  <circle cx="160" cy="65" r="8" fill="#1A1A1A"/>
+  <circle cx="162" cy="63" r="3" fill="#FFFFFF"/>
+
+  <!-- Pico curvo -->
+  <path d="M175 70 Q195 75 200 70 Q195 80 180 82 Q175 78 175 70 Z" fill="#333333"/>
+  <path d="M175 74 Q185 78 188 76" stroke="#555" stroke-width="1" fill="none"/>
+
+  <!-- Corona/Plumas de la cabeza -->
+  <path d="M130 45 Q125 30 135 35 Q140 40 138 50 Z" fill="#E31E24"/>
+  <path d="M145 40 Q145 22 155 30 Q158 38 150 48 Z" fill="#0066CC"/>
+  <path d="M160 42 Q165 25 172 35 Q170 45 162 50 Z" fill="#00A651"/>
+
+  <!-- Cola larga -->
+  <path d="M120 170 L90 250 Q100 245 115 220 Z" fill="#E31E24"/>
+  <path d="M135 175 L115 260 Q130 250 140 220 Z" fill="#0066CC"/>
+  <path d="M150 175 L150 270 Q160 255 160 220 Z" fill="#FFD700"/>
+  <path d="M165 175 L185 260 Q170 250 160 220 Z" fill="#00A651"/>
+  <path d="M180 170 L210 250 Q200 245 185 220 Z" fill="#E31E24"/>
+
+  <!-- Patas -->
+  <g fill="#666666">
+    <path d="M130 165 L120 185 L115 180 M120 185 L118 190 M120 185 L125 188"/>
+    <path d="M170 165 L180 185 L185 180 M180 185 L182 190 M180 185 L175 188"/>
+  </g>
+
+  <!-- Paquete que carga -->
+  <g transform="translate(125, 180)">
+    <rect x="0" y="0" width="50" height="40" rx="4" fill="#8B4513"/>
+    <rect x="5" y="5" width="40" height="30" fill="#D2691E"/>
+    <line x1="25" y1="0" x2="25" y2="40" stroke="#FFD700" stroke-width="4"/>
+    <line x1="0" y1="20" x2="50" y2="20" stroke="#FFD700" stroke-width="4"/>
+    <!-- Cinta amarilla cruzada -->
+    <rect x="20" y="15" width="10" height="10" fill="#FFD700"/>
+    <!-- Lazo -->
+    <path d="M22 12 Q15 5 22 8 M28 12 Q35 5 28 8" stroke="#FFD700" stroke-width="2" fill="none"/>
+    <ellipse cx="25" cy="12" rx="3" ry="2" fill="#FFD700"/>
+  </g>
+
+  <!-- Líneas de velocidad -->
+  <g stroke="#FFFFFF" stroke-width="2" opacity="0.5">
+    <line x1="10" y1="100" x2="40" y2="95"/>
+    <line x1="5" y1="120" x2="30" y2="118"/>
+    <line x1="15" y1="140" x2="35" y2="140"/>
+  </g>
+</svg>

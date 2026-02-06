@@ -4,12 +4,15 @@ import { IconComponent } from '@shared/components/icon/icon.component';
 
 interface Service {
   icon: string;
+  iconCategory: string;
   title: string;
   subtitle: string;
   features: string[];
   buttonText: string;
   buttonClass: string;
-  color: 'blue' | 'red' | 'black';
+  color: 'blue' | 'red' | 'green' | 'yellow';
+  guacamayaImage: string;
+  borderColor: string;
 }
 
 @Component({
@@ -23,6 +26,7 @@ export class ServicesComponent {
   services: Service[] = [
     {
       icon: 'package',
+      iconCategory: 'delivery',
       title: 'Contado',
       subtitle: 'Pago inmediato, entrega garantizada',
       features: [
@@ -32,36 +36,44 @@ export class ServicesComponent {
         'Seguro incluido'
       ],
       buttonText: 'Cotizar Ahora',
-      buttonClass: 'btn-blue',
-      color: 'blue'
+      buttonClass: 'btn-azul',
+      color: 'blue',
+      guacamayaImage: 'assets/guacamayas/guacamaya-service-blue.svg',
+      borderColor: 'card-border-azul'
     },
     {
       icon: 'check-circle',
+      iconCategory: 'status',
       title: 'Contra Entrega',
       subtitle: 'El destinatario paga al recibir',
       features: [
         'Sin riesgo para el remitente',
-        'Confirmación de pago',
+        'Confirmacion de pago',
         'Transferencia inmediata',
         'Ideal para e-commerce'
       ],
       buttonText: 'Solicitar Servicio',
-      buttonClass: 'btn-red',
-      color: 'red'
+      buttonClass: 'btn-rojo',
+      color: 'red',
+      guacamayaImage: 'assets/guacamayas/guacamaya-service-red.svg',
+      borderColor: 'card-border-rojo'
     },
     {
       icon: 'truck',
-      title: 'Crédito',
+      iconCategory: 'delivery',
+      title: 'Credito',
       subtitle: 'Para empresas establecidas',
       features: [
-        'Facturación mensual',
-        'Términos flexibles',
-        'Gestión corporativa',
+        'Facturacion mensual',
+        'Terminos flexibles',
+        'Gestion corporativa',
         'Reportes detallados'
       ],
       buttonText: 'Contactar Ventas',
-      buttonClass: 'btn-secondary',
-      color: 'black'
+      buttonClass: 'btn-verde',
+      color: 'green',
+      guacamayaImage: 'assets/guacamayas/guacamaya-service-green.svg',
+      borderColor: 'card-border-verde'
     }
   ];
 }

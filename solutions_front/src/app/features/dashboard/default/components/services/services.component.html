@@ -5,40 +5,52 @@
         Nuestros Servicios
       </h2>
       <p class="section-description">
-        Soluciones flexibles para cada necesidad de envío
+        Soluciones flexibles para cada necesidad de envio
       </p>
     </div>
 
     <div class="services-grid">
-      <div *ngFor="let service of services" class="service-card">
-        <div 
+      <div *ngFor="let service of services" class="service-card" [ngClass]="service.borderColor">
+        <!-- Guacamaya decorativa -->
+        <img
+          [src]="service.guacamayaImage"
+          alt=""
+          class="service-guacamaya guacamaya-hover"
+        />
+
+        <div
           class="service-icon"
-          [class.bg-blue]="service.color === 'blue'"
-          [class.bg-red]="service.color === 'red'"
-          [class.bg-black]="service.color === 'black'">
-          
-          <app-icon 
-            category="common" 
-            [name]="service.icon" 
+          [class.bg-azul]="service.color === 'blue'"
+          [class.bg-rojo]="service.color === 'red'"
+          [class.bg-verde]="service.color === 'green'"
+          [class.bg-amarillo]="service.color === 'yellow'">
+
+          <app-icon
+            [category]="service.iconCategory"
+            [name]="service.icon"
             size="32px">
           </app-icon>
         </div>
 
-        <h3 
+        <h3
           class="service-title"
-          [class.text-blue]="service.color === 'blue'"
-          [class.text-red]="service.color === 'red'"
-          [class.text-black]="service.color === 'black'">
+          [class.text-azul]="service.color === 'blue'"
+          [class.text-rojo]="service.color === 'red'"
+          [class.text-verde]="service.color === 'green'"
+          [class.text-amarillo]="service.color === 'yellow'">
           {{ service.title }}
         </h3>
 
         <p class="service-subtitle">{{ service.subtitle }}</p>
 
         <ul class="service-list">
-          <li *ngFor="let feature of service.features">• {{ feature }}</li>
+          <li *ngFor="let feature of service.features">
+            <span class="check-icon" [class.check-azul]="service.color === 'blue'" [class.check-rojo]="service.color === 'red'" [class.check-verde]="service.color === 'green'"></span>
+            {{ feature }}
+          </li>
         </ul>
 
-        <button [class]="service.buttonClass + ' w-full'">
+        <button [ngClass]="service.buttonClass + ' btn-full'">
           {{ service.buttonText }}
         </button>
       </div>

@@ -2,33 +2,43 @@
   <!-- Deliveries Today -->
   <div class="overview-card primary">
     <div class="card-header">
+      <app-icon category="delivery" name="package" size="20px" color="#3b82f6"></app-icon>
       <h3>Entregas de Hoy</h3>
     </div>
     <div class="card-content">
       <div class="big-number">{{ deliveriesToday }}</div>
-      <div class="sub-text">{{ completed }} completadas, {{ pending }} pendientes</div>
+      <div class="sub-text">
+        <span class="stat-highlight success">{{ completed }} completadas</span>
+        <span class="stat-separator">•</span>
+        <span class="stat-highlight warning">{{ pending }} pendientes</span>
+      </div>
+      <div class="progress-bar" *ngIf="deliveriesToday > 0">
+        <div class="progress-fill" [style.width.%]="completionRate"></div>
+      </div>
     </div>
   </div>
 
   <!-- Average Time -->
   <div class="overview-card warning">
     <div class="card-header">
+      <app-icon category="delivery" name="clock" size="20px" color="#f59e0b"></app-icon>
       <h3>Tiempo Promedio</h3>
     </div>
     <div class="card-content">
-      <div class="big-number">{{ averageTime }}h</div>
-      <div class="sub-text">Por entrega completada</div>
+      <div class="big-number">{{ formattedAverageTime }}</div>
+      <div class="sub-text">Por entrega completada (últimos 30 días)</div>
     </div>
   </div>
 
   <!-- Satisfaction -->
   <div class="overview-card success">
     <div class="card-header">
+      <app-icon category="misc" name="star" size="20px" color="#10b981"></app-icon>
       <h3>Satisfacción</h3>
     </div>
     <div class="card-content">
-      <div class="big-number">{{ satisfaction }}%</div>
-      <div class="sub-text">Cliente satisfecho</div>
+      <div class="big-number">{{ formattedSatisfaction }}</div>
+      <div class="sub-text">Calificación promedio de clientes</div>
     </div>
   </div>
 </div>

@@ -487,3 +487,76 @@ resource "aws_apigatewayv2_route" "assignments_history" {
   authorization_type = "JWT"
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
+
+# -----------------------------------------
+# ADMIN
+
+// GET /admin/stats
+resource "aws_apigatewayv2_route" "admin_stats" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/admin/stats"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /admin/employees
+resource "aws_apigatewayv2_route" "admin_employees" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/admin/employees"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /admin/users/search
+resource "aws_apigatewayv2_route" "admin_users_search" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/admin/users/search"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /admin/employees/{id}
+resource "aws_apigatewayv2_route" "admin_employees_by_id" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/admin/employees/{id}"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// POST /admin/employees/{id}
+resource "aws_apigatewayv2_route" "admin_employees_create" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "POST /api/v1/admin/employees/{id}"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// PUT /admin/employees/{id} - Actualizar empleado (rol, etc.)
+resource "aws_apigatewayv2_route" "admin_employees_update" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "PUT /api/v1/admin/employees/{id}"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// GET /admin/clients/ranking - Obtener ranking de mejores clientes
+resource "aws_apigatewayv2_route" "admin_clients_ranking" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/admin/clients/ranking"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}

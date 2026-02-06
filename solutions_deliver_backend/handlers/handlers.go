@@ -28,6 +28,9 @@ func Manejadores(path string, method string, body string, headers map[string]str
 
 	switch {
 
+	case strings.HasPrefix(path, "/admin"):
+		return ProccessAdmin(body, path, method, userUUID, request)
+
 	case strings.HasPrefix(path, "/guides"):
 		return ProcesoGuias(body, path, method, userUUID, idn, request)
 
@@ -460,4 +463,44 @@ func extractAssignmentIDFromPath(path string, suffix string) int64 {
 		return 0
 	}
 	return id
+}
+
+// ProccessAdmin maneja las peticiones del panel de administración
+func ProccessAdmin(body string, path string, method string, user string, request events.APIGatewayV2HTTPRequest) (int, string) {
+	fmt.Printf("ProccessAdmin -> Path:%s, Method: %s\n", path, method)
+
+	switch {
+	// GET /admin/stats - Obtener estadísticas del dashboard
+	case path == "/admin/stats" && method == "GET":
+		return routers.GetAdminDashboardStats(user)
+
+	// GET /admin/employees - Listar empleados
+	case path == "/admin/employees" && method == "GET":
+		return routers.GetEmployees(request, user)
+
+	// GET /admin/users/search - Buscar usuario por documento
+	case path == "/admin/users/search" && method == "GET":
+		documentNumber := ""
+		if request.QueryStringParameters != nil {
+			documentNumber = request.QueryStringParameters["document"]
+		}
+		return routers.GetUserByDocument(user, documentNumber)
+
+	// GET /admin/employees/{id} - Obtener empleado por ID
+	case strings.HasPrefix(path, "/admin/employees/") && method == "GET":
+		employeeID := strings.TrimPrefix(path, "/admin/employees/")
+		return routers.GetEmployeeByID(user, employeeID)
+
+	// PUT /admin/employees/{id} - Actualizar empleado
+	case strings.HasPrefix(path, "/admin/employees/") && method == "PUT":
+		employeeID := strings.TrimPrefix(path, "/admin/employees/")
+		return routers.UpdateEmployee(body, user, employeeID)
+
+	// GET /admin/clients/ranking - Obtener ranking de mejores clientes
+	case path == "/admin/clients/ranking" && method == "GET":
+		return routers.GetClientRanking(request, user)
+
+	default:
+		return 404, `{"error": "Ruta no encontrada"}`
+	}
 }

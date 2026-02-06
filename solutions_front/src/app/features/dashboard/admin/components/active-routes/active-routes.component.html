@@ -5,8 +5,17 @@
   </div>
 </div>
 
+<!-- Empty State -->
+<div *ngIf="!isLoading && routes.length === 0" class="empty-state">
+  <div class="empty-icon">
+    <app-icon category="delivery" name="truck" size="48px"></app-icon>
+  </div>
+  <h3 class="empty-title">Sin rutas activas</h3>
+  <p class="empty-description">No hay entregadores en servicio en este momento</p>
+</div>
+
 <!-- Routes List -->
-<div *ngIf="!isLoading" class="routes-list">
+<div *ngIf="!isLoading && routes.length > 0" class="routes-list">
   <div *ngFor="let route of routes" class="route-item">
     <div class="route-header">
       <div class="route-name">{{ route.name }}</div>

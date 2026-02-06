@@ -80,6 +80,64 @@
   margin: 0 auto;
 }
 
+// ===== FLOATING REFRESH BUTTON =====
+.floating-refresh-btn {
+  position: fixed;
+  bottom: 100px; // Por encima del toast (que está a 20px)
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: $brand-blue;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba($brand-blue, 0.4);
+  transition: all $transition-base;
+  z-index: 1000; // Por debajo del toast (z-index: 10000)
+
+  &:hover:not(:disabled) {
+    background: darken($brand-blue, 8%);
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba($brand-blue, 0.5);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.95);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+
+  &.refreshing {
+    background: $brand-blue;
+
+    app-icon,
+    ::ng-deep svg {
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  @include respond-to($breakpoint-md) {
+    bottom: 90px;
+    right: 16px;
+    width: 52px;
+    height: 52px;
+  }
+
+  @include respond-to($breakpoint-xs) {
+    bottom: 24px; // En móvil el toast está arriba, así que puede ir más abajo
+    right: 16px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
 // ===== ANIMATIONS =====
 @keyframes fadeIn {
   from {
@@ -87,5 +145,14 @@
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

@@ -1,24 +1,65 @@
 <!-- Loading State -->
 <div *ngIf="isLoading" class="loading-container">
-  <div class="loading-item" *ngFor="let i of [1, 2, 3]">
+  <div class="loading-item" *ngFor="let i of [1, 2, 3, 4, 5]">
     <div class="loading-shimmer"></div>
   </div>
 </div>
 
+<!-- Empty State -->
+<div *ngIf="!isLoading && deliveries.length === 0" class="empty-state">
+  <app-icon category="delivery" name="truck" size="48px" color="#d1d5db"></app-icon>
+  <h3>Sin entregas activas</h3>
+  <p>No hay entregas en proceso en este momento. Las asignaciones pendientes y en ruta aparecerán aquí.</p>
+</div>
+
 <!-- Deliveries List -->
-<div *ngIf="!isLoading" class="deliveries-list">
+<div *ngIf="!isLoading && deliveries.length > 0" class="deliveries-list">
+  <!-- Summary header -->
+  <div class="list-header">
+    <span class="total-count">{{ deliveries.length }} entregas activas</span>
+  </div>
+
   <div *ngFor="let delivery of deliveries" class="delivery-item">
-    <div class="delivery-info">
-      <div class="delivery-id">{{ delivery.id }}</div>
-      <div class="delivery-customer">{{ delivery.customer }}</div>
-      <div class="delivery-address">{{ delivery.address }}</div>
+    <!-- Left side: Guide info -->
+    <div class="delivery-main">
+      <div class="delivery-header">
+        <div class="delivery-id">
+          <app-icon category="delivery" name="package" size="16px" color="#3b82f6"></app-icon>
+          <span>Guía #{{ delivery.id }}</span>
+        </div>
+        <span class="service-badge">{{ getServiceTypeLabel(delivery.serviceType) }}</span>
+      </div>
+      <div class="delivery-customer">
+        <app-icon category="users" name="user" size="14px" color="#6b7280"></app-icon>
+        {{ delivery.customer }}
+      </div>
+      <div class="delivery-address">
+        <app-icon category="delivery" name="map-pin" size="14px" color="#6b7280"></app-icon>
+        {{ delivery.address }}
+      </div>
     </div>
-    <div class="delivery-status">
+
+    <!-- Right side: Status and actions -->
+    <div class="delivery-meta">
       <span class="badge" [ngClass]="getStatusClass(delivery.status)">
+        <app-icon [category]="getStatusIconCategory(delivery.status)" [name]="getStatusIcon(delivery.status)" size="12px"></app-icon>
         {{ delivery.status }}
       </span>
-      <div class="delivery-person">{{ delivery.deliveryPerson }}</div>
-      <div class="delivery-time">{{ delivery.time }}</div>
+      <div class="delivery-person">
+        <app-icon category="delivery" name="truck" size="14px" color="#6b7280"></app-icon>
+        {{ delivery.deliveryPerson }}
+      </div>
+      <div class="delivery-time">
+        <app-icon category="delivery" name="clock" size="12px" color="#9ca3af"></app-icon>
+        {{ delivery.time }}
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="delivery-actions">
+      <button class="btn-view" (click)="onViewGuide(delivery.id)" title="Ver detalles de la guía">
+        <app-icon category="navigation" name="eye" size="18px"></app-icon>
+      </button>
     </div>
   </div>
 </div>

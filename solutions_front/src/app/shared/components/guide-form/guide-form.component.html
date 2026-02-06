@@ -3,7 +3,7 @@
     <!-- ===== REMITENTE ===== -->
     <div class="form-section">
       <div class="section-header">
-        <app-icon category="common" name="user-circle" size="20px" color="#3b82f6"></app-icon>
+        <app-icon category="users" name="user-circle" size="20px" color="#3b82f6"></app-icon>
         <h3>Información del Remitente</h3>
         <span class="badge-readonly" *ngIf="isClientReadonly"></span>
       </div>
@@ -25,7 +25,7 @@
             class="autocomplete-input">
           <app-icon
             *ngIf="isLoadingSenderSuggestions"
-            category="common"
+            category="status"
             name="loader"
             size="16px"
             customClass="spinner autocomplete-icon">
@@ -134,7 +134,7 @@
             (click)="selectSenderAddress(address)">
             <div class="address-text">{{ address.address }}</div>
             <div class="address-meta">
-              <app-icon category="common" name="repeat" size="12px"></app-icon>
+              <app-icon category="actions" name="repeat" size="12px"></app-icon>
               Usado {{ address.usage_count }} {{ address.usage_count === 1 ? 'vez' : 'veces' }}
             </div>
           </div>
@@ -157,7 +157,7 @@
     <!-- ===== DESTINATARIO ===== -->
     <div class="form-section">
       <div class="section-header destination">
-        <app-icon category="common" name="map-pin" size="20px" color="#ef4444"></app-icon>
+        <app-icon category="delivery" name="map-pin" size="20px" color="#ef4444"></app-icon>
         <h3>Información del Destinatario</h3>
       </div>
 
@@ -178,7 +178,7 @@
             class="autocomplete-input">
           <app-icon
             *ngIf="isLoadingReceiverSuggestions"
-            category="common"
+            category="status"
             name="loader"
             size="16px"
             customClass="spinner autocomplete-icon">
@@ -283,7 +283,7 @@
             (click)="selectReceiverAddress(address)">
             <div class="address-text">{{ address.address }}</div>
             <div class="address-meta">
-              <app-icon category="common" name="repeat" size="12px"></app-icon>
+              <app-icon category="actions" name="repeat" size="12px"></app-icon>
               Usado {{ address.usage_count }} {{ address.usage_count === 1 ? 'vez' : 'veces' }}
             </div>
           </div>
@@ -307,7 +307,7 @@
   <!-- ===== INFORMACIÓN DEL PAQUETE ===== -->
   <div class="form-section full-width">
     <div class="section-header">
-      <app-icon category="common" name="box" size="20px" color="#3b82f6"></app-icon>
+      <app-icon category="delivery" name="box" size="20px" color="#3b82f6"></app-icon>
       <h3>Información del Paquete</h3>
     </div>
 
@@ -396,9 +396,9 @@
     type="submit" 
     class="btn btn-primary btn-large" 
     [disabled]="!guideForm.valid || isSubmitting">
-    <app-icon 
-      *ngIf="isSubmitting" 
-      category="common" 
+    <app-icon
+      *ngIf="isSubmitting"
+      category="status"
       name="loader" 
       size="20px"
       customClass="spinner">

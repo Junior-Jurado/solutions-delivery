@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { IconComponent } from '@shared/components/icon/icon.component';
 
 export interface DeliveryPerson {
   id: string;
@@ -24,7 +25,7 @@ export interface RouteAssignment {
   standalone: true,
   templateUrl: './route-assignment-form.component.html',
   styleUrls: ['./route-assignment-form.component.scss'],
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, IconComponent]
 })
 export class RouteAssignmentFormComponent {
   @Input() deliveryPersons: DeliveryPerson[] = [];

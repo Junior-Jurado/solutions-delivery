@@ -5,14 +5,31 @@
 
 .cta {
   padding: 4rem 0;
-  background-color: $brand-black;
+  background: linear-gradient(135deg, var(--color-azul) 0%, var(--color-azul-dark) 100%);
   color: $white;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(0, 166, 81, 0.1) 0%, transparent 40%);
+    pointer-events: none;
+  }
 
   .container {
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 $spacing-md;
+    position: relative;
+    z-index: 1;
 
     @media (min-width: $breakpoint-sm) {
       padding: 0 $spacing-lg;
@@ -27,6 +44,7 @@
     font-size: $font-2xl;
     font-weight: $font-bold;
     margin-bottom: $spacing-md;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
     @media (min-width: $breakpoint-md) {
       font-size: $font-3xl;
@@ -35,11 +53,31 @@
 
   .cta-description {
     font-size: $font-lg;
-    margin-bottom: $spacing-xl;
-    opacity: 0.9;
+    margin-bottom: $spacing-lg;
+    opacity: 0.95;
 
     @media (min-width: $breakpoint-md) {
       font-size: $font-xl;
+    }
+  }
+
+  .cta-guacamaya-container {
+    margin-bottom: $spacing-lg;
+
+    .cta-guacamaya {
+      width: 50px;
+      height: auto;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+      animation: guacamayaFlight 4s ease-in-out infinite;
+    }
+  }
+
+  @keyframes guacamayaFlight {
+    0%, 100% {
+      transform: translateY(0) rotate(-2deg);
+    }
+    50% {
+      transform: translateY(-10px) rotate(2deg);
     }
   }
 
@@ -55,39 +93,109 @@
   }
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, $brand-blue, $brand-red);
-  color: $white;
-  border: none;
-  padding: $spacing-sm $spacing-lg;
-  border-radius: $radius-md;
-  font-weight: $font-semibold;
-  cursor: pointer;
-  transition: transform $transition-base, box-shadow $transition-base;
+// Decorative feathers
+.cta-feathers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
 
-  &:hover {
-    transform: translateY(-1px);
-    box-shadow: $shadow-lg;
+  .cta-feather {
+    position: absolute;
+    opacity: 0.4;
+    width: 20px;
+  }
+
+  .feather-1 {
+    top: 20%;
+    left: 8%;
+    animation-delay: 0s;
+  }
+
+  .feather-2 {
+    top: 30%;
+    right: 10%;
+    animation-delay: -2s;
   }
 }
 
-.btn-outline {
+@keyframes featherFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-15px) rotate(10deg);
+    opacity: 0.5;
+  }
+}
+
+.feather-float {
+  animation: featherFloat 6s ease-in-out infinite;
+}
+
+// Button styles
+.btn-cta-primary {
+  background-color: var(--color-amarillo);
+  color: #333333;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+
+  &:hover {
+    background-color: var(--color-amarillo-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.btn-cta-outline {
   background: transparent;
   color: $white;
-  border: 1px solid $white;
+  border: 2px solid $white;
   padding: $spacing-sm $spacing-lg;
   border-radius: $radius-md;
   font-weight: $font-semibold;
   cursor: pointer;
-  transition: background-color $transition-base, color $transition-base;
+  transition: all 0.3s ease;
 
   &:hover {
     background-color: $white;
-    color: $brand-black;
+    color: var(--color-azul);
   }
 }
 
 .btn-lg {
   padding: $spacing-md $spacing-xl;
   font-size: $font-lg;
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .cta {
+    background: linear-gradient(135deg, #004D99 0%, #003366 100%);
+
+    .cta-guacamaya {
+      filter: brightness(1.15) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+
+    .cta-feather {
+      filter: brightness(1.2);
+    }
+  }
+
+  .btn-cta-primary {
+    background-color: #FFE033;
+  }
 }

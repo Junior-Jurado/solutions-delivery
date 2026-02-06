@@ -4,7 +4,7 @@
     <div class="modal-header">
       <h2>{{ title }}</h2>
       <button class="btn-close" (click)="onCancel()" [disabled]="isCreating">
-        <app-icon category="common" name="x" size="24px"></app-icon>
+        <app-icon category="navigation" name="x" size="24px"></app-icon>
       </button>
     </div>
 
@@ -12,21 +12,72 @@
     <div class="modal-body" *ngIf="guideData">
       <!-- Warning Banner -->
       <div class="warning-banner">
-        <app-icon category="common" name="alert-triangle" size="24px"></app-icon>
+        <app-icon category="status" name="alert-triangle" size="24px"></app-icon>
         <p><strong>Importante:</strong> {{ warningMessage }}</p>
       </div>
 
       <!-- Price Banner -->
-      <div class="price-banner">
-        <div class="price-label">
-          <app-icon category="common" name="dollar-sign" size="24px"></app-icon>
-          <span>Precio del Envío</span>
+      <div class="price-banner" [class.editable]="allowPriceEdit" [class.editing]="isEditingPrice">
+        <div class="price-header">
+          <div class="price-label">
+            <app-icon category="finance" name="dollar-sign" size="24px"></app-icon>
+            <span>Precio del Envío</span>
+          </div>
+          <button
+            *ngIf="allowPriceEdit && !isEditingPrice && !isCreating"
+            class="btn-edit-price"
+            (click)="startEditPrice()"
+            title="Modificar precio">
+            <app-icon category="actions" name="edit" size="16px"></app-icon>
+            <span>Modificar</span>
+          </button>
         </div>
-        <div class="price-amount">
-          ${{ formatPrice(guideData.calculatedPrice) }}
-        </div>
-        <div class="price-details">
-          Peso: {{ guideData.weight }} kg | Tipo: {{ guideData.serviceType }}
+
+        <!-- Modo visualización -->
+        <ng-container *ngIf="!isEditingPrice">
+          <div class="price-amount" [class.modified]="customPrice > 0">
+            ${{ formatPrice(currentPrice) }}
+          </div>
+          <div class="price-details">
+            <span>Peso: {{ guideData.weight }} kg | Tipo: {{ guideData.serviceType }}</span>
+            <span *ngIf="customPrice > 0" class="price-modified-badge">
+              <app-icon category="actions" name="edit" size="12px"></app-icon>
+              Precio modificado
+              <button class="btn-reset-price" (click)="resetToCalculatedPrice()" title="Restaurar precio calculado">
+                <app-icon category="navigation" name="x" size="12px"></app-icon>
+              </button>
+            </span>
+          </div>
+          <div *ngIf="customPrice > 0" class="original-price">
+            Precio calculado: ${{ formatPrice(guideData.calculatedPrice) }}
+          </div>
+        </ng-container>
+
+        <!-- Modo edición -->
+        <div *ngIf="isEditingPrice" class="price-edit-form">
+          <div class="price-input-group">
+            <span class="currency-symbol">$</span>
+            <input
+              type="number"
+              [(ngModel)]="customPrice"
+              class="price-input"
+              min="0"
+              step="1000"
+              placeholder="Ingrese el precio">
+          </div>
+          <div class="price-edit-actions">
+            <button class="btn-save-price" (click)="savePrice()">
+              <app-icon category="status" name="check" size="16px"></app-icon>
+              Aplicar
+            </button>
+            <button class="btn-cancel-price" (click)="cancelEditPrice()">
+              <app-icon category="navigation" name="x" size="16px"></app-icon>
+              Cancelar
+            </button>
+          </div>
+          <div class="price-hint">
+            Precio calculado automáticamente: ${{ formatPrice(guideData.calculatedPrice) }}
+          </div>
         </div>
       </div>
 
@@ -35,7 +86,7 @@
         <!-- Remitente -->
         <div class="preview-section">
           <h3>
-            <app-icon category="common" name="user-circle" size="20px"></app-icon>
+            <app-icon category="users" name="user-circle" size="20px"></app-icon>
             Remitente
           </h3>
           <div class="preview-details">
@@ -65,7 +116,7 @@
         <!-- Destinatario -->
         <div class="preview-section">
           <h3>
-            <app-icon category="common" name="map-pin" size="20px"></app-icon>
+            <app-icon category="delivery" name="map-pin" size="20px"></app-icon>
             Destinatario
           </h3>
           <div class="preview-details">
@@ -95,7 +146,7 @@
         <!-- Paquete -->
         <div class="preview-section">
           <h3>
-            <app-icon category="common" name="box" size="20px"></app-icon>
+            <app-icon category="delivery" name="box" size="20px"></app-icon>
             Información del Paquete
           </h3>
           <div class="preview-details">
@@ -140,16 +191,16 @@
         class="btn btn-primary" 
         (click)="onConfirm()" 
         [disabled]="isCreating">
-        <app-icon 
+        <app-icon
           *ngIf="isCreating"
-          category="common" 
+          category="status"
           name="loader" 
           size="20px"
           customClass="spinner">
         </app-icon>
-        <app-icon 
+        <app-icon
           *ngIf="!isCreating"
-          category="common" 
+          category="status"
           name="check-circle" 
           size="20px">
         </app-icon>

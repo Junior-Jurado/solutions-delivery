@@ -2,102 +2,381 @@
 @use "variables" as *;
 @use "mixins" as *;
 
-.employee-list {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
-}
-
-.employee-item {
+// ===== FILTER BAR =====
+.filter-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: $spacing-lg;
   padding: $spacing-md;
-  border: 1px solid $border-color;
-  border-radius: $radius-md;
-  transition: all $transition-base;
+  background-color: $bg-light;
+  border-radius: $radius-lg;
 
   @include respond-to($breakpoint-sm) {
     flex-direction: column;
-    align-items: flex-start;
     gap: $spacing-md;
   }
+}
 
-  &:hover {
-    background-color: $bg-light;
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  app-icon {
+    color: $text-muted;
   }
 
-  .employee-info {
-    .employee-name {
-      font-weight: $font-medium;
-      color: $text-primary;
-      margin-bottom: $spacing-xs;
-    }
+  .filter-select {
+    padding: $spacing-sm $spacing-xl $spacing-sm $spacing-md;
+    font-size: $font-sm;
+    color: $text-primary;
+    background-color: $white;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $spacing-xs center;
+    background-size: 16px;
+    min-width: 160px;
 
-    .employee-role {
-      font-size: $font-sm;
-      color: $text-muted;
-    }
-  }
-
-  .employee-actions {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-
-    @include respond-to($breakpoint-sm) {
-      width: 100%;
-      justify-content: space-between;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: $spacing-xs $spacing-sm;
-      font-size: $font-xs;
-      font-weight: $font-medium;
-      border-radius: $radius-full;
-
-      &.badge-success {
-        background-color: $success-light;
-        color: $success-color;
-      }
-
-      &.badge-secondary {
-        background-color: $gray-100;
-        color: $gray-600;
-      }
-    }
-
-    .edit-button {
-      padding: $spacing-xs $spacing-md;
-      font-size: $font-sm;
-      font-weight: $font-medium;
-      color: $text-primary;
-      background-color: $white;
-      border: 1px solid $border-color;
-      border-radius: $radius-md;
-      cursor: pointer;
-      transition: all $transition-base;
-
-      &:hover {
-        background-color: $bg-light;
-        border-color: $gray-400;
-      }
+    &:focus {
+      outline: none;
+      border-color: $brand-blue;
     }
   }
 }
 
-// Loading State
+.employee-count {
+  display: flex;
+  align-items: baseline;
+  gap: $spacing-xs;
+
+  .count {
+    font-size: $font-xl;
+    font-weight: $font-bold;
+    color: $brand-blue;
+  }
+
+  .label {
+    font-size: $font-sm;
+    color: $text-muted;
+  }
+}
+
+// ===== EMPLOYEE LIST =====
+.employee-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.employee-card {
+  display: grid;
+  grid-template-columns: 48px 1fr auto auto auto;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  background: $white;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  transition: all $transition-base;
+
+  @include respond-to($breakpoint-md) {
+    grid-template-columns: 40px 1fr auto;
+    grid-template-rows: auto auto;
+    gap: $spacing-sm;
+
+    .employee-role,
+    .employee-status {
+      grid-row: 2;
+    }
+
+    .employee-actions {
+      grid-row: 1 / 3;
+    }
+  }
+
+  @include respond-to($breakpoint-sm) {
+    grid-template-columns: 1fr;
+    text-align: center;
+
+    .employee-avatar {
+      margin: 0 auto;
+    }
+
+    .employee-actions {
+      justify-content: center;
+    }
+  }
+
+  &:hover {
+    border-color: $brand-blue;
+    box-shadow: 0 4px 12px rgba($brand-blue, 0.1);
+  }
+
+  &.editing {
+    border-color: $brand-blue;
+    background: linear-gradient(135deg, rgba($brand-blue, 0.02) 0%, $white 100%);
+  }
+
+  &.is-admin {
+    border-left: 3px solid $error-color;
+  }
+}
+
+// ===== AVATAR =====
+.employee-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: $radius-full;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: $font-bold;
+  font-size: $font-sm;
+  color: $white;
+  flex-shrink: 0;
+
+  &.badge-admin {
+    background: linear-gradient(135deg, $error-color 0%, darken($error-color, 10%) 100%);
+  }
+
+  &.badge-secretary {
+    background: linear-gradient(135deg, $warning-color 0%, darken($warning-color, 10%) 100%);
+  }
+
+  &.badge-delivery {
+    background: linear-gradient(135deg, $brand-blue 0%, $brand-blue-dark 100%);
+  }
+
+  &.badge-client {
+    background: linear-gradient(135deg, $success-color 0%, darken($success-color, 10%) 100%);
+  }
+
+  @include respond-to($breakpoint-md) {
+    width: 40px;
+    height: 40px;
+    font-size: $font-xs;
+  }
+}
+
+// ===== INFO =====
+.employee-info {
+  min-width: 0;
+
+  .employee-name {
+    font-weight: $font-semibold;
+    color: $text-primary;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .employee-email {
+    font-size: $font-sm;
+    color: $text-muted;
+    margin-bottom: $spacing-xs;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .employee-meta {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    font-size: $font-xs;
+    color: $text-disabled;
+
+    @include respond-to($breakpoint-sm) {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+  }
+}
+
+// ===== ROLE =====
+.employee-role {
+  .role-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: $spacing-xs $spacing-md;
+    font-size: $font-xs;
+    font-weight: $font-semibold;
+    border-radius: $radius-full;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &.badge-admin {
+      background: #fecaca;
+      color: #b91c1c;
+    }
+
+    &.badge-secretary {
+      background: #fef3c7;
+      color: #b45309;
+    }
+
+    &.badge-delivery {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    &.badge-client {
+      background: #d1fae5;
+      color: #047857;
+    }
+  }
+
+  .role-select {
+    padding: $spacing-xs $spacing-lg $spacing-xs $spacing-sm;
+    font-size: $font-sm;
+    color: $text-primary;
+    background-color: $white;
+    border: 2px solid $brand-blue;
+    border-radius: $radius-md;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+    background-size: 14px;
+    min-width: 130px;
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba($brand-blue, 0.2);
+    }
+  }
+}
+
+// ===== STATUS =====
+.employee-status {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-xs;
+    font-weight: $font-medium;
+    border-radius: $radius-md;
+
+    &.badge-success {
+      background: #d1fae5;
+      color: #047857;
+    }
+
+    &.badge-info {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    &.badge-secondary {
+      background: $gray-200;
+      color: $gray-700;
+    }
+  }
+
+  .delivery-stats {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: $font-xs;
+    color: $success-color;
+    font-weight: $font-medium;
+  }
+}
+
+// ===== ACTIONS =====
+.employee-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all $transition-base;
+
+    &.edit-btn {
+      background: $bg-light;
+      color: $text-muted;
+
+      &:hover {
+        background: $brand-blue;
+        color: $white;
+      }
+    }
+
+    &.save-btn {
+      background: $success-color;
+      color: $white;
+
+      &:hover:not(:disabled) {
+        background: darken($success-color, 8%);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    &.cancel-btn {
+      background: $gray-200;
+      color: $text-muted;
+
+      &:hover:not(:disabled) {
+        background: $gray-300;
+        color: $text-primary;
+      }
+    }
+
+    .spin {
+      animation: spin 1s linear infinite;
+    }
+  }
+
+  .admin-shield {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $warning-color;
+  }
+}
+
+// ===== LOADING STATE =====
 .loading-container {
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: $spacing-sm;
 
   .loading-item {
-    height: 64px;
-    background: $bg-primary;
+    height: 80px;
+    background: $white;
     border: 1px solid $border-color;
-    border-radius: $radius-md;
+    border-radius: $radius-lg;
     position: relative;
     overflow: hidden;
 
@@ -118,11 +397,37 @@
   }
 }
 
+// ===== EMPTY STATE =====
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3xl;
+  text-align: center;
+  color: $text-muted;
+
+  p {
+    margin-top: $spacing-md;
+    font-size: $font-sm;
+  }
+}
+
+// ===== ANIMATIONS =====
 @keyframes shimmer {
   0% {
     transform: translateX(-100%);
   }
   100% {
     transform: translateX(100%);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }

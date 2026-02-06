@@ -4,7 +4,7 @@
     <div class="auth-header">
       <div class="logo-container">
         <div class="logo-circle">
-          <app-icon category="common" name="package" size="32px"></app-icon>
+          <app-icon category="delivery" name="package" size="32px"></app-icon>
         </div>
       </div>
       <h1>Soluciones</h1>
@@ -214,7 +214,7 @@
             <form *ngIf="authTab === 'confirm'" (ngSubmit)="handleConfirmEmail($event)" class="form">
               <div class="confirm-info">
                 <div class="info-box">
-                  <app-icon category="common" name="mail" size="20px"></app-icon>
+                  <app-icon category="communication" name="mail" size="20px"></app-icon>
                   <p>Código enviado a: <strong>{{ confirmEmail }}</strong></p>
                 </div>
               </div>
@@ -276,7 +276,7 @@
     <!-- Back to Home -->
     <div class="back-link">
       <button class="btn-link" (click)="goHome()" [disabled]="isLoading">
-        <app-icon category="common" name="arrow-left" size="16px"></app-icon>
+        <app-icon category="navigation" name="arrow-left" size="16px"></app-icon>
         Volver al inicio
       </button>
     </div>

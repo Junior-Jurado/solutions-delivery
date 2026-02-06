@@ -17,8 +17,11 @@ export class DashboardHeaderComponent {
   @Input() companyName: string = 'SOLUCIONES';
   @Input() showUserName: boolean = false;
   @Input() isMobile: boolean = false;
+  @Input() showRefresh: boolean = false;
+  @Input() isRefreshing: boolean = false;
 
   @Output() logout = new EventEmitter<void>();
+  @Output() refresh = new EventEmitter<void>();
 
   /**
    * Devuelve el texto a mostrar en el header.
@@ -34,5 +37,11 @@ export class DashboardHeaderComponent {
 
   onLogout(): void {
     this.logout.emit();
+  }
+
+  onRefresh(): void {
+    if (!this.isRefreshing) {
+      this.refresh.emit();
+    }
   }
 }

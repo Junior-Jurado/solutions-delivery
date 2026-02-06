@@ -12,7 +12,7 @@
   <!-- Rating Banner -->
   <div class="rating-banner" *ngIf="pendingRatings.length > 0">
     <div class="rating-banner-content">
-      <app-icon category="common" name="star" size="24px"></app-icon>
+      <app-icon category="misc" name="star" size="24px"></app-icon>
       <div class="rating-banner-text">
         <strong>Tienes {{ pendingRatings.length }} entrega{{ pendingRatings.length > 1 ? 's' : '' }} pendiente{{ pendingRatings.length > 1 ? 's' : '' }} de calificar</strong>
         <span>Tu opinión nos ayuda a mejorar</span>
@@ -32,7 +32,7 @@
           class="tab-button"
           [class.active]="activeTab === 'tracking'"
           (click)="setActiveTab('tracking')">
-          <app-icon category="common" name="search" size="20px"></app-icon>
+          <app-icon category="navigation" name="search" size="20px"></app-icon>
           <span>Rastrear Guía</span>
         </button>
         
@@ -40,7 +40,7 @@
           class="tab-button"
           [class.active]="activeTab === 'my-guides'"
           (click)="setActiveTab('my-guides')">
-          <app-icon category="common" name="clipboard-list" size="20px"></app-icon>
+          <app-icon category="documents" name="clipboard-list" size="20px"></app-icon>
           <span>Mis Guías</span>
         </button>
         
@@ -48,7 +48,7 @@
           class="tab-button"
           [class.active]="activeTab === 'history'"
           (click)="setActiveTab('history')">
-          <app-icon category="common" name="clock" size="20px"></app-icon>
+          <app-icon category="delivery" name="clock" size="20px"></app-icon>
           <span>Histórico</span>
         </button>
 
@@ -56,7 +56,7 @@
           class="tab-button"
           [class.active]="activeTab === 'quote'"
           (click)="setActiveTab('quote')">
-          <app-icon category="common" name="calculator" size="20px"></app-icon>
+          <app-icon category="finance" name="calculator" size="20px"></app-icon>
           <span>Cotizar</span>
         </button>
         
@@ -64,7 +64,7 @@
           class="tab-button"
           [class.active]="activeTab === 'create'"
           (click)="setActiveTab('create')">
-          <app-icon category="common" name="plus-circle" size="20px"></app-icon>
+          <app-icon category="actions" name="plus-circle" size="20px"></app-icon>
           <span>Crear Guía</span>
         </button>
       </nav>
@@ -165,6 +165,21 @@
     (closeModal)="closeRatingModal()"
     (submitRating)="submitRating($event)">
   </app-rating-modal>
+
+  <!-- Floating Refresh Button -->
+  <button
+    class="floating-refresh-btn"
+    [class.refreshing]="isRefreshing"
+    [disabled]="isRefreshing"
+    (click)="handleRefresh()"
+    title="Actualizar datos">
+    <app-icon
+      category="navigation"
+      name="refresh-cw"
+      size="24px"
+      [class.spin]="isRefreshing">
+    </app-icon>
+  </button>
 
   <!-- Footer Component -->
   <app-dashboard-footer></app-dashboard-footer>

@@ -16,7 +16,18 @@
   <!-- Available Packages -->
   <div class="form-group">
     <label>Paquetes a asignar ({{ availablePackages.length }} disponibles)</label>
-    <div class="packages-list">
+
+    <!-- Empty State for Packages -->
+    <div *ngIf="availablePackages.length === 0" class="empty-packages">
+      <div class="empty-icon">
+        <app-icon category="delivery" name="package" size="32px"></app-icon>
+      </div>
+      <p class="empty-text">No hay paquetes pendientes de asignar</p>
+      <p class="empty-hint">Los paquetes aparecerán aquí cuando haya guías listas para entrega</p>
+    </div>
+
+    <!-- Packages List -->
+    <div *ngIf="availablePackages.length > 0" class="packages-list">
       <div
         *ngFor="let pkg of availablePackages"
         class="package-item"
@@ -51,7 +62,7 @@
   <button
     type="submit"
     class="submit-button"
-    [disabled]="!selectedDeliveryPerson">
+    [disabled]="!selectedDeliveryPerson || availablePackages.length === 0">
     Asignar Ruta
   </button>
 </form>

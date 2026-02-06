@@ -5,7 +5,7 @@
   </div>
 
   <div class="loading-spinner" *ngIf="loading">
-    <app-icon category="common" name="loader" size="32px" customClass="spinner"></app-icon>
+    <app-icon category="status" name="loader" size="32px" customClass="spinner"></app-icon>
     <p>Cargando histórico...</p>
   </div>
 
@@ -36,10 +36,10 @@
           <td class="price-cell">\${{ formatPrice(guide.price) }}</td>
           <td class="actions-cell">
             <button class="btn-icon" (click)="onViewDetails(guide.guide_id)" title="Ver detalles">
-              <app-icon category="common" name="eye" size="16px"></app-icon>
+              <app-icon category="navigation" name="eye" size="16px"></app-icon>
             </button>
             <button class="btn-icon" (click)="onDownloadPDF(guide.guide_id)" *ngIf="guide.pdf_url" title="Descargar PDF">
-              <app-icon category="common" name="download" size="16px"></app-icon>
+              <app-icon category="documents" name="download" size="16px"></app-icon>
             </button>
           </td>
         </tr>
@@ -48,7 +48,7 @@
   </div>
 
   <div class="empty-state" *ngIf="!loading && (!guides || guides.length === 0)">
-    <app-icon category="common" name="archive" size="64px"></app-icon>
+    <app-icon category="documents" name="archive" size="64px"></app-icon>
     <h3>No hay registros en el histórico</h3>
     <p>Aquí aparecerán tus guías entregadas</p>
   </div>

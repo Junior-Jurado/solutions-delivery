@@ -1,13 +1,33 @@
 // ===============================
-// PRIMARY BRAND COLORS
+// PALETA DE COLORES COLOMBIANA - GUACAMAYAS
 // ===============================
-$brand-blue: #3b82f6;
-$brand-blue-dark: #2563eb;
-$brand-blue-light: #60a5fa;
 
-$brand-red: #ef4444;
-$brand-red-dark: #dc2626;
-$brand-red-light: #f87171;
+// Colores de marca principales (Guacamaya)
+$color-amarillo: #FFD700;
+$color-azul: #0066CC;
+$color-rojo: #E31E24;
+$color-verde: #00A651;
+
+// Variantes de los colores principales
+$color-amarillo-dark: #D4A900;
+$color-amarillo-light: #FFE44D;
+$color-azul-dark: #004D99;
+$color-azul-light: #3399FF;
+$color-rojo-dark: #B5171C;
+$color-rojo-light: #FF4D52;
+$color-verde-dark: #007A3D;
+$color-verde-light: #33D47F;
+
+// ===============================
+// LEGACY BRAND COLORS (para compatibilidad)
+// ===============================
+$brand-blue: $color-azul;
+$brand-blue-dark: $color-azul-dark;
+$brand-blue-light: $color-azul-light;
+
+$brand-red: $color-rojo;
+$brand-red-dark: $color-rojo-dark;
+$brand-red-light: $color-rojo-light;
 
 $brand-black: #1e293b;
 $brand-black-dark: #0f172a;
@@ -31,39 +51,57 @@ $gray-800: #1f2937;
 $gray-900: #111827;
 
 // ===============================
+// LIGHT MODE COLORS
+// ===============================
+$light-bg-primary: #FFFFFF;
+$light-bg-secondary: #F5F5F5;
+$light-text-primary: #333333;
+$light-text-secondary: #666666;
+$light-border: #E0E0E0;
+
+// ===============================
+// DARK MODE COLORS
+// ===============================
+$dark-bg-primary: #1A1A1A;
+$dark-bg-secondary: #2D2D2D;
+$dark-text-primary: #FFFFFF;
+$dark-text-secondary: #B0B0B0;
+$dark-border: #404040;
+
+// ===============================
 // SEMANTIC COLORS
 // ===============================
-$success-color: #16a34a;
-$success-dark: #15803d;
+$success-color: $color-verde;
+$success-dark: $color-verde-dark;
 $success-light: #dcfce7;
 
-$warning-color: #ca8a04;
-$warning-dark: #a16207;
+$warning-color: $color-amarillo;
+$warning-dark: $color-amarillo-dark;
 $warning-light: #fef3c7;
 
-$error-color: #dc2626;
-$error-dark: #b91c1c;
+$error-color: $color-rojo;
+$error-dark: $color-rojo-dark;
 $error-light: #fee2e2;
 
-$info-color: #0284c7;
-$info-dark: #0369a1;
+$info-color: $color-azul;
+$info-dark: $color-azul-dark;
 $info-light: #e0f2fe;
 
 // ===============================
-// UI COMPONENT COLORS (Aliases)
+// UI COMPONENT COLORS (Aliases - Light mode defaults)
 // ===============================
-$border-color: $gray-200;
+$border-color: $light-border;
 $border-color-light: $gray-100;
 $border-color-dark: $gray-300;
 
-$text-primary: $brand-black;
-$text-secondary: $gray-700;
+$text-primary: $light-text-primary;
+$text-secondary: $light-text-secondary;
 $text-muted: $gray-500;
 $text-disabled: $gray-400;
 $text-inverse: $white;
 
-$bg-primary: $white;
-$bg-secondary: $gray-50;
+$bg-primary: $light-bg-primary;
+$bg-secondary: $light-bg-secondary;
 $bg-light: $gray-100;
 $bg-dark: $gray-800;
 $bg-overlay: rgba(0, 0, 0, 0.5);
@@ -80,19 +118,19 @@ $shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 $badge-created-bg: #e0e7ff;
 $badge-created-text: #4f46e5;
 
-$badge-in-route-bg: #dbeafe;
-$badge-in-route-text: #1e40af;
+$badge-in-route-bg: rgba($color-azul, 0.15);
+$badge-in-route-text: $color-azul;
 
-$badge-in-warehouse-bg: #fef3c7;
-$badge-in-warehouse-text: #ca8a04;
+$badge-in-warehouse-bg: rgba($color-amarillo, 0.2);
+$badge-in-warehouse-text: $color-amarillo-dark;
 
-$badge-out-delivery-bg: #fef08a;
-$badge-out-delivery-text: #a16207;
+$badge-out-delivery-bg: rgba($color-amarillo, 0.3);
+$badge-out-delivery-text: $color-amarillo-dark;
 
-$badge-delivered-bg: #dcfce7;
-$badge-delivered-text: #16a34a;
+$badge-delivered-bg: rgba($color-verde, 0.15);
+$badge-delivered-text: $color-verde;
 
-$badge-cancelled-bg: #fee2e2;
-$badge-cancelled-text: #dc2626;
+$badge-cancelled-bg: rgba($color-rojo, 0.15);
+$badge-cancelled-text: $color-rojo;
 
 // NO INCLUIR :export aquí - solo si necesitas los colores en TypeScript

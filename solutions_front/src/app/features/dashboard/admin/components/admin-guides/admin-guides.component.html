@@ -1,0 +1,217 @@
+<!-- Search and Filters Section -->
+<div class="search-section">
+  <div class="search-row">
+    <!-- Search Input -->
+    <div class="search-input-wrapper">
+      <app-icon category="navigation" name="search" size="20px"></app-icon>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (keyup)="onSearchKeyup($event)"
+        placeholder="Buscar por ID, remitente, destinatario..."
+        class="search-input">
+      <button
+        *ngIf="searchTerm"
+        class="clear-btn"
+        (click)="searchTerm = ''; searchGuides()">
+        <app-icon category="navigation" name="x" size="16px"></app-icon>
+      </button>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="filter-wrapper">
+      <select
+        [(ngModel)]="selectedStatus"
+        (change)="onStatusFilterChange()"
+        class="status-filter">
+        <option *ngFor="let option of statusOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Search Button -->
+    <button
+      class="btn btn-primary"
+      (click)="searchGuides()"
+      [disabled]="isSearching">
+      <app-icon
+        *ngIf="isSearching"
+        category="status"
+        name="loader"
+        size="18px">
+      </app-icon>
+      <app-icon
+        *ngIf="!isSearching"
+        category="navigation"
+        name="search"
+        size="18px">
+      </app-icon>
+      Buscar
+    </button>
+
+    <!-- Clear Filters -->
+    <button
+      *ngIf="searchTerm || selectedStatus"
+      class="btn btn-outline"
+      (click)="clearSearch()">
+      <app-icon category="navigation" name="x" size="18px"></app-icon>
+      Limpiar
+    </button>
+  </div>
+
+  <!-- Results info -->
+  <div class="results-info" *ngIf="!isLoading">
+    <span *ngIf="totalGuides > 0">
+      Mostrando {{ guides.length }} de {{ totalGuides }} guías
+    </span>
+    <span *ngIf="totalGuides === 0 && (searchTerm || selectedStatus)">
+      No se encontraron guías con los filtros aplicados
+    </span>
+  </div>
+</div>
+
+<!-- Loading State -->
+<div class="loading-container" *ngIf="isLoading">
+  <div class="loading-card" *ngFor="let i of [1, 2, 3, 4, 5]">
+    <div class="loading-shimmer"></div>
+  </div>
+</div>
+
+<!-- Empty State -->
+<div class="empty-state" *ngIf="!isLoading && guides.length === 0">
+  <app-icon category="misc" name="inbox" size="64px"></app-icon>
+  <h3>No hay guías</h3>
+  <p *ngIf="searchTerm || selectedStatus">
+    No se encontraron guías con los filtros aplicados.
+    <button class="link-btn" (click)="clearSearch()">Limpiar filtros</button>
+  </p>
+  <p *ngIf="!searchTerm && !selectedStatus">
+    No hay guías registradas en el sistema.
+  </p>
+</div>
+
+<!-- Guides Table -->
+<div class="guides-table-container" *ngIf="!isLoading && guides.length > 0">
+  <table class="guides-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Remitente</th>
+        <th>Destinatario</th>
+        <th>Ruta</th>
+        <th>Estado</th>
+        <th>Valor</th>
+        <th>Fecha</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let guide of guides">
+        <td class="guide-id">
+          <span class="id-badge">#{{ guide.guide_id }}</span>
+        </td>
+        <td class="sender-cell">
+          <div class="person-info">
+            <span class="person-name">{{ guide.sender?.full_name || 'N/A' }}</span>
+            <span class="person-phone">{{ guide.sender?.phone || '' }}</span>
+          </div>
+        </td>
+        <td class="receiver-cell">
+          <div class="person-info">
+            <span class="person-name">{{ guide.receiver?.full_name || 'N/A' }}</span>
+            <span class="person-phone">{{ guide.receiver?.phone || '' }}</span>
+          </div>
+        </td>
+        <td class="route-cell">
+          <div class="route-info">
+            <span class="city">{{ guide.origin_city_name || 'N/A' }}</span>
+            <app-icon category="navigation" name="arrow-left" size="14px" class="arrow-icon"></app-icon>
+            <span class="city">{{ guide.destination_city_name || 'N/A' }}</span>
+          </div>
+        </td>
+        <td class="status-cell">
+          <!-- View Mode -->
+          <div *ngIf="editingGuideId !== guide.guide_id" class="status-view">
+            <span class="badge" [ngClass]="getStatusBadgeClass(guide.current_status)">
+              {{ getStatusLabel(guide.current_status) }}
+            </span>
+            <button
+              class="edit-status-btn"
+              (click)="startEditStatus(guide)"
+              title="Cambiar estado">
+              <app-icon category="actions" name="edit" size="14px"></app-icon>
+            </button>
+          </div>
+
+          <!-- Edit Mode -->
+          <div *ngIf="editingGuideId === guide.guide_id" class="status-edit">
+            <select
+              [(ngModel)]="editingStatus"
+              [disabled]="isUpdatingStatus"
+              class="status-select">
+              <ng-container *ngFor="let option of statusOptions">
+                <option *ngIf="option.value" [value]="option.value">
+                  {{ option.label }}
+                </option>
+              </ng-container>
+            </select>
+            <div class="edit-actions">
+              <button
+                class="action-btn save"
+                (click)="saveStatus(guide)"
+                [disabled]="isUpdatingStatus"
+                title="Guardar">
+                <app-icon category="status" [name]="isUpdatingStatus ? 'loader' : 'check'" size="14px"></app-icon>
+              </button>
+              <button
+                class="action-btn cancel"
+                (click)="cancelEditStatus()"
+                [disabled]="isUpdatingStatus"
+                title="Cancelar">
+                <app-icon category="navigation" name="x" size="14px"></app-icon>
+              </button>
+            </div>
+          </div>
+        </td>
+        <td class="value-cell">
+          <span class="value-amount">{{ formatCurrency(guide.price) }}</span>
+        </td>
+        <td class="date-cell">
+          {{ formatDate(guide.created_at) }}
+        </td>
+        <td class="actions-cell">
+          <button
+            class="btn-icon"
+            (click)="onViewGuide(guide.guide_id)"
+            title="Ver detalles">
+            <app-icon category="navigation" name="eye" size="18px"></app-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Pagination -->
+<div class="pagination" *ngIf="!isLoading && totalPages > 1">
+  <button
+    class="pagination-btn"
+    (click)="previousPage()"
+    [disabled]="currentPage === 0">
+    <app-icon category="navigation" name="arrow-left" size="18px"></app-icon>
+    Anterior
+  </button>
+
+  <div class="pagination-info">
+    Página {{ currentPage + 1 }} de {{ totalPages }}
+  </div>
+
+  <button
+    class="pagination-btn"
+    (click)="nextPage()"
+    [disabled]="currentPage >= totalPages - 1">
+    Siguiente
+    <app-icon category="navigation" name="arrow-left" size="18px" class="rotate-180"></app-icon>
+  </button>
+</div>

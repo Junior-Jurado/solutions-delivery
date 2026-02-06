@@ -343,12 +343,17 @@ export class GuideService {
     // BUILDER METHODS
     // ==========================================
 
-    buildGuideRequest(formValue: any, userId: string): CreateGuideRequest {
+    buildGuideRequest(formValue: any, userId: string, customPrice?: number): CreateGuideRequest {
         const dimensions = this.parseDimensions(formValue.dimensions || '20x15x10');
+
+        // Usar precio personalizado si se proporciona, sino calcular
+        const finalPrice = customPrice !== undefined && customPrice > 0
+            ? customPrice
+            : this.calculatePrice(formValue);
 
         return {
             created_by: userId,
-            
+
             service: {
                 service_type: this.mapServiceType(formValue.serviceType),
                 payment_method: this.mapPaymentMethod(formValue.serviceType),
@@ -357,7 +362,7 @@ export class GuideService {
 
             pricing: {
                 declared_value: parseFloat(formValue.declaredValue) || 0,
-                price: this.calculatePrice(formValue)
+                price: finalPrice
             },
 
             route: {

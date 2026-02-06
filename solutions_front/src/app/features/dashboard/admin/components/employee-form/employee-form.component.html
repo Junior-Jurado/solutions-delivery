@@ -1,100 +1,144 @@
-<form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="employee-form">
-  <!-- Name Fields Row -->
-  <div class="form-row">
-    <div class="form-group">
-      <label for="firstName">Nombre</label>
+<!-- Search Section -->
+<div class="search-section">
+  <div class="search-header">
+    <app-icon category="navigation" name="search" size="20px" color="#3b82f6"></app-icon>
+    <span>Buscar Usuario por Documento</span>
+  </div>
+
+  <div class="search-form">
+    <div class="search-input-wrapper">
       <input
         type="text"
-        id="firstName"
-        formControlName="firstName"
-        placeholder="Juan"
-        [class.invalid]="isFieldInvalid('firstName')">
-      <span *ngIf="isFieldInvalid('firstName')" class="error-message">
-        El nombre es requerido
+        [(ngModel)]="documentNumber"
+        placeholder="Ingrese número de documento..."
+        (keyup.enter)="searchUser()"
+        [disabled]="isSearching">
+      <button
+        *ngIf="documentNumber"
+        class="clear-btn"
+        (click)="clearSearch()"
+        type="button">
+        <app-icon category="navigation" name="x" size="16px"></app-icon>
+      </button>
+    </div>
+    <button
+      class="search-btn"
+      (click)="searchUser()"
+      [disabled]="isSearching || !documentNumber">
+      <app-icon
+        *ngIf="isSearching"
+        category="status"
+        name="loader"
+        size="18px"
+        customClass="spin">
+      </app-icon>
+      <app-icon
+        *ngIf="!isSearching"
+        category="navigation"
+        name="search"
+        size="18px">
+      </app-icon>
+      <span>{{ isSearching ? 'Buscando...' : 'Buscar' }}</span>
+    </button>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="searchError" class="search-error">
+    <app-icon category="status" name="alert-triangle" size="16px"></app-icon>
+    <span>{{ searchError }}</span>
+  </div>
+</div>
+
+<!-- User Found Card -->
+<div *ngIf="foundUser" class="user-card">
+  <div class="user-card-header">
+    <div class="user-avatar">
+      <app-icon category="users" name="user" size="24px" color="#ffffff"></app-icon>
+    </div>
+    <div class="user-main-info">
+      <h3 class="user-name">{{ foundUser.full_name || 'Sin nombre' }}</h3>
+      <p class="user-email">{{ foundUser.email }}</p>
+    </div>
+    <div class="user-badges">
+      <span class="badge" [ngClass]="getRoleBadgeClass(foundUser.role)">
+        {{ getRoleLabel(foundUser.role) }}
+      </span>
+      <span class="badge" [ngClass]="getStatusBadgeClass(foundUser.status)">
+        {{ foundUser.status }}
       </span>
     </div>
+  </div>
 
-    <div class="form-group">
-      <label for="lastName">Apellido</label>
-      <input
-        type="text"
-        id="lastName"
-        formControlName="lastName"
-        placeholder="Pérez"
-        [class.invalid]="isFieldInvalid('lastName')">
-      <span *ngIf="isFieldInvalid('lastName')" class="error-message">
-        El apellido es requerido
-      </span>
+  <div class="user-details">
+    <div class="detail-row">
+      <div class="detail-item">
+        <span class="detail-label">Documento</span>
+        <span class="detail-value">{{ foundUser.type_document || 'CC' }} {{ foundUser.number_document }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Teléfono</span>
+        <span class="detail-value">{{ foundUser.phone || 'No registrado' }}</span>
+      </div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-item">
+        <span class="detail-label">Fecha de registro</span>
+        <span class="detail-value">{{ formatDate(foundUser.created_at) }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Último acceso</span>
+        <span class="detail-value">{{ foundUser.last_login ? formatDate(foundUser.last_login) : 'Nunca' }}</span>
+      </div>
+    </div>
+    <div class="detail-row" *ngIf="foundUser.role === 'DELIVERY'">
+      <div class="detail-item">
+        <span class="detail-label">Entregas completadas</span>
+        <span class="detail-value highlight">{{ foundUser.total_completed || 0 }}</span>
+      </div>
+      <div class="detail-item">
+        <span class="detail-label">Rendimiento</span>
+        <span class="detail-value">{{ foundUser.performance || 'N/A' }}</span>
+      </div>
     </div>
   </div>
 
-  <!-- Email -->
-  <div class="form-group">
-    <label for="email">Correo electrónico</label>
-    <input
-      type="email"
-      id="email"
-      formControlName="email"
-      placeholder="empleado@empresa.com"
-      [class.invalid]="isFieldInvalid('email')">
-    <span *ngIf="isFieldInvalid('email')" class="error-message">
-      Ingrese un correo válido
-    </span>
+  <!-- Role Edit Section -->
+  <div class="role-edit-section" *ngIf="canEditRole">
+    <div class="role-edit-header">
+      <app-icon category="actions" name="edit" size="18px" color="#3b82f6"></app-icon>
+      <span>Cambiar Rol del Usuario</span>
+    </div>
+    <div class="role-edit-form">
+      <select [(ngModel)]="selectedRole" class="role-select">
+        <option value="" disabled>Seleccionar nuevo rol</option>
+        <option *ngFor="let role of roles" [value]="role.value">
+          {{ role.label }}
+        </option>
+      </select>
+      <button
+        class="update-btn"
+        [disabled]="!roleChanged || isUpdating"
+        (click)="updateUserRole()">
+        <app-icon
+          category="status"
+          [name]="isUpdating ? 'loader' : 'check'"
+          size="18px"
+          [class.spin]="isUpdating">
+        </app-icon>
+        <span>{{ isUpdating ? 'Actualizando...' : 'Actualizar Rol' }}</span>
+      </button>
+    </div>
   </div>
 
-  <!-- Password -->
-  <div class="form-group">
-    <label for="password">Contraseña temporal</label>
-    <input
-      type="password"
-      id="password"
-      formControlName="password"
-      placeholder="••••••••"
-      [class.invalid]="isFieldInvalid('password')">
-    <span *ngIf="isFieldInvalid('password')" class="error-message">
-      La contraseña debe tener al menos 8 caracteres
-    </span>
+  <!-- Admin Warning -->
+  <div class="admin-warning" *ngIf="foundUser.role === 'ADMIN'">
+    <app-icon category="misc" name="shield" size="18px"></app-icon>
+    <span>Este usuario es Administrador. No se puede modificar su rol.</span>
   </div>
+</div>
 
-  <!-- Role Select -->
-  <div class="form-group">
-    <label for="role">Rol</label>
-    <select
-      id="role"
-      formControlName="role"
-      [class.invalid]="isFieldInvalid('role')">
-      <option value="" disabled>Seleccionar rol</option>
-      <option *ngFor="let role of roles" [value]="role.value">
-        {{ role.label }}
-      </option>
-    </select>
-    <span *ngIf="isFieldInvalid('role')" class="error-message">
-      Seleccione un rol
-    </span>
-  </div>
-
-  <!-- Zone Select -->
-  <div class="form-group">
-    <label for="zone">Zona asignada</label>
-    <select
-      id="zone"
-      formControlName="zone"
-      [class.invalid]="isFieldInvalid('zone')">
-      <option value="" disabled>Seleccionar zona</option>
-      <option *ngFor="let zone of zones" [value]="zone.value">
-        {{ zone.label }}
-      </option>
-    </select>
-    <span *ngIf="isFieldInvalid('zone')" class="error-message">
-      Seleccione una zona
-    </span>
-  </div>
-
-  <!-- Submit Button -->
-  <button
-    type="submit"
-    class="submit-button"
-    [disabled]="isSubmitting">
-    {{ isSubmitting ? 'Creando...' : 'Crear Empleado' }}
-  </button>
-</form>
+<!-- Empty State -->
+<div *ngIf="!foundUser && !searchError && !isSearching" class="empty-state">
+  <app-icon category="users" name="users" size="48px" color="#d1d5db"></app-icon>
+  <p>Ingrese un número de documento para buscar un usuario y gestionar su rol</p>
+</div>

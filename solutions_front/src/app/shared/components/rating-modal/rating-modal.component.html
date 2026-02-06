@@ -3,11 +3,11 @@
     <!-- Header -->
     <div class="modal-header">
       <h2 class="modal-title">
-        <app-icon category="common" name="star" size="24px"></app-icon>
+        <app-icon category="misc" name="star" size="24px"></app-icon>
         Calificar Entrega
       </h2>
       <button class="close-btn" (click)="onClose()">
-        <app-icon category="common" name="x" size="24px"></app-icon>
+        <app-icon category="navigation" name="x" size="24px"></app-icon>
       </button>
     </div>
 
@@ -60,7 +60,7 @@
       <button class="btn btn-primary" (click)="onSubmit()" [disabled]="!canSubmit">
         <app-icon
           *ngIf="isSubmitting"
-          category="common"
+          category="status"
           name="loader"
           size="16px"
           customClass="spinner">

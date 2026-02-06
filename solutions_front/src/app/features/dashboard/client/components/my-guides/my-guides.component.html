@@ -3,13 +3,13 @@
     <h2>Mis Guías Activas</h2>
     <p class="subtitle">Guías donde apareces como remitente o destinatario</p>
     <button class="btn-refresh" (click)="onRefresh()" [disabled]="loading">
-      <app-icon category="common" name="refresh-cw" size="18px"></app-icon>
+      <app-icon category="navigation" name="refresh-cw" size="18px"></app-icon>
       <span>Actualizar</span>
     </button>
   </div>
 
   <div class="loading-spinner" *ngIf="loading">
-    <app-icon category="common" name="loader" size="32px" customClass="spinner"></app-icon>
+    <app-icon category="status" name="loader" size="32px" customClass="spinner"></app-icon>
     <p>Cargando guías...</p>
   </div>
 
@@ -24,18 +24,18 @@
 
       <div class="guide-card-body">
         <div class="guide-info-row">
-          <app-icon category="common" name="calendar" size="16px"></app-icon>
+          <app-icon category="delivery" name="calendar" size="16px"></app-icon>
           <span>{{ formatDate(guide.created_at) }}</span>
         </div>
 
         <div class="guide-route">
           <div class="route-point">
-            <app-icon category="common" name="circle" size="12px"></app-icon>
+            <app-icon category="status" name="circle" size="12px"></app-icon>
             <span>{{ guide.origin_city_name }}</span>
           </div>
           <div class="route-line"></div>
           <div class="route-point">
-            <app-icon category="common" name="map-pin" size="12px"></app-icon>
+            <app-icon category="delivery" name="map-pin" size="12px"></app-icon>
             <span>{{ guide.destination_city_name }}</span>
           </div>
         </div>
@@ -62,11 +62,11 @@
 
       <div class="guide-card-footer">
         <button class="btn btn-secondary btn-sm" (click)="onViewDetails(guide.guide_id)">
-          <app-icon category="common" name="eye" size="16px"></app-icon>
+          <app-icon category="navigation" name="eye" size="16px"></app-icon>
           <span>Ver Detalles</span>
         </button>
         <button class="btn btn-outline btn-sm" (click)="onDownloadPDF(guide.guide_id)" *ngIf="guide.pdf_url">
-          <app-icon category="common" name="download" size="16px"></app-icon>
+          <app-icon category="documents" name="download" size="16px"></app-icon>
           <span>PDF</span>
         </button>
       </div>
@@ -74,11 +74,11 @@
   </div>
 
   <div class="empty-state" *ngIf="!loading && (!guides || guides.length === 0)">
-    <app-icon category="common" name="inbox" size="64px"></app-icon>
+    <app-icon category="misc" name="inbox" size="64px"></app-icon>
     <h3>No tienes guías activas</h3>
     <p>Crea una nueva guía para comenzar</p>
     <button class="btn btn-primary" (click)="onCreateGuide()">
-      <app-icon category="common" name="plus-circle" size="20px"></app-icon>
+      <app-icon category="actions" name="plus-circle" size="20px"></app-icon>
       <span>Crear Primera Guía</span>
     </button>
   </div>

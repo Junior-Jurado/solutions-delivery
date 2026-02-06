@@ -23,7 +23,7 @@ import { StatsCardsComponent } from "../components/stats-cards/stats-cards.compo
 import { GuideDetailsModalComponent } from "@shared/components/guide-details-modal.component";
 import { GuideSearchComponent } from "../components/guide-search/guide-search.component";
 import { StatusDistributionComponent } from "../components/status-distribution/status-distribution.component";
-import { AssignmentPanelComponent } from "../components/assignment-panel/assignment-panel.component";
+import { AssignmentPanelComponent } from "@shared/components/assignment-panel/assignment-panel.component";
 import { IconComponent } from "@shared/components/icon/icon.component";
 import { DashboardHeaderComponent } from "@shared/components/dashboard-header/dashboard-header.component";
 
@@ -132,6 +132,11 @@ export class SecretaryDashboardPage implements OnInit {
     // ==========================================
     selectedGuideForDetails: ShippingGuide | null = null;
     isDetailsModalOpen: boolean = false;
+
+    // ==========================================
+    // REFRESH
+    // ==========================================
+    isRefreshing: boolean = false;
 
     // ==========================================
     // CONSTRUCTOR
@@ -265,8 +270,9 @@ export class SecretaryDashboardPage implements OnInit {
 
     /**
      * Confirma y crea la guía
+     * @param finalPrice - El precio final (viene del modal, puede ser el calculado o personalizado por admin)
      */
-    async confirmGuideCreation(): Promise<void> {
+    async confirmGuideCreation(finalPrice?: number): Promise<void> {
         if (!this.pendingGuideData) return;
 
         this.isCreatingGuide = true;
@@ -274,11 +280,12 @@ export class SecretaryDashboardPage implements OnInit {
         this.cdr.detectChanges();
 
         try {
+            // Secretaria no puede modificar precio, así que no pasamos precio personalizado
             const guideRequest = this.guideService.buildGuideRequest(
-                this.pendingGuideData, 
+                this.pendingGuideData,
                 this.currentUserId
             );
-            
+
             const response = await this.guideService.createGuide(guideRequest);
 
             this.toast.success(
@@ -513,6 +520,45 @@ export class SecretaryDashboardPage implements OnInit {
     // ==========================================
     formatPrice(price: number): string {
         return this.translationService.formatCurrency(price);
+    }
+
+    // ==========================================
+    // REFRESH
+    // ==========================================
+    async handleRefresh(): Promise<void> {
+        if (this.isRefreshing) return;
+
+        this.isRefreshing = true;
+        this.cdr.detectChanges();
+
+        try {
+            switch (this.activeTab) {
+                case 'create-guide':
+                    // No hay nada que refrescar en este tab
+                    break;
+                case 'manage-guides':
+                    await this.loadGuides();
+                    break;
+                case 'search':
+                    // El usuario debe buscar de nuevo
+                    break;
+                case 'reports':
+                    await this.loadStats();
+                    break;
+                case 'assignments':
+                    // El panel de asignaciones maneja su propia carga
+                    break;
+                default:
+                    await this.loadGuides();
+            }
+            this.toast.success('Datos actualizados correctamente');
+        } catch (error) {
+            console.error('Error al refrescar:', error);
+            this.toast.error('Error al actualizar los datos');
+        } finally {
+            this.isRefreshing = false;
+            this.cdr.detectChanges();
+        }
     }
 
     // ==========================================

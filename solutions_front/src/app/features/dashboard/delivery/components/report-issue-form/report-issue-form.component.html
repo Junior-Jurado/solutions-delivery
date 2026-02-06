@@ -1,7 +1,7 @@
 <div class="card">
   <div class="card-header">
     <h2 class="card-title">
-      <app-icon category="common" name="alert-triangle" size="24px"></app-icon>
+      <app-icon category="status" name="alert-triangle" size="24px"></app-icon>
       Reportar Problema
     </h2>
     <p class="card-description">
@@ -69,7 +69,7 @@
       <div class="form-field">
         <label>Evidencia fotográfica</label>
         <div class="upload-area">
-          <app-icon category="common" name="camera" size="32px"></app-icon>
+          <app-icon category="misc" name="camera" size="32px"></app-icon>
           <p>Opcional: Sube fotos que sustenten el reporte</p>
           <input
             type="file"
@@ -105,14 +105,14 @@
         [disabled]="isReporting || !isFormValid">
         <app-icon
           *ngIf="isReporting"
-          category="common"
+          category="status"
           name="loader"
           size="16px"
           customClass="spinner">
         </app-icon>
         <app-icon
           *ngIf="!isReporting"
-          category="common"
+          category="status"
           name="alert-triangle"
           size="16px">
         </app-icon>

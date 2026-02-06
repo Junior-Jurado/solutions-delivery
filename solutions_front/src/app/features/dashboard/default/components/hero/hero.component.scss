@@ -4,13 +4,13 @@
 @use "mixins" as *;
 
 .hero {
-  background: linear-gradient(135deg, $brand-blue 0%, #6366f1 50%, $brand-red 100%);
+  background: linear-gradient(135deg, var(--color-azul) 0%, #4D7ACC 30%, var(--color-rojo) 100%);
   color: $white;
   padding: 5rem 0;
   position: relative;
   overflow: hidden;
 
-  // Patrón de fondo animado
+  // Patron de fondo animado
   &::before {
     content: '';
     position: absolute;
@@ -18,9 +18,9 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: 
-      radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0, 166, 81, 0.1) 0%, transparent 50%);
     animation: moveBackground 20s ease-in-out infinite;
     pointer-events: none;
   }
@@ -56,7 +56,8 @@
     align-items: center;
 
     @media (min-width: $breakpoint-lg) {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
     }
   }
 
@@ -73,7 +74,7 @@
     font-weight: $font-bold;
     margin-bottom: $spacing-lg;
     line-height: 1.2;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 
     @media (min-width: $breakpoint-md) {
       font-size: $font-4xl;
@@ -88,9 +89,118 @@
   }
 }
 
+// Guacamaya Hero Illustration
+.hero-illustration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  @media (min-width: $breakpoint-lg) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .guacamaya-hero {
+    width: 280px;
+    height: auto;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+    animation: guacamayaFlight 4s ease-in-out infinite;
+
+    @media (min-width: $breakpoint-md) {
+      width: 320px;
+    }
+  }
+}
+
+@keyframes guacamayaFlight {
+  0%, 100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  25% {
+    transform: translateY(-15px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+  75% {
+    transform: translateY(-20px) rotate(-1deg);
+  }
+}
+
+// Floating Feathers
+.floating-feathers {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+
+  .feather {
+    position: absolute;
+    opacity: 0.6;
+    animation: featherFloat 6s ease-in-out infinite;
+  }
+
+  .feather-1 {
+    width: 25px;
+    top: 15%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+
+  .feather-2 {
+    width: 20px;
+    top: 60%;
+    left: 5%;
+    animation-delay: -1.5s;
+  }
+
+  .feather-3 {
+    width: 22px;
+    top: 25%;
+    right: 8%;
+    animation-delay: -3s;
+  }
+
+  .feather-4 {
+    width: 18px;
+    top: 70%;
+    right: 12%;
+    animation-delay: -4.5s;
+  }
+}
+
+@keyframes featherFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.5;
+  }
+  25% {
+    transform: translateY(-20px) rotate(15deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-10px) rotate(-10deg);
+    opacity: 0.6;
+  }
+  75% {
+    transform: translateY(-25px) rotate(10deg);
+    opacity: 0.9;
+  }
+}
+
+// Map Section
 .map-section {
   display: flex;
   justify-content: center;
+
+  @media (min-width: $breakpoint-lg) {
+    grid-column: span 2;
+  }
 
   .map-container {
     background: rgba(255, 255, 255, 0.1);
@@ -98,16 +208,17 @@
     border-radius: $radius-xl;
     padding: $spacing-xl;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 
+    box-shadow:
       0 10px 40px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
     width: 100%;
-    max-width: 500px;
+    max-width: 600px;
+    position: relative;
 
     &:hover {
       transform: translateY(-5px);
-      box-shadow: 
+      box-shadow:
         0 15px 50px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
@@ -129,11 +240,49 @@
       flex: 1;
       height: 2px;
       background: linear-gradient(
-        to right, 
-        transparent, 
-        rgba(255, 255, 255, 0.3), 
+        to right,
+        transparent,
+        var(--color-amarillo),
         transparent
       );
+    }
+  }
+
+  // Guacamayas on map
+  .map-guacamayas {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 2;
+
+    .map-bird {
+      position: absolute;
+      width: 30px;
+      height: auto;
+      animation: guacamayaFlight 5s ease-in-out infinite;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+    }
+
+    .bird-1 {
+      top: 20%;
+      left: 25%;
+      animation-delay: 0s;
+    }
+
+    .bird-2 {
+      top: 40%;
+      right: 20%;
+      animation-delay: -1.5s;
+      transform: scaleX(-1);
+    }
+
+    .bird-3 {
+      top: 60%;
+      left: 40%;
+      animation-delay: -3s;
     }
   }
 
@@ -143,6 +292,7 @@
     align-items: center;
     min-height: 400px;
     margin-bottom: $spacing-lg;
+    position: relative;
   }
 
   .map-description {
@@ -160,7 +310,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  // Estadísticas del mapa
+  // Stats
   .map-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -175,17 +325,32 @@
       background: rgba(255, 255, 255, 0.05);
       border-radius: $radius-md;
       transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
 
       &:hover {
         background: rgba(255, 255, 255, 0.1);
         transform: translateY(-2px);
       }
 
+      &.stat-amarillo {
+        border-bottom-color: var(--color-amarillo);
+        .stat-value { color: var(--color-amarillo); }
+      }
+
+      &.stat-azul {
+        border-bottom-color: var(--color-azul-light);
+        .stat-value { color: var(--color-azul-light); }
+      }
+
+      &.stat-verde {
+        border-bottom-color: var(--color-verde-light);
+        .stat-value { color: var(--color-verde-light); }
+      }
+
       .stat-value {
         display: block;
         font-size: $font-2xl;
         font-weight: $font-bold;
-        color: #fbbf24;
         margin-bottom: $spacing-xs;
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
       }
@@ -207,9 +372,23 @@
     padding: 3rem 0;
   }
 
+  .hero-illustration {
+    .guacamaya-hero {
+      width: 220px;
+    }
+  }
+
+  .floating-feathers .feather {
+    display: none;
+  }
+
   .map-section {
     .map-container {
       padding: $spacing-lg;
+    }
+
+    .map-guacamayas .map-bird {
+      width: 24px;
     }
 
     .map-stats {
@@ -231,14 +410,40 @@
 }
 
 @media (max-width: $breakpoint-sm) {
+  .hero-illustration {
+    .guacamaya-hero {
+      width: 180px;
+    }
+  }
+
   .map-section {
     .map-wrapper {
       min-height: 300px;
+    }
+
+    .map-guacamayas {
+      display: none;
     }
 
     .map-stats {
       grid-template-columns: 1fr;
       gap: $spacing-xs;
     }
+  }
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .hero {
+    background: linear-gradient(135deg, #004D99 0%, #2D4A6D 30%, #B5171C 100%);
+  }
+
+  .map-section .map-container {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .floating-feathers .feather {
+    filter: brightness(1.2);
   }
 }

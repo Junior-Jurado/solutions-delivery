@@ -5,6 +5,8 @@
 
 .features {
   padding: 4rem 0;
+  background-color: var(--bg-primary);
+  transition: background-color var(--transition-theme);
 
   .container {
     max-width: 1280px;
@@ -28,8 +30,9 @@
   .section-title {
     font-size: $font-2xl;
     font-weight: $font-bold;
-    color: $brand-black;
+    color: var(--text-primary);
     margin-bottom: $spacing-md;
+    transition: color var(--transition-theme);
 
     @media (min-width: $breakpoint-md) {
       font-size: $font-3xl;
@@ -38,7 +41,8 @@
 
   .section-description {
     font-size: $font-lg;
-    color: $gray-600;
+    color: var(--text-secondary);
+    transition: color var(--transition-theme);
 
     @media (min-width: $breakpoint-md) {
       font-size: $font-xl;
@@ -56,27 +60,48 @@
 }
 
 .feature-card {
-  background-color: $white;
+  background-color: var(--card-bg);
   padding: $spacing-lg;
   border-radius: $radius-md;
   text-align: center;
-  transition: box-shadow $transition-slow;
+  transition: all 0.3s ease;
   border-left: 4px solid;
+  position: relative;
+  box-shadow: var(--card-shadow);
 
   &:hover {
-    box-shadow: $shadow-lg;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+
+    .feature-guacamaya {
+      transform: scale(1.15) rotate(5deg);
+    }
   }
 
-  &.border-blue {
-    border-left-color: $brand-blue;
+  &.border-amarillo {
+    border-left-color: var(--color-amarillo);
   }
 
-  &.border-red {
-    border-left-color: $brand-red;
+  &.border-azul {
+    border-left-color: var(--color-azul);
   }
 
-  &.border-black {
-    border-left-color: $brand-black;
+  &.border-rojo {
+    border-left-color: var(--color-rojo);
+  }
+
+  &.border-verde {
+    border-left-color: var(--color-verde);
+  }
+
+  .feature-guacamaya {
+    position: absolute;
+    top: $spacing-sm;
+    right: $spacing-sm;
+    width: 22px;
+    height: 22px;
+    transition: transform 0.3s ease;
+    opacity: 0.85;
   }
 
   .feature-icon {
@@ -87,20 +112,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
 
-    &.bg-blue {
-      background-color: rgba($brand-blue, 0.1);
-      color: $brand-blue;
+    &.bg-amarillo {
+      background-color: rgba(255, 215, 0, 0.15);
+      color: var(--color-amarillo-dark);
     }
 
-    &.bg-red {
-      background-color: rgba($brand-red, 0.1);
-      color: $brand-red;
+    &.bg-azul {
+      background-color: rgba(0, 102, 204, 0.12);
+      color: var(--color-azul);
     }
 
-    &.bg-black {
-      background-color: rgba($brand-black, 0.1);
-      color: $brand-black;
+    &.bg-rojo {
+      background-color: rgba(227, 30, 36, 0.12);
+      color: var(--color-rojo);
+    }
+
+    &.bg-verde {
+      background-color: rgba(0, 166, 81, 0.12);
+      color: var(--color-verde);
     }
   }
 
@@ -108,22 +139,55 @@
     font-size: $font-xl;
     font-weight: $font-semibold;
     margin-bottom: $spacing-sm;
+    transition: color var(--transition-theme);
 
-    &.text-blue {
-      color: $brand-blue;
+    &.text-amarillo {
+      color: var(--color-amarillo-dark);
     }
 
-    &.text-red {
-      color: $brand-red;
+    &.text-azul {
+      color: var(--color-azul);
     }
 
-    &.text-black {
-      color: $brand-black;
+    &.text-rojo {
+      color: var(--color-rojo);
+    }
+
+    &.text-verde {
+      color: var(--color-verde);
     }
   }
 
   .feature-description {
-    color: $gray-600;
+    color: var(--text-secondary);
     font-size: $font-base;
+    transition: color var(--transition-theme);
+  }
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .feature-card {
+    .feature-guacamaya {
+      filter: brightness(1.15);
+    }
+
+    .feature-icon {
+      &.bg-amarillo {
+        background-color: rgba(255, 224, 51, 0.18);
+      }
+
+      &.bg-azul {
+        background-color: rgba(77, 154, 255, 0.15);
+      }
+
+      &.bg-rojo {
+        background-color: rgba(255, 92, 92, 0.15);
+      }
+
+      &.bg-verde {
+        background-color: rgba(51, 212, 127, 0.15);
+      }
+    }
   }
 }

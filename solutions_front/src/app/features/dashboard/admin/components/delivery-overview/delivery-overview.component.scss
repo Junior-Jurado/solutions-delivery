@@ -20,16 +20,25 @@
 .overview-card {
   background: $white;
   border: 1px solid $border-color;
-  border-radius: $radius-md;
+  border-radius: $radius-lg;
   box-shadow: $shadow-sm;
   overflow: hidden;
+  transition: all $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
 
   .card-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
     padding: $spacing-md $spacing-lg;
     border-bottom: 1px solid $border-color;
+    background: $bg-light;
 
     h3 {
-      font-size: $font-lg;
+      font-size: $font-base;
       font-weight: $font-semibold;
       color: $text-primary;
       margin: 0;
@@ -40,34 +49,76 @@
     padding: $spacing-lg;
 
     .big-number {
-      font-size: 2rem;
+      font-size: 2.5rem;
       font-weight: $font-bold;
       margin-bottom: $spacing-sm;
+      line-height: 1;
 
       @include respond-to($breakpoint-xs) {
-        font-size: 1.75rem;
+        font-size: 2rem;
       }
     }
 
     .sub-text {
       font-size: $font-sm;
       color: $text-muted;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: $spacing-xs;
+    }
+
+    .stat-highlight {
+      font-weight: $font-medium;
+
+      &.success {
+        color: $success-color;
+      }
+
+      &.warning {
+        color: $warning-color;
+      }
+    }
+
+    .stat-separator {
+      color: $text-disabled;
+    }
+
+    .progress-bar {
+      margin-top: $spacing-md;
+      height: 6px;
+      background: $gray-200;
+      border-radius: $radius-full;
+      overflow: hidden;
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, $brand-blue, $success-color);
+        border-radius: $radius-full;
+        transition: width 0.5s ease;
+      }
     }
   }
 
   &.primary {
+    border-top: 3px solid $brand-blue;
+
     .card-content .big-number {
       color: $brand-blue;
     }
   }
 
   &.warning {
+    border-top: 3px solid $warning-color;
+
     .card-content .big-number {
-      color: $brand-red;
+      color: $warning-color;
     }
   }
 
   &.success {
+    border-top: 3px solid $success-color;
+
     .card-content .big-number {
       color: $success-color;
     }

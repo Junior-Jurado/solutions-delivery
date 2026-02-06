@@ -1,66 +1,161 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
-export interface EmployeeFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  role: string;
-  zone: string;
-}
+import { FormsModule } from '@angular/forms';
+import { AdminService, Employee, UserRole } from '@core/services/admin.service';
+import { ToastService } from '@shared/services/toast.service';
+import { IconComponent } from '@shared/components/icon/icon.component';
 
 @Component({
   selector: 'app-employee-form',
   standalone: true,
   templateUrl: './employee-form.component.html',
   styleUrls: ['./employee-form.component.scss'],
-  imports: [CommonModule, ReactiveFormsModule]
+  imports: [CommonModule, FormsModule, IconComponent]
 })
 export class EmployeeFormComponent {
-  @Output() formSubmit = new EventEmitter<EmployeeFormData>();
+  @Output() userUpdated = new EventEmitter<Employee>();
+  @Output() userFound = new EventEmitter<Employee>();
 
-  employeeForm: FormGroup;
-  isSubmitting: boolean = false;
+  // Search
+  documentNumber: string = '';
+  isSearching: boolean = false;
 
-  roles = [
-    { value: 'secretary', label: 'Secretaria' },
-    { value: 'delivery', label: 'Entregador' }
+  // User found
+  foundUser: Employee | null = null;
+  searchError: string = '';
+
+  // Role editing
+  selectedRole: UserRole | '' = '';
+  isUpdating: boolean = false;
+
+  // Available roles for assignment (ADMIN and CLIENT excluded)
+  roles: { value: UserRole; label: string }[] = [
+    { value: 'SECRETARY', label: 'Secretaria' },
+    { value: 'DELIVERY', label: 'Entregador' }
   ];
 
-  zones = [
-    { value: 'north', label: 'Norte' },
-    { value: 'south', label: 'Sur' },
-    { value: 'east', label: 'Oriente' },
-    { value: 'west', label: 'Occidente' },
-    { value: 'center', label: 'Centro' }
+  // All roles for display purposes
+  allRoles: { value: UserRole; label: string }[] = [
+    { value: 'CLIENT', label: 'Cliente' },
+    { value: 'SECRETARY', label: 'Secretaria' },
+    { value: 'DELIVERY', label: 'Entregador' },
+    { value: 'ADMIN', label: 'Administrador' }
   ];
 
-  constructor(private fb: FormBuilder) {
-    this.employeeForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.minLength(2)]],
-      lastName: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      role: ['', Validators.required],
-      zone: ['', Validators.required]
-    });
-  }
+  constructor(
+    private adminService: AdminService,
+    private toast: ToastService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
-  onSubmit(): void {
-    if (this.employeeForm.valid) {
-      this.isSubmitting = true;
-      this.formSubmit.emit(this.employeeForm.value);
-      this.employeeForm.reset();
-      this.isSubmitting = false;
-    } else {
-      this.employeeForm.markAllAsTouched();
+  async searchUser(): Promise<void> {
+    if (!this.documentNumber || this.documentNumber.trim().length < 5) {
+      this.toast.error('Ingrese un número de documento válido (mínimo 5 dígitos)');
+      return;
+    }
+
+    this.isSearching = true;
+    this.foundUser = null;
+    this.searchError = '';
+    this.selectedRole = '';
+    this.cdr.detectChanges();
+
+    try {
+      const user = await this.adminService.getUserByDocument(this.documentNumber.trim());
+      this.foundUser = user;
+      this.selectedRole = user.role;
+      // Emit event so parent can load statistics for this user
+      this.userFound.emit(user);
+    } catch (error: any) {
+      if (error.status === 404) {
+        this.searchError = 'No se encontró ningún usuario con ese número de documento';
+      } else {
+        this.searchError = 'Error al buscar el usuario';
+      }
+      this.toast.error(this.searchError);
+    } finally {
+      this.isSearching = false;
+      this.cdr.detectChanges();
     }
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.employeeForm.get(fieldName);
-    return field ? field.invalid && field.touched : false;
+  clearSearch(): void {
+    this.documentNumber = '';
+    this.foundUser = null;
+    this.searchError = '';
+    this.selectedRole = '';
+  }
+
+  get canEditRole(): boolean {
+    // Cannot edit if user is ADMIN
+    return this.foundUser !== null && this.foundUser.role !== 'ADMIN';
+  }
+
+  get roleChanged(): boolean {
+    return this.foundUser !== null && this.selectedRole !== this.foundUser.role;
+  }
+
+  async updateUserRole(): Promise<void> {
+    if (!this.foundUser || !this.selectedRole || !this.roleChanged) {
+      return;
+    }
+
+    this.isUpdating = true;
+    this.cdr.detectChanges();
+
+    try {
+      const updatedUser = await this.adminService.updateEmployee(this.foundUser.user_uuid, {
+        role: this.selectedRole as UserRole
+      });
+
+      this.foundUser = updatedUser;
+      this.selectedRole = updatedUser.role;
+      this.toast.success(`Rol actualizado a ${this.getRoleLabel(this.selectedRole as UserRole)}`);
+      this.userUpdated.emit(updatedUser);
+
+    } catch (error: any) {
+      console.error('Error updating role:', error);
+      this.toast.error('Error al actualizar el rol del usuario');
+    } finally {
+      this.isUpdating = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  getRoleLabel(role: UserRole): string {
+    const found = this.allRoles.find(r => r.value === role);
+    return found ? found.label : role;
+  }
+
+  getRoleBadgeClass(role: UserRole): string {
+    switch (role) {
+      case 'ADMIN': return 'badge-admin';
+      case 'SECRETARY': return 'badge-secretary';
+      case 'DELIVERY': return 'badge-delivery';
+      case 'CLIENT': return 'badge-client';
+      default: return 'badge-default';
+    }
+  }
+
+  getStatusBadgeClass(status: string): string {
+    switch (status) {
+      case 'Activo': return 'badge-success';
+      case 'En ruta': return 'badge-info';
+      default: return 'badge-secondary';
+    }
+  }
+
+  formatDate(dateStr: string): string {
+    if (!dateStr) return 'N/A';
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('es-CO', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      });
+    } catch {
+      return 'N/A';
+    }
   }
 }

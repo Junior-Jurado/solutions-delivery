@@ -8,6 +8,8 @@
     [userName]="userName"
     [showUserName]="true"
     [isMobile]="isMobile"
+    [showRefresh]="false"
+    [isRefreshing]="isRefreshing"
     (logout)="logout()">
   </app-dashboard-header>
 
@@ -21,7 +23,7 @@
         class="tab-button"
         [class.active]="activeTab === 'deliveries'"
         (click)="setActiveTab('deliveries')">
-        <app-icon category="common" name="package" size="20px"></app-icon>
+        <app-icon category="delivery" name="package" size="20px"></app-icon>
         <span>Mis Entregas</span>
       </button>
 
@@ -29,7 +31,7 @@
         class="tab-button"
         [class.active]="activeTab === 'confirm'"
         (click)="setActiveTab('confirm')">
-        <app-icon category="common" name="check-circle" size="20px"></app-icon>
+        <app-icon category="status" name="check-circle" size="20px"></app-icon>
         <span>Confirmar Entrega</span>
       </button>
 
@@ -37,7 +39,7 @@
         class="tab-button"
         [class.active]="activeTab === 'issues'"
         (click)="setActiveTab('issues')">
-        <app-icon category="common" name="alert-triangle" size="20px"></app-icon>
+        <app-icon category="status" name="alert-triangle" size="20px"></app-icon>
         <span>Reportar Problema</span>
       </button>
 
@@ -45,7 +47,7 @@
         class="tab-button"
         [class.active]="activeTab === 'performance'"
         (click)="setActiveTab('performance')">
-        <app-icon category="common" name="star" size="20px"></app-icon>
+        <app-icon category="misc" name="star" size="20px"></app-icon>
         <span>Mi Rendimiento</span>
       </button>
     </nav>
@@ -115,6 +117,21 @@
       </div>
     </div>
   </div>
+
+  <!-- Floating Refresh Button -->
+  <button
+    class="floating-refresh-btn"
+    [class.refreshing]="isRefreshing"
+    [disabled]="isRefreshing"
+    (click)="handleRefresh()"
+    title="Actualizar datos">
+    <app-icon
+      category="navigation"
+      name="refresh-cw"
+      size="24px"
+      [class.spin]="isRefreshing">
+    </app-icon>
+  </button>
 </div>
 
 <!-- Map Modal -->

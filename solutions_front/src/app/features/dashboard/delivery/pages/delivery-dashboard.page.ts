@@ -75,6 +75,9 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   // Device detection
   isMobile: boolean = false;
 
+  // Refresh
+  isRefreshing: boolean = false;
+
   // User data
   userName: string = '';
   userRole: string = 'DELIVERY';
@@ -354,6 +357,43 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
       this.toastService.error('Error al cargar estadísticas de rendimiento');
     } finally {
       this.isLoadingPerformance = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ==========================================
+  // REFRESH
+  // ==========================================
+
+  async handleRefresh(): Promise<void> {
+    if (this.isRefreshing) return;
+
+    this.isRefreshing = true;
+    this.cdr.detectChanges();
+
+    try {
+      switch (this.activeTab) {
+        case 'deliveries':
+          await this.loadDeliveries();
+          break;
+        case 'confirm':
+          await this.loadDeliveries();
+          break;
+        case 'issues':
+          await this.loadDeliveries();
+          break;
+        case 'performance':
+          await this.loadPerformance();
+          break;
+        default:
+          await this.loadDeliveries();
+      }
+      this.toastService.success('Datos actualizados correctamente');
+    } catch (error) {
+      console.error('Error al refrescar:', error);
+      this.toastService.error('Error al actualizar los datos');
+    } finally {
+      this.isRefreshing = false;
       this.cdr.detectChanges();
     }
   }

@@ -5,7 +5,8 @@
 
 .services {
   padding: 4rem 0;
-  background-color: rgba($gray-100, 0.5);
+  background-color: var(--bg-secondary);
+  transition: background-color var(--transition-theme);
 
   .container {
     max-width: 1280px;
@@ -29,8 +30,9 @@
   .section-title {
     font-size: $font-2xl;
     font-weight: $font-bold;
-    color: $brand-black;
+    color: var(--text-primary);
     margin-bottom: $spacing-md;
+    transition: color var(--transition-theme);
 
     @media (min-width: $breakpoint-md) {
       font-size: $font-3xl;
@@ -39,7 +41,8 @@
 
   .section-description {
     font-size: $font-lg;
-    color: $gray-600;
+    color: var(--text-secondary);
+    transition: color var(--transition-theme);
 
     @media (min-width: $breakpoint-md) {
       font-size: $font-xl;
@@ -57,13 +60,49 @@
 }
 
 .service-card {
-  background-color: $white;
+  background-color: var(--card-bg);
   padding: $spacing-lg;
   border-radius: $radius-md;
-  transition: box-shadow $transition-slow;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
 
   &:hover {
-    box-shadow: $shadow-lg;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-4px);
+
+    .service-guacamaya {
+      transform: scale(1.15) rotate(5deg);
+    }
+  }
+
+  // Colored top borders
+  &.card-border-azul {
+    border-top: 4px solid var(--color-azul);
+  }
+
+  &.card-border-rojo {
+    border-top: 4px solid var(--color-rojo);
+  }
+
+  &.card-border-verde {
+    border-top: 4px solid var(--color-verde);
+  }
+
+  &.card-border-amarillo {
+    border-top: 4px solid var(--color-amarillo);
+  }
+
+  // Guacamaya decoration
+  .service-guacamaya {
+    position: absolute;
+    top: $spacing-sm;
+    right: $spacing-sm;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+    opacity: 0.9;
   }
 
   .service-icon {
@@ -74,20 +113,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.3s ease;
 
-    &.bg-blue {
-      background-color: rgba($brand-blue, 0.1);
-      color: $brand-blue;
+    &.bg-azul {
+      background-color: rgba(0, 102, 204, 0.12);
+      color: var(--color-azul);
     }
 
-    &.bg-red {
-      background-color: rgba($brand-red, 0.1);
-      color: $brand-red;
+    &.bg-rojo {
+      background-color: rgba(227, 30, 36, 0.12);
+      color: var(--color-rojo);
     }
 
-    &.bg-black {
-      background-color: rgba($brand-black, 0.1);
-      color: $brand-black;
+    &.bg-verde {
+      background-color: rgba(0, 166, 81, 0.12);
+      color: var(--color-verde);
+    }
+
+    &.bg-amarillo {
+      background-color: rgba(255, 215, 0, 0.15);
+      color: var(--color-amarillo-dark);
     }
   }
 
@@ -95,24 +140,30 @@
     font-size: $font-xl;
     font-weight: $font-semibold;
     margin-bottom: $spacing-xs;
+    transition: color var(--transition-theme);
 
-    &.text-blue {
-      color: $brand-blue;
+    &.text-azul {
+      color: var(--color-azul);
     }
 
-    &.text-red {
-      color: $brand-red;
+    &.text-rojo {
+      color: var(--color-rojo);
     }
 
-    &.text-black {
-      color: $brand-black;
+    &.text-verde {
+      color: var(--color-verde);
+    }
+
+    &.text-amarillo {
+      color: var(--color-amarillo-dark);
     }
   }
 
   .service-subtitle {
-    color: $gray-600;
+    color: var(--text-secondary);
     font-size: $font-sm;
     margin-bottom: $spacing-md;
+    transition: color var(--transition-theme);
   }
 
   .service-list {
@@ -121,59 +172,137 @@
     margin-bottom: $spacing-md;
 
     li {
-      color: $gray-600;
+      color: var(--text-secondary);
       font-size: $font-sm;
       margin-bottom: $spacing-sm;
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      transition: color var(--transition-theme);
+
+      .check-icon {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        &::before {
+          content: '✓';
+          font-size: 10px;
+          color: white;
+        }
+
+        &.check-azul {
+          background-color: var(--color-azul);
+        }
+
+        &.check-rojo {
+          background-color: var(--color-rojo);
+        }
+
+        &.check-verde {
+          background-color: var(--color-verde);
+        }
+      }
     }
   }
 }
 
 // Button styles
-.btn-blue {
-  background-color: $brand-blue;
+.btn-azul {
+  background-color: var(--color-azul);
   color: $white;
   border: none;
   padding: $spacing-sm $spacing-lg;
   border-radius: $radius-md;
   font-weight: $font-semibold;
   cursor: pointer;
-  transition: background-color $transition-base;
+  transition: all 0.3s ease;
 
   &:hover {
-    background-color: color.adjust($brand-blue, $lightness: -10%);
+    background-color: var(--color-azul-dark);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
   }
 }
 
-.btn-red {
-  background-color: $brand-red;
+.btn-rojo {
+  background-color: var(--color-rojo);
   color: $white;
   border: none;
   padding: $spacing-sm $spacing-lg;
   border-radius: $radius-md;
   font-weight: $font-semibold;
   cursor: pointer;
-  transition: background-color $transition-base;
+  transition: all 0.3s ease;
 
   &:hover {
-    background-color: color.adjust($brand-red, $lightness: -10%);
+    background-color: var(--color-rojo-dark);
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3);
   }
 }
 
-.btn-secondary {
-  background-color: $gray-100;
-  color: $gray-700;
+.btn-verde {
+  background-color: var(--color-verde);
+  color: $white;
   border: none;
   padding: $spacing-sm $spacing-lg;
   border-radius: $radius-md;
   font-weight: $font-semibold;
   cursor: pointer;
-  transition: background-color $transition-base;
+  transition: all 0.3s ease;
 
   &:hover {
-    background-color: $gray-300;
+    background-color: var(--color-verde-dark);
+    box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3);
   }
 }
 
-.w-full {
+.btn-amarillo {
+  background-color: var(--color-amarillo);
+  color: #333333;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: var(--color-amarillo-dark);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+  }
+}
+
+.btn-full {
   width: 100%;
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .service-card {
+    .service-guacamaya {
+      filter: brightness(1.15);
+    }
+
+    .service-icon {
+      &.bg-azul {
+        background-color: rgba(77, 154, 255, 0.15);
+      }
+
+      &.bg-rojo {
+        background-color: rgba(255, 92, 92, 0.15);
+      }
+
+      &.bg-verde {
+        background-color: rgba(51, 212, 127, 0.15);
+      }
+
+      &.bg-amarillo {
+        background-color: rgba(255, 224, 51, 0.18);
+      }
+    }
+  }
 }

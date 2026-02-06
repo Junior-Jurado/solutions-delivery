@@ -8,7 +8,7 @@
     <!-- Columna Izquierda: Formulario -->
     <div class="quote-form-card">
       <div class="quote-card-header">
-        <app-icon category="common" name="box" size="24px"></app-icon>
+        <app-icon category="delivery" name="box" size="24px"></app-icon>
         <h3>Información del Paquete</h3>
       </div>
 
@@ -17,7 +17,7 @@
         <div class="quote-form-row three-cols">
           <div class="quote-form-group">
             <label for="quoteServiceType">
-              <app-icon category="common" name="tag" size="16px"></app-icon>
+              <app-icon category="misc" name="tag" size="16px"></app-icon>
               Tipo de servicio *
             </label>
             <select 
@@ -34,7 +34,7 @@
 
           <div class="quote-form-group">
             <label for="quoteWeight">
-              <app-icon category="common" name="weight" size="16px"></app-icon>
+              <app-icon category="misc" name="weight" size="16px"></app-icon>
               Peso (kg) *
             </label>
             <input 
@@ -50,7 +50,7 @@
 
           <div class="quote-form-group">
             <label for="quoteDeclaredValue">
-              <app-icon category="common" name="dollar-sign" size="16px"></app-icon>
+              <app-icon category="finance" name="dollar-sign" size="16px"></app-icon>
               Valor declarado *
             </label>
             <input 
@@ -68,7 +68,7 @@
         <div class="quote-form-row three-cols">
           <div class="quote-form-group">
             <label for="quoteDimensions">
-              <app-icon category="common" name="maximize" size="16px"></app-icon>
+              <app-icon category="navigation" name="maximize" size="16px"></app-icon>
               Dimensiones (cm)
             </label>
             <input 
@@ -82,7 +82,7 @@
 
           <div class="quote-form-group">
             <label for="quoteInsurance">
-              <app-icon category="common" name="shield" size="16px"></app-icon>
+              <app-icon category="misc" name="shield" size="16px"></app-icon>
               Seguro adicional
             </label>
             <select 
@@ -97,7 +97,7 @@
 
           <div class="quote-form-group">
             <label for="quotePieces">
-              <app-icon category="common" name="layers" size="16px"></app-icon>
+              <app-icon category="misc" name="layers" size="16px"></app-icon>
               Número de piezas
             </label>
             <input 
@@ -115,7 +115,7 @@
           type="submit" 
           class="btn btn-primary btn-quote-calculate"
           [disabled]="!quoteData.weight || quoteData.weight <= 0 || !quoteData.serviceType">
-          <app-icon category="common" name="calculator" size="20px"></app-icon>
+          <app-icon category="finance" name="calculator" size="20px"></app-icon>
           <span>Calcular Precio</span>
         </button>
       </form>
@@ -126,7 +126,7 @@
       <!-- Resultado de la cotización -->
       <div class="quote-result-card" *ngIf="result !== null">
         <div class="quote-card-header success">
-          <app-icon category="common" name="check-circle" size="24px"></app-icon>
+          <app-icon category="status" name="check-circle" size="24px"></app-icon>
           <h3>Resultado de la Cotización</h3>
         </div>
 
@@ -192,18 +192,18 @@
 
           <!-- Info -->
           <div class="quote-info-notice">
-            <app-icon category="common" name="info" size="16px"></app-icon>
+            <app-icon category="status" name="info" size="16px"></app-icon>
             <span>Este precio es una estimación. El precio final puede variar según la ruta.</span>
           </div>
 
           <!-- Acciones -->
           <div class="quote-result-actions">
             <button class="btn btn-secondary" (click)="onReset()">
-              <app-icon category="common" name="refresh-cw" size="18px"></app-icon>
+              <app-icon category="navigation" name="refresh-cw" size="18px"></app-icon>
               <span>Nueva Cotización</span>
             </button>
             <button class="btn btn-primary" (click)="onProceedToCreate()">
-              <app-icon category="common" name="plus-circle" size="18px"></app-icon>
+              <app-icon category="actions" name="plus-circle" size="18px"></app-icon>
               <span>Crear Guía</span>
             </button>
           </div>
@@ -213,7 +213,7 @@
       <!-- Placeholder cuando no hay cotización -->
       <div class="quote-placeholder" *ngIf="result === null">
         <div class="quote-placeholder-content">
-          <app-icon category="common" name="calculator" size="64px"></app-icon>
+          <app-icon category="finance" name="calculator" size="64px"></app-icon>
           <h3>Ingresa los datos de tu envío</h3>
           <p>Completa el formulario para obtener una cotización instantánea</p>
           
@@ -221,11 +221,11 @@
             <h4>Tarifas de referencia:</h4>
             <ul>
               <li>
-                <app-icon category="common" name="check" size="14px"></app-icon>
+                <app-icon category="status" name="check" size="14px"></app-icon>
                 Tarifa base: \$15,000
               </li>
               <li>
-                <app-icon category="common" name="check" size="14px"></app-icon>
+                <app-icon category="status" name="check" size="14px"></app-icon>
                 Por kilogramo: \$3,000
               </li>
             </ul>

@@ -7,6 +7,8 @@
     userDescription="Panel de administración"
     [userName]="userName"
     [showUserName]="true"
+    [showRefresh]="false"
+    [isRefreshing]="isRefreshing"
     (logout)="handleLogout()">
   </app-dashboard-header>
 
@@ -14,46 +16,38 @@
        MAIN PANEL
        ======================================== -->
   <div class="admin-panel">
-    <!-- Tabs Navigation -->
+    <!-- Tabs Navigation (Consolidado: 4 tabs) -->
     <nav class="tabs-navigation">
       <button
         class="tab-button"
         [class.active]="activeTab === 'stats'"
         (click)="setActiveTab('stats')">
-        <app-icon category="common" name="bar-chart" size="20px"></app-icon>
+        <app-icon category="stats" name="bar-chart" size="20px"></app-icon>
         <span>Dashboard</span>
       </button>
 
       <button
         class="tab-button"
-        [class.active]="activeTab === 'employees'"
-        (click)="setActiveTab('employees')">
-        <app-icon category="common" name="users" size="20px"></app-icon>
-        <span>Empleados</span>
+        [class.active]="activeTab === 'operations'"
+        (click)="setActiveTab('operations')">
+        <app-icon category="actions" name="settings" size="20px"></app-icon>
+        <span>Operaciones</span>
       </button>
 
       <button
         class="tab-button"
         [class.active]="activeTab === 'deliveries'"
         (click)="setActiveTab('deliveries')">
-        <app-icon category="common" name="package" size="20px"></app-icon>
+        <app-icon category="delivery" name="truck" size="20px"></app-icon>
         <span>Entregas</span>
       </button>
 
       <button
         class="tab-button"
-        [class.active]="activeTab === 'routes'"
-        (click)="setActiveTab('routes')">
-        <app-icon category="common" name="truck" size="20px"></app-icon>
-        <span>Rutas</span>
-      </button>
-
-      <button
-        class="tab-button"
-        [class.active]="activeTab === 'cash-close'"
-        (click)="setActiveTab('cash-close')">
-        <app-icon category="common" name="credit-card" size="20px"></app-icon>
-        <span>Cierre de Caja</span>
+        [class.active]="activeTab === 'finance'"
+        (click)="setActiveTab('finance')">
+        <app-icon category="finance" name="credit-card" size="20px"></app-icon>
+        <span>Finanzas</span>
       </button>
     </nav>
 
@@ -110,125 +104,277 @@
       <div class="card">
         <div class="card-header">
           <h2 class="card-title alert-title">
-            <app-icon category="common" name="alert-triangle" size="20px" color="#ca8a04"></app-icon>
+            <app-icon category="status" name="alert-triangle" size="20px" color="#ca8a04"></app-icon>
             Alertas del Sistema
           </h2>
         </div>
         <div class="card-content">
           <app-alerts-panel
             [alerts]="alerts"
-            (alertAction)="handleAlertAction($event)">
+            (alertAction)="handleAlertAction($event)"
+            (viewGuide)="handleViewGuide($event)"
+            (dismissAlert)="handleDismissAlert($event)">
           </app-alerts-panel>
         </div>
       </div>
     </div>
 
     <!-- ========================================
-         TAB 2: EMPLOYEES
+         TAB 2: OPERATIONS (Empleados + Guías)
          ======================================== -->
-    <div class="tab-content" *ngIf="activeTab === 'employees'">
-      <div class="two-column-grid">
-        <!-- Employee Form -->
+    <div class="tab-content" *ngIf="activeTab === 'operations'">
+      <!-- Sub-tabs Navigation -->
+      <div class="sub-tabs">
+        <button
+          class="sub-tab"
+          [class.active]="operationsSubTab === 'employees'"
+          (click)="setOperationsSubTab('employees')">
+          <app-icon category="users" name="users" size="18px"></app-icon>
+          <span>Empleados</span>
+        </button>
+        <button
+          class="sub-tab"
+          [class.active]="operationsSubTab === 'guides'"
+          (click)="setOperationsSubTab('guides')">
+          <app-icon category="documents" name="file-text" size="18px"></app-icon>
+          <span>Guias</span>
+        </button>
+        <button
+          class="sub-tab"
+          [class.active]="operationsSubTab === 'clients'"
+          (click)="setOperationsSubTab('clients')">
+          <app-icon category="misc" name="award" size="18px"></app-icon>
+          <span>Mejores Clientes</span>
+        </button>
+      </div>
+
+      <!-- Sub-tab: Employees -->
+      <div *ngIf="operationsSubTab === 'employees'" class="sub-tab-content">
+        <div class="two-column-grid">
+          <!-- User Search & Role Management -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <app-icon category="navigation" name="search" size="20px" color="#3b82f6"></app-icon>
+                Gestionar Rol de Usuario
+              </h2>
+              <p class="card-description">Buscar usuario por documento y modificar su rol en el sistema</p>
+            </div>
+            <div class="card-content">
+              <app-employee-form
+                (userUpdated)="handleUserUpdated($event)"
+                (userFound)="handleUserFound($event)">
+              </app-employee-form>
+            </div>
+          </div>
+
+          <!-- Employee List -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <app-icon category="users" name="users" size="20px" color="#3b82f6"></app-icon>
+                Usuarios del Sistema
+              </h2>
+              <p class="card-description">Personal registrado (excepto clientes)</p>
+            </div>
+            <div class="card-content">
+              <app-employee-list
+                [employees]="employees"
+                [isLoading]="isLoadingEmployees"
+                (employeeUpdated)="handleUserUpdated($event)">
+              </app-employee-list>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-tab: Guides -->
+      <div *ngIf="operationsSubTab === 'guides'" class="sub-tab-content">
+        <!-- Guides Sub-tabs -->
+        <div class="sub-tabs secondary">
+          <button
+            class="sub-tab"
+            [class.active]="guidesSubTab === 'create'"
+            (click)="setGuidesSubTab('create')">
+            <app-icon category="actions" name="plus-circle" size="18px"></app-icon>
+            <span>Crear Guía</span>
+          </button>
+          <button
+            class="sub-tab"
+            [class.active]="guidesSubTab === 'manage'"
+            (click)="setGuidesSubTab('manage')">
+            <app-icon category="documents" name="file-text" size="18px"></app-icon>
+            <span>Gestionar Guías</span>
+          </button>
+        </div>
+
+        <!-- Create Guide -->
+        <div *ngIf="guidesSubTab === 'create'" class="sub-tab-content">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <app-icon category="actions" name="plus-circle" size="20px" color="#3b82f6"></app-icon>
+                Crear Nueva Guía
+              </h2>
+              <p class="card-description">
+                Complete el formulario para crear una nueva guía de envío.
+                <strong>Como administrador, puede modificar el precio calculado.</strong>
+              </p>
+            </div>
+            <div class="card-content">
+              <app-guide-form
+                [currentUserId]="currentUserId"
+                (formSubmit)="handleGuideFormSubmit($event)">
+              </app-guide-form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Manage Guides -->
+        <div *ngIf="guidesSubTab === 'manage'" class="sub-tab-content">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <app-icon category="documents" name="file-text" size="20px" color="#3b82f6"></app-icon>
+                Gestión de Guías
+              </h2>
+              <p class="card-description">Buscar, visualizar y gestionar el estado de las guías</p>
+            </div>
+            <div class="card-content">
+              <app-admin-guides
+                (viewGuide)="handleViewGuide($event)">
+              </app-admin-guides>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-tab: Clients (Best Clients Ranking) -->
+      <div *ngIf="operationsSubTab === 'clients'" class="sub-tab-content">
         <div class="card">
           <div class="card-header">
             <h2 class="card-title">
-              <app-icon category="common" name="plus" size="20px" color="#3b82f6"></app-icon>
-              Crear Empleado
+              <app-icon category="misc" name="award" size="20px" color="#f59e0b"></app-icon>
+              Ranking de Mejores Clientes
             </h2>
-            <p class="card-description">Agregar nuevo personal al sistema</p>
+            <p class="card-description">Analiza y posiciona a tus mejores clientes basado en diferentes criterios</p>
           </div>
           <div class="card-content">
-            <app-employee-form
-              (formSubmit)="handleEmployeeCreate($event)">
-            </app-employee-form>
-          </div>
-        </div>
-
-        <!-- Employee List -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Lista de Empleados</h2>
-            <p class="card-description">Personal activo en el sistema</p>
-          </div>
-          <div class="card-content">
-            <app-employee-list
-              [employees]="employees"
-              [isLoading]="isLoadingEmployees"
-              (editEmployee)="handleEmployeeEdit($event)">
-            </app-employee-list>
+            <app-client-ranking></app-client-ranking>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ========================================
-         TAB 3: DELIVERIES
+         TAB 3: DELIVERIES (Entregas + Asignaciones)
          ======================================== -->
     <div class="tab-content" *ngIf="activeTab === 'deliveries'">
-      <!-- Delivery Overview Stats -->
-      <app-delivery-overview
-        [deliveriesToday]="stats.shipmentsToday"
-        [completed]="stats.delivered"
-        [pending]="stats.pending"
-        [averageTime]="2.4"
-        [satisfaction]="98.5">
-      </app-delivery-overview>
+      <!-- Sub-tabs Navigation -->
+      <div class="sub-tabs">
+        <button
+          class="sub-tab"
+          [class.active]="deliveriesSubTab === 'overview'"
+          (click)="setDeliveriesSubTab('overview')">
+          <app-icon category="delivery" name="package" size="18px"></app-icon>
+          <span>Vista General</span>
+        </button>
+        <button
+          class="sub-tab"
+          [class.active]="deliveriesSubTab === 'assignments'"
+          (click)="setDeliveriesSubTab('assignments')">
+          <app-icon category="users" name="users" size="18px"></app-icon>
+          <span>Asignar Repartidores</span>
+        </button>
+      </div>
 
-      <!-- Realtime Deliveries -->
-      <div class="card">
-        <div class="card-header">
-          <h2 class="card-title">Entregas en Tiempo Real</h2>
-          <p class="card-description">Estado actual de todas las entregas</p>
+      <!-- Sub-tab: Overview (Entregas + Rutas Activas) -->
+      <div *ngIf="deliveriesSubTab === 'overview'" class="sub-tab-content">
+        <!-- Delivery Overview Stats -->
+        <app-delivery-overview
+          [deliveriesToday]="stats.shipmentsToday"
+          [completed]="stats.delivered"
+          [pending]="stats.pending"
+          [averageTime]="stats.averageDeliveryTime"
+          [satisfaction]="stats.satisfactionRate">
+        </app-delivery-overview>
+
+        <div class="two-column-grid">
+          <!-- Realtime Deliveries -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <app-icon category="stats" name="activity" size="20px" color="#3b82f6"></app-icon>
+                Entregas en Tiempo Real
+              </h2>
+              <p class="card-description">Estado actual de todas las entregas</p>
+            </div>
+            <div class="card-content">
+              <app-realtime-deliveries
+                [deliveries]="deliveries"
+                [isLoading]="isLoadingDeliveries"
+                (viewGuide)="handleViewGuide($event)">
+              </app-realtime-deliveries>
+            </div>
+          </div>
+
+          <!-- Active Routes -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">
+                <app-icon category="delivery" name="truck" size="20px" color="#3b82f6"></app-icon>
+                Rutas Activas
+              </h2>
+              <p class="card-description">Entregadores en servicio</p>
+            </div>
+            <div class="card-content">
+              <app-active-routes
+                [routes]="activeRoutes"
+                [isLoading]="isLoadingRoutes">
+              </app-active-routes>
+            </div>
+          </div>
         </div>
-        <div class="card-content">
-          <app-realtime-deliveries
-            [deliveries]="deliveries"
-            [isLoading]="isLoadingDeliveries">
-          </app-realtime-deliveries>
+      </div>
+
+      <!-- Sub-tab: Assignments (Reutiliza AssignmentPanelComponent del Secretary) -->
+      <div *ngIf="deliveriesSubTab === 'assignments'" class="sub-tab-content">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <app-icon category="users" name="user-plus" size="20px" color="#3b82f6"></app-icon>
+              Asignación de Repartidores
+            </h2>
+            <p class="card-description">Asigna repartidores para recoger y entregar paquetes en Bogotá</p>
+          </div>
+          <div class="card-content">
+            <app-assignment-panel
+              (assignmentCreated)="loadStats(true)">
+            </app-assignment-panel>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- ========================================
-         TAB 4: ROUTES
-         ======================================== -->
-    <div class="tab-content" *ngIf="activeTab === 'routes'">
-      <div class="two-column-grid">
-        <!-- Route Assignment Form -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Asignar Ruta</h2>
-            <p class="card-description">Asignar entregas a entregadores</p>
-          </div>
-          <div class="card-content">
-            <app-route-assignment-form
-              [deliveryPersons]="deliveryPersons"
-              [availablePackages]="availablePackages"
-              (assignRoute)="handleRouteAssignment($event)">
-            </app-route-assignment-form>
-          </div>
-        </div>
-
-        <!-- Active Routes -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Rutas Activas</h2>
-            <p class="card-description">Entregadores en servicio</p>
-          </div>
-          <div class="card-content">
-            <app-active-routes
-              [routes]="activeRoutes"
-              [isLoading]="isLoadingRoutes">
-            </app-active-routes>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Guide Preview Modal (Admin - allows price edit) -->
+    <app-guide-preview-modal
+      [isOpen]="showGuidePreview"
+      [guideData]="guidePreviewData"
+      [isCreating]="isCreatingGuide"
+      [allowPriceEdit]="true"
+      title="Confirmar Creación de Guía"
+      warningMessage="Verifique la información. Como administrador, puede modificar el precio antes de confirmar."
+      confirmButtonText="Crear Guía"
+      cancelButtonText="Cancelar"
+      (confirm)="confirmGuideCreation($event)"
+      (cancel)="cancelGuideCreation()"
+      (closeModal)="cancelGuideCreation()">
+    </app-guide-preview-modal>
 
     <!-- ========================================
-         TAB 5: CASH CLOSE
+         TAB 4: FINANCE (Cierre de Caja)
          ======================================== -->
-    <div class="tab-content" *ngIf="activeTab === 'cash-close'">
+    <div class="tab-content" *ngIf="activeTab === 'finance'">
       <!-- Cash Close Stats -->
       <app-cash-close-stats
         [stats]="cashCloseStats"
@@ -239,7 +385,7 @@
       <div class="card mb-6">
         <div class="card-header">
           <h2 class="card-title">
-            <app-icon category="common" name="credit-card" size="20px" color="#3b82f6"></app-icon>
+            <app-icon category="finance" name="credit-card" size="20px" color="#3b82f6"></app-icon>
             Generar Nuevo Cierre de Caja
           </h2>
           <p class="card-description">Selecciona el tipo de período y las fechas para generar un cierre</p>
@@ -279,4 +425,27 @@
       </div>
     </div>
   </div>
+
+  <!-- Guide Admin Modal -->
+  <app-guide-admin-modal
+    [guideId]="selectedGuideId"
+    [isOpen]="isGuideModalOpen"
+    (closeModal)="closeGuideModal()"
+    (statusUpdated)="handleGuideStatusUpdated($event)">
+  </app-guide-admin-modal>
+
+  <!-- Floating Refresh Button -->
+  <button
+    class="floating-refresh-btn"
+    [class.refreshing]="isRefreshing"
+    [disabled]="isRefreshing"
+    (click)="handleRefresh()"
+    title="Actualizar datos">
+    <app-icon
+      category="navigation"
+      name="refresh-cw"
+      size="24px"
+      [class.spin]="isRefreshing">
+    </app-icon>
+  </button>
 </div>

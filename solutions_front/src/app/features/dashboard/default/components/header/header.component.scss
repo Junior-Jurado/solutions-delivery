@@ -3,9 +3,10 @@
 @use "mixins" as *;
 
 .header {
-  background-color: $white;
-  border-bottom: 1px solid $gray-300;
-  box-shadow: $shadow-sm;
+  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-theme);
 
   .header-content {
     display: flex;
@@ -35,33 +36,68 @@
   }
 
   .logo-icon {
-    background-color: $brand-blue;
+    background-color: var(--color-azul);
     padding: $spacing-sm;
     border-radius: $radius-md;
     color: $white;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: background-color var(--transition-theme);
+
+    &:hover {
+      background-color: var(--color-azul-dark);
+    }
   }
 
   .logo-text {
     font-size: $font-xl;
     font-weight: $font-bold;
-    color: $brand-black;
+    color: var(--text-primary);
+    transition: color var(--transition-theme);
+  }
+
+  .guacamaya-logo {
+    width: 36px;
+    height: 36px;
+    margin-left: $spacing-xs;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: scale(1.15) rotate(5deg);
+    }
   }
 }
 
-.btn-ghost {
-  background: transparent;
+.btn-login {
+  background-color: var(--color-amarillo);
+  color: #333333;
   border: none;
-  padding: $spacing-sm $spacing-md;
+  padding: $spacing-sm $spacing-lg;
   cursor: pointer;
-  color: $gray-700;
-  font-weight: $font-medium;
-  border-radius: $radius-base;
-  transition: background-color $transition-base;
+  font-weight: $font-semibold;
+  border-radius: $radius-md;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 
   &:hover {
-    background-color: $gray-100;
+    background-color: var(--color-amarillo-dark);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .header {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .guacamaya-logo {
+    filter: brightness(1.1);
   }
 }

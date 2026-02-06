@@ -7,7 +7,7 @@
   font-size: $font-sm;
   font-weight: $font-medium;
   cursor: pointer;
-  transition: all $transition-base;
+  transition: all 0.3s ease;
   border: 1px solid transparent;
   display: inline-flex;
   align-items: center;
@@ -23,12 +23,21 @@
     flex-shrink: 0;
   }
 
+  // Primary button - Yellow CTA
   &.btn-primary {
-    background: $brand-blue;
-    color: $white;
+    background: var(--color-amarillo);
+    color: #333333;
+    font-weight: $font-semibold;
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
 
     &:hover:not(:disabled) {
-      background: $brand-blue-dark;
+      background: var(--color-amarillo-dark);
+      box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
     }
 
     &:disabled {
@@ -37,15 +46,75 @@
     }
   }
 
-  &.btn-outline {
-    background: $white;
-    border-color: $border-color;
-    color: $text-primary;
+  // Secondary button - Blue
+  &.btn-secondary {
+    background: var(--color-azul);
+    color: $white;
 
-    &:hover {
-      background: $bg-light;
-      border-color: $brand-blue;
-      color: $brand-blue;
+    &:hover:not(:disabled) {
+      background: var(--color-azul-dark);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Outline button - Blue border
+  &.btn-outline {
+    background: transparent;
+    border-color: var(--color-azul);
+    color: var(--color-azul);
+
+    &:hover:not(:disabled) {
+      background: var(--color-azul);
+      color: $white;
+    }
+  }
+
+  // Outline green
+  &.btn-outline-green {
+    background: transparent;
+    border-color: var(--color-verde);
+    color: var(--color-verde);
+
+    &:hover:not(:disabled) {
+      background: var(--color-verde);
+      color: $white;
+    }
+  }
+
+  // Danger button - Red
+  &.btn-danger {
+    background: var(--color-rojo);
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: var(--color-rojo-dark);
+      box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  // Success button - Green
+  &.btn-success {
+    background: var(--color-verde);
+    color: $white;
+
+    &:hover:not(:disabled) {
+      background: var(--color-verde-dark);
+      box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
   }
 
@@ -63,11 +132,80 @@
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    
+
     &:hover {
       background: inherit;
       border-color: inherit;
       color: inherit;
+      transform: none;
+      box-shadow: none;
     }
+  }
+}
+
+// Legacy button classes for compatibility
+.btn-blue {
+  background-color: var(--color-azul);
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: var(--color-azul-dark);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+  }
+}
+
+.btn-red {
+  background-color: var(--color-rojo);
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: var(--color-rojo-dark);
+    box-shadow: 0 4px 12px rgba(227, 30, 36, 0.3);
+  }
+}
+
+.btn-green {
+  background-color: var(--color-verde);
+  color: $white;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: var(--color-verde-dark);
+    box-shadow: 0 4px 12px rgba(0, 166, 81, 0.3);
+  }
+}
+
+.btn-yellow {
+  background-color: var(--color-amarillo);
+  color: #333333;
+  border: none;
+  padding: $spacing-sm $spacing-lg;
+  border-radius: $radius-md;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+
+  &:hover {
+    background-color: var(--color-amarillo-dark);
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    transform: translateY(-1px);
   }
 }

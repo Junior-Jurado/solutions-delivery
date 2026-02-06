@@ -116,6 +116,9 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   // Device detection
   isMobile: boolean = false;
 
+  // Refresh
+  isRefreshing: boolean = false;
+
   // Rating
   pendingRatings: PendingRating[] = [];
   showRatingModal: boolean = false;
@@ -589,6 +592,49 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
       this.toastService.error(error.message || 'Error al enviar la calificación');
     } finally {
       this.isSubmittingRating = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ==========================================
+  // REFRESH
+  // ==========================================
+
+  /**
+   * Refresca los datos según el tab activo
+   */
+  async handleRefresh(): Promise<void> {
+    if (this.isRefreshing) return;
+
+    this.isRefreshing = true;
+    this.cdr.detectChanges();
+
+    try {
+      switch (this.activeTab) {
+        case 'tracking':
+          // El usuario debe buscar de nuevo
+          break;
+        case 'my-guides':
+          await this.loadMyGuides();
+          break;
+        case 'history':
+          await this.loadGuidesHistory();
+          break;
+        case 'quote':
+          // No hay nada que refrescar
+          break;
+        case 'create':
+          // No hay nada que refrescar
+          break;
+        default:
+          await this.loadMyGuides();
+      }
+      this.toastService.success('Datos actualizados correctamente');
+    } catch (error) {
+      console.error('Error al refrescar:', error);
+      this.toastService.error('Error al actualizar los datos');
+    } finally {
+      this.isRefreshing = false;
       this.cdr.detectChanges();
     }
   }

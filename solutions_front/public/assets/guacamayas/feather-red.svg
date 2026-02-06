@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 40" fill="none">
+  <!-- Pluma roja flotante -->
+  <path d="M10 2 Q15 10 14 20 Q12 30 10 38 Q8 30 6 20 Q5 10 10 2 Z" fill="#E31E24"/>
+  <path d="M10 5 L10 35" stroke="#B5171C" stroke-width="0.5"/>
+  <path d="M10 10 Q12 12 13 15" stroke="#B5171C" stroke-width="0.3" fill="none"/>
+  <path d="M10 15 Q8 17 7 20" stroke="#B5171C" stroke-width="0.3" fill="none"/>
+  <path d="M10 20 Q12 22 13 25" stroke="#B5171C" stroke-width="0.3" fill="none"/>
+</svg>
