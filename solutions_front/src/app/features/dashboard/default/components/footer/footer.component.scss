@@ -68,47 +68,6 @@
     transition: color var(--transition-theme);
   }
 
-  // Guacamaya separator
-  .guacamaya-separator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: $spacing-md;
-    margin: $spacing-lg 0;
-
-    .footer-guacamaya {
-      width: 20px;
-      height: 20px;
-      transition: transform 0.3s ease;
-
-      &.flipped {
-        transform: scaleX(-1);
-      }
-
-      &:hover {
-        transform: scale(1.15) rotate(5deg);
-
-        &.flipped {
-          transform: scaleX(-1) scale(1.15) rotate(-5deg);
-        }
-      }
-    }
-
-    .separator-line {
-      flex: 1;
-      max-width: 200px;
-      height: 2px;
-      background: linear-gradient(
-        to right,
-        var(--color-amarillo),
-        var(--color-azul),
-        var(--color-rojo),
-        var(--color-verde)
-      );
-      border-radius: 1px;
-    }
-  }
-
   .footer-info {
     display: flex;
     justify-content: center;
@@ -132,15 +91,8 @@
     }
 
     .info-separator {
-      width: 16px;
-      height: 16px;
-      opacity: 0.7;
-      transition: all 0.3s ease;
-
-      &:hover {
-        opacity: 1;
-        transform: scale(1.2) rotate(5deg);
-      }
+      color: var(--text-muted);
+      font-weight: $font-bold;
 
       @media (max-width: $breakpoint-sm) {
         display: none;
@@ -198,11 +150,6 @@
 // Dark mode adjustments
 @media (prefers-color-scheme: dark) {
   .footer {
-    .footer-guacamaya,
-    .info-separator {
-      filter: brightness(1.2);
-    }
-
     .colombian-colors .color-bar {
       &.amarillo {
         background-color: #FFE033;
@@ -226,12 +173,6 @@
 // Responsive
 @media (max-width: $breakpoint-sm) {
   .footer {
-    .guacamaya-separator {
-      .separator-line {
-        max-width: 100px;
-      }
-    }
-
     .footer-info {
       flex-direction: column;
       gap: $spacing-sm;

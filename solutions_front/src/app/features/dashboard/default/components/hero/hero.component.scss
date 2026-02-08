@@ -4,13 +4,13 @@
 @use "mixins" as *;
 
 .hero {
-  background: linear-gradient(135deg, var(--color-azul) 0%, #4D7ACC 30%, var(--color-rojo) 100%);
+  background: linear-gradient(135deg, var(--color-azul) 0%, #4D7ACC 50%, var(--color-rojo) 100%);
   color: $white;
-  padding: 5rem 0;
+  padding: 4rem 0;
   position: relative;
   overflow: hidden;
 
-  // Patron de fondo animado
+  // Patrón de fondo sutil
   &::before {
     content: '';
     position: absolute;
@@ -19,19 +19,9 @@
     right: 0;
     bottom: 0;
     background-image:
-      radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(0, 166, 81, 0.1) 0%, transparent 50%);
-    animation: moveBackground 20s ease-in-out infinite;
+      radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(0, 166, 81, 0.08) 0%, transparent 50%);
     pointer-events: none;
-  }
-
-  @keyframes moveBackground {
-    0%, 100% {
-      transform: translate(0, 0);
-    }
-    50% {
-      transform: translate(30px, -30px);
-    }
   }
 
   .container {
@@ -52,12 +42,11 @@
 
   .hero-grid {
     display: grid;
-    gap: $spacing-3xl;
+    gap: $spacing-2xl;
     align-items: center;
 
     @media (min-width: $breakpoint-lg) {
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
     }
   }
 
@@ -86,110 +75,82 @@
     margin-bottom: $spacing-xl;
     opacity: 0.95;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  }
-}
+    max-width: 500px;
 
-// Guacamaya Hero Illustration
-.hero-illustration {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
+    @media (min-width: $breakpoint-lg) {
+      margin-left: 0;
+    }
 
-  @media (min-width: $breakpoint-lg) {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .guacamaya-hero {
-    width: 280px;
-    height: auto;
-    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
-    animation: guacamayaFlight 4s ease-in-out infinite;
-
-    @media (min-width: $breakpoint-md) {
-      width: 320px;
+    @media (max-width: $breakpoint-lg) {
+      margin-left: auto;
+      margin-right: auto;
     }
   }
-}
 
-@keyframes guacamayaFlight {
-  0%, 100% {
-    transform: translateY(0) rotate(-2deg);
-  }
-  25% {
-    transform: translateY(-15px) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-8px) rotate(2deg);
-  }
-  75% {
-    transform: translateY(-20px) rotate(-1deg);
-  }
-}
+  // Estadísticas en el hero
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-md;
 
-// Floating Feathers
-.floating-feathers {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  overflow: hidden;
-  z-index: 0;
+    .stat-item {
+      text-align: center;
+      padding: $spacing-md;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: $radius-lg;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.3s ease;
 
-  .feather {
-    position: absolute;
-    opacity: 0.6;
-    animation: featherFloat 6s ease-in-out infinite;
-  }
+      &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-3px);
+      }
 
-  .feather-1 {
-    width: 25px;
-    top: 15%;
-    left: 10%;
-    animation-delay: 0s;
-  }
+      &:nth-child(1) .stat-value {
+        color: var(--color-amarillo);
+      }
 
-  .feather-2 {
-    width: 20px;
-    top: 60%;
-    left: 5%;
-    animation-delay: -1.5s;
-  }
+      &:nth-child(2) .stat-value {
+        color: #7dd3fc;
+      }
 
-  .feather-3 {
-    width: 22px;
-    top: 25%;
-    right: 8%;
-    animation-delay: -3s;
-  }
+      &:nth-child(3) .stat-value {
+        color: var(--color-verde-light);
+      }
 
-  .feather-4 {
-    width: 18px;
-    top: 70%;
-    right: 12%;
-    animation-delay: -4.5s;
-  }
-}
+      .stat-value {
+        display: block;
+        font-size: $font-2xl;
+        font-weight: $font-bold;
+        margin-bottom: $spacing-xs;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
-@keyframes featherFloat {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.5;
-  }
-  25% {
-    transform: translateY(-20px) rotate(15deg);
-    opacity: 0.8;
-  }
-  50% {
-    transform: translateY(-10px) rotate(-10deg);
-    opacity: 0.6;
-  }
-  75% {
-    transform: translateY(-25px) rotate(10deg);
-    opacity: 0.9;
+        @media (max-width: $breakpoint-sm) {
+          font-size: $font-xl;
+        }
+      }
+
+      .stat-label {
+        display: block;
+        font-size: $font-xs;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.85;
+
+        @media (max-width: $breakpoint-sm) {
+          font-size: 10px;
+        }
+      }
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      gap: $spacing-sm;
+
+      .stat-item {
+        padding: $spacing-sm;
+      }
+    }
   }
 }
 
@@ -197,10 +158,6 @@
 .map-section {
   display: flex;
   justify-content: center;
-
-  @media (min-width: $breakpoint-lg) {
-    grid-column: span 2;
-  }
 
   .map-container {
     background: rgba(255, 255, 255, 0.1);
@@ -213,8 +170,7 @@
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
     width: 100%;
-    max-width: 600px;
-    position: relative;
+    max-width: 500px;
 
     &:hover {
       transform: translateY(-5px);
@@ -222,10 +178,15 @@
         0 15px 50px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
+
+    @media (max-width: $breakpoint-md) {
+      padding: $spacing-lg;
+      max-width: 400px;
+    }
   }
 
   .map-title {
-    font-size: $font-2xl;
+    font-size: $font-xl;
     font-weight: $font-bold;
     text-align: center;
     margin-bottom: $spacing-lg;
@@ -246,53 +207,10 @@
         transparent
       );
     }
-  }
 
-  // Guacamayas on map
-  .map-guacamayas {
-    position: absolute;
-    top: 60px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    z-index: 2;
-
-    .map-bird {
-      position: absolute;
-      width: 30px;
-      height: auto;
-      animation: guacamayaFlight 5s ease-in-out infinite;
-      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+    @media (max-width: $breakpoint-sm) {
+      font-size: $font-lg;
     }
-
-    .bird-1 {
-      top: 20%;
-      left: 25%;
-      animation-delay: 0s;
-    }
-
-    .bird-2 {
-      top: 40%;
-      right: 20%;
-      animation-delay: -1.5s;
-      transform: scaleX(-1);
-    }
-
-    .bird-3 {
-      top: 60%;
-      left: 40%;
-      animation-delay: -3s;
-    }
-  }
-
-  .map-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 400px;
-    margin-bottom: $spacing-lg;
-    position: relative;
   }
 
   .map-description {
@@ -308,60 +226,9 @@
     background: rgba(255, 255, 255, 0.05);
     border-radius: $radius-md;
     border: 1px solid rgba(255, 255, 255, 0.1);
-  }
 
-  // Stats
-  .map-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: $spacing-md;
-    margin-top: $spacing-lg;
-    padding-top: $spacing-lg;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-
-    .stat-item {
-      text-align: center;
-      padding: $spacing-sm;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: $radius-md;
-      transition: all 0.3s ease;
-      border-bottom: 3px solid transparent;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-      }
-
-      &.stat-amarillo {
-        border-bottom-color: var(--color-amarillo);
-        .stat-value { color: var(--color-amarillo); }
-      }
-
-      &.stat-azul {
-        border-bottom-color: var(--color-azul-light);
-        .stat-value { color: var(--color-azul-light); }
-      }
-
-      &.stat-verde {
-        border-bottom-color: var(--color-verde-light);
-        .stat-value { color: var(--color-verde-light); }
-      }
-
-      .stat-value {
-        display: block;
-        font-size: $font-2xl;
-        font-weight: $font-bold;
-        margin-bottom: $spacing-xs;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-
-      .stat-label {
-        display: block;
-        font-size: $font-xs;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        opacity: 0.8;
-      }
+    @media (max-width: $breakpoint-sm) {
+      font-size: $font-xs;
     }
   }
 }
@@ -371,79 +238,16 @@
   .hero {
     padding: 3rem 0;
   }
-
-  .hero-illustration {
-    .guacamaya-hero {
-      width: 220px;
-    }
-  }
-
-  .floating-feathers .feather {
-    display: none;
-  }
-
-  .map-section {
-    .map-container {
-      padding: $spacing-lg;
-    }
-
-    .map-guacamayas .map-bird {
-      width: 24px;
-    }
-
-    .map-stats {
-      gap: $spacing-sm;
-
-      .stat-item {
-        padding: $spacing-xs;
-
-        .stat-value {
-          font-size: $font-xl;
-        }
-
-        .stat-label {
-          font-size: 10px;
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: $breakpoint-sm) {
-  .hero-illustration {
-    .guacamaya-hero {
-      width: 180px;
-    }
-  }
-
-  .map-section {
-    .map-wrapper {
-      min-height: 300px;
-    }
-
-    .map-guacamayas {
-      display: none;
-    }
-
-    .map-stats {
-      grid-template-columns: 1fr;
-      gap: $spacing-xs;
-    }
-  }
 }
 
 // Dark mode adjustments
 @media (prefers-color-scheme: dark) {
   .hero {
-    background: linear-gradient(135deg, #004D99 0%, #2D4A6D 30%, #B5171C 100%);
+    background: linear-gradient(135deg, #004D99 0%, #2D4A6D 50%, #B5171C 100%);
   }
 
   .map-section .map-container {
     background: rgba(0, 0, 0, 0.3);
     border-color: rgba(255, 255, 255, 0.15);
-  }
-
-  .floating-feathers .feather {
-    filter: brightness(1.2);
   }
 }

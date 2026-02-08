@@ -6,13 +6,14 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(135deg, $gray-50 0%, $gray-200 100%);
+  background: var(--bg-secondary);
+  transition: background-color var(--transition-theme);
 }
 
 // ===== RATING BANNER =====
 .rating-banner {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-bottom: 1px solid #f59e0b;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.3) 100%);
+  border-bottom: 1px solid var(--color-amarillo);
 
   .rating-banner-content {
     max-width: 1400px;
@@ -29,7 +30,7 @@
     }
 
     app-icon {
-      color: #f59e0b;
+      color: var(--color-amarillo);
       flex-shrink: 0;
     }
 
@@ -40,29 +41,30 @@
       gap: $spacing-xs;
 
       strong {
-        color: #92400e;
+        color: var(--color-amarillo-dark);
         font-size: $font-base;
       }
 
       span {
-        color: #a16207;
+        color: var(--text-secondary);
         font-size: $font-sm;
       }
     }
 
     .rating-banner-btn {
-      background: #f59e0b;
-      color: white;
+      background: var(--color-amarillo);
+      color: #333333;
       border: none;
       padding: $spacing-sm $spacing-lg;
       border-radius: $radius-base;
       font-weight: $font-medium;
       cursor: pointer;
-      transition: all $transition-base;
+      transition: all var(--transition-theme);
       white-space: nowrap;
 
       &:hover {
-        background: #d97706;
+        background: var(--color-amarillo-dark);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
       }
     }
   }
@@ -93,11 +95,12 @@
   display: flex;
   gap: $spacing-sm;
   margin-bottom: $spacing-xl;
-  background: white;
+  background: var(--card-bg);
   padding: $spacing-sm;
   border-radius: $radius-lg;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--card-shadow);
   overflow-x: auto;
+  transition: all var(--transition-theme);
 
   @include respond-to($breakpoint-md) {
     gap: $spacing-xs;
@@ -114,11 +117,11 @@
     background: transparent;
     border: none;
     border-radius: $radius-base;
-    color: $text-secondary;
+    color: var(--text-secondary);
     font-weight: $font-medium;
     font-size: $font-sm;
     cursor: pointer;
-    transition: all $transition-base;
+    transition: all var(--transition-theme);
     white-space: nowrap;
 
     @include respond-to($breakpoint-md) {
@@ -133,17 +136,17 @@
     }
 
     &:hover {
-      background: $bg-secondary;
-      color: $brand-blue;
+      background: var(--bg-tertiary);
+      color: var(--color-azul);
     }
 
     &.active {
-      background: linear-gradient(135deg, $brand-blue 0%, $brand-blue-dark 100%);
+      background: linear-gradient(135deg, var(--color-azul) 0%, var(--color-azul-dark) 100%);
       color: white;
-      box-shadow: 0 4px 12px rgba($brand-blue, 0.3);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
 
       &:hover {
-        background: linear-gradient(135deg, $brand-blue-dark 0%, $brand-blue 100%);
+        background: linear-gradient(135deg, var(--color-azul-dark) 0%, var(--color-azul) 100%);
       }
     }
   }
@@ -155,10 +158,11 @@
 }
 
 .tab-panel {
-  background: white;
+  background: var(--card-bg);
   border-radius: $radius-lg;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--card-shadow);
   padding: $spacing-2xl;
+  transition: all var(--transition-theme);
 
   @include respond-to($breakpoint-md) {
     padding: $spacing-lg;
@@ -174,13 +178,13 @@
     h2 {
       margin: 0 0 $spacing-sm 0;
       font-size: $font-2xl;
-      color: $text-primary;
+      color: var(--text-primary);
       font-weight: $font-bold;
     }
 
     p {
       margin: 0;
-      color: $text-secondary;
+      color: var(--text-secondary);
       font-size: $font-base;
     }
   }
@@ -204,7 +208,7 @@
 }
 
 .modal-content {
-  background: white;
+  background: var(--card-bg);
   border-radius: $radius-xl;
   max-width: 700px;
   width: 100%;
@@ -230,33 +234,33 @@
   letter-spacing: 0.5px;
 
   &.badge-created {
-    background: $badge-created-bg;
-    color: $badge-created-text;
+    background: rgba(79, 70, 229, 0.15);
+    color: #6366f1;
   }
 
   &.badge-in-route {
-    background: $badge-in-route-bg;
-    color: $badge-in-route-text;
+    background: rgba(0, 102, 204, 0.15);
+    color: var(--color-azul);
   }
 
   &.badge-warning {
-    background: $badge-in-warehouse-bg;
-    color: $badge-in-warehouse-text;
+    background: rgba(255, 215, 0, 0.2);
+    color: var(--color-amarillo-dark);
   }
 
   &.badge-out-delivery {
-    background: $badge-out-delivery-bg;
-    color: $badge-out-delivery-text;
+    background: rgba(255, 215, 0, 0.3);
+    color: var(--color-amarillo-dark);
   }
 
   &.badge-success {
-    background: $badge-delivered-bg;
-    color: $badge-delivered-text;
+    background: rgba(0, 166, 81, 0.15);
+    color: var(--color-verde);
   }
 
   &.badge-default {
-    background: rgba($text-secondary, 0.15);
-    color: $text-secondary;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
   }
 }
 
@@ -290,20 +294,20 @@
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: $brand-blue;
+  background: var(--color-azul);
   color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba($brand-blue, 0.4);
-  transition: all $transition-base;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+  transition: all var(--transition-theme);
   z-index: 1000;
 
   &:hover:not(:disabled) {
-    background: darken($brand-blue, 8%);
+    background: var(--color-azul-dark);
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba($brand-blue, 0.5);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.5);
   }
 
   &:active:not(:disabled) {
@@ -316,7 +320,7 @@
   }
 
   &.refreshing {
-    background: $brand-blue;
+    background: var(--color-azul);
 
     app-icon,
     ::ng-deep svg {
@@ -342,4 +346,26 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+// ===== DARK MODE ADJUSTMENTS =====
+@media (prefers-color-scheme: dark) {
+  .rating-banner {
+    background: linear-gradient(135deg, rgba(255, 224, 51, 0.15) 0%, rgba(255, 224, 51, 0.2) 100%);
+    border-color: var(--color-amarillo);
+  }
+
+  .dashboard-tabs .tab-button {
+    &:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .floating-refresh-btn {
+    box-shadow: 0 4px 12px rgba(77, 154, 255, 0.3);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 6px 16px rgba(77, 154, 255, 0.4);
+    }
+  }
 }

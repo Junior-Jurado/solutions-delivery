@@ -1,5 +1,5 @@
-import { Component, ChangeDetectorRef } from "@angular/core";
-import { Router } from "@angular/router";
+import { Component, ChangeDetectorRef, OnInit } from "@angular/core";
+import { Router, ActivatedRoute } from "@angular/router";
 import { FormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { AuthService } from "@core/services/auth.service";
@@ -18,7 +18,7 @@ import { IconComponent } from "@shared/components/icon/icon.component";
         IconComponent
     ]
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
     // ==========================================
     // LOGIN FIELDS
     // ==========================================
@@ -66,10 +66,23 @@ export class AuthComponent {
     // ==========================================
     constructor(
         private router: Router,
+        private route: ActivatedRoute,
         private authService: AuthService,
         private toast: ToastService,
-        private cdr: ChangeDetectorRef 
+        private cdr: ChangeDetectorRef
     ) {}
+
+    // ==========================================
+    // LIFECYCLE
+    // ==========================================
+    ngOnInit(): void {
+        this.route.queryParams.subscribe(params => {
+            if (params['tab'] === 'register') {
+                this.authTab = 'register';
+                this.cdr.detectChanges();
+            }
+        });
+    }
 
     // ==========================================
     // VALIDATION METHODS

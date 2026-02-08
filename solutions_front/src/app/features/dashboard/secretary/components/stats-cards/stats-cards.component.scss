@@ -24,11 +24,11 @@
 // STAT CARD
 // ===============================
 .stat-card {
-  background: $bg-primary;
-  border: 1px solid $border-color;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: $radius-md;
   padding: $spacing-lg;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
   position: relative;
   overflow: hidden;
 
@@ -48,28 +48,28 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: $brand-blue;
-    transition: height $transition-base;
+    background: var(--color-azul);
+    transition: height var(--transition-theme);
   }
 
   &[data-type="primary"]::before {
-    background: $brand-blue;
+    background: var(--color-azul);
   }
 
   &[data-type="success"]::before {
-    background: $success-color;
+    background: var(--color-verde);
   }
 
   &[data-type="warning"]::before {
-    background: $warning-color;
+    background: var(--color-amarillo);
   }
 
   &[data-type="info"]::before {
-    background: $info-color;
+    background: var(--color-rojo);
   }
 
   &:hover {
-    box-shadow: $shadow-md;
+    box-shadow: var(--shadow-md);
     transform: translateY(-2px);
 
     &::before {
@@ -84,15 +84,15 @@
     margin-bottom: $spacing-md;
 
     svg {
-      color: $brand-blue;
+      color: var(--color-azul);
       flex-shrink: 0;
-      transition: transform $transition-base;
+      transition: transform var(--transition-theme);
     }
 
     h3 {
       font-size: $font-base;
       font-weight: $font-semibold;
-      color: $text-secondary;
+      color: var(--text-secondary);
       margin: 0;
 
       @include respond-to($breakpoint-xs) {
@@ -102,19 +102,19 @@
   }
 
   &[data-type="primary"] .stat-header svg {
-    color: $brand-blue;
+    color: var(--color-azul);
   }
 
   &[data-type="success"] .stat-header svg {
-    color: $success-color;
+    color: var(--color-verde);
   }
 
   &[data-type="warning"] .stat-header svg {
-    color: $warning-color;
+    color: var(--color-amarillo);
   }
 
   &[data-type="info"] .stat-header svg {
-    color: $info-color;
+    color: var(--color-rojo);
   }
 
   &:hover .stat-header svg {
@@ -126,31 +126,32 @@
     font-weight: $font-bold;
     margin-bottom: $spacing-sm;
     line-height: 1.2;
+    color: var(--text-primary);
 
     @include respond-to($breakpoint-xs) {
       font-size: 1.75rem;
     }
 
     &.primary {
-      color: $brand-blue;
+      color: var(--color-azul);
     }
 
     &.success {
-      color: $success-color;
+      color: var(--color-verde);
     }
 
     &.warning {
-      color: $warning-color;
+      color: var(--color-amarillo);
     }
 
     &.info {
-      color: $info-color;
+      color: var(--color-rojo);
     }
   }
 
   .stat-label {
     font-size: $font-sm;
-    color: $text-muted;
+    color: var(--text-secondary);
     line-height: 1.5;
 
     @include respond-to($breakpoint-xs) {
@@ -177,8 +178,8 @@
   }
 
   .loading-card {
-    background: $bg-primary;
-    border: 1px solid $border-color;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: $radius-md;
     padding: $spacing-lg;
     height: 140px;
@@ -200,7 +201,7 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba($brand-blue, 0.05) 50%,
+      rgba(0, 102, 204, 0.05) 50%,
       transparent 100%
     );
     animation: shimmer 1.5s infinite;
@@ -234,5 +235,25 @@
 
   .stat-card {
     padding: $spacing-md;
+  }
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .stat-card {
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .stats-loading .loading-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(77, 154, 255, 0.1) 50%,
+      transparent 100%
+    );
   }
 }

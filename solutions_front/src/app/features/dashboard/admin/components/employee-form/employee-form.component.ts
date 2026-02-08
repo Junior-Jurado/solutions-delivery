@@ -28,8 +28,9 @@ export class EmployeeFormComponent {
   selectedRole: UserRole | '' = '';
   isUpdating: boolean = false;
 
-  // Available roles for assignment (ADMIN and CLIENT excluded)
+  // Available roles for assignment (ADMIN excluded)
   roles: { value: UserRole; label: string }[] = [
+    { value: 'CLIENT', label: 'Cliente' },
     { value: 'SECRETARY', label: 'Secretaria' },
     { value: 'DELIVERY', label: 'Entregador' }
   ];

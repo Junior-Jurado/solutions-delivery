@@ -64,10 +64,10 @@
       <app-icon [category]="getMainActionIconCategory()" [name]="getMainActionIcon()" size="16px"></app-icon>
       <span class="btn-action-text">
         <ng-container *ngIf="isPickup">
-          {{ isInProgress ? 'Completar Recogida' : 'Iniciar Recogida' }}
+          {{ isInProgress ? 'Ya recogí el paquete' : 'Salir a recoger' }}
         </ng-container>
         <ng-container *ngIf="!isPickup">
-          {{ isInProgress ? 'Confirmar Entrega' : 'Iniciar Entrega' }}
+          {{ isInProgress ? 'Ya entregué el paquete' : 'Salir a entregar' }}
         </ng-container>
       </span>
     </button>
@@ -76,6 +76,10 @@
   <!-- Info sobre cambio de estado -->
   <div class="status-change-info" *ngIf="isPending">
     <app-icon category="status" name="info" size="14px"></app-icon>
-    <span>Al iniciar, la guía pasará a estado "{{ isPickup ? 'En ruta' : 'En reparto' }}"</span>
+    <span>Paso 1: Al salir, la guía pasará a "{{ isPickup ? 'En ruta' : 'En reparto' }}"</span>
+  </div>
+  <div class="status-change-info in-progress" *ngIf="isInProgress">
+    <app-icon category="status" name="check-circle" size="14px"></app-icon>
+    <span>Paso 2: Confirma cuando {{ isPickup ? 'hayas recogido' : 'hayas entregado' }} el paquete</span>
   </div>
 </div>

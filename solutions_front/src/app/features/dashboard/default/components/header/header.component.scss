@@ -56,16 +56,37 @@
     color: var(--text-primary);
     transition: color var(--transition-theme);
   }
+}
 
-  .guacamaya-logo {
-    width: 36px;
-    height: 36px;
-    margin-left: $spacing-xs;
-    transition: transform 0.3s ease;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
 
-    &:hover {
-      transform: scale(1.15) rotate(5deg);
-    }
+.btn-register {
+  background: transparent;
+  color: var(--color-azul);
+  border: 2px solid var(--color-azul);
+  padding: $spacing-sm $spacing-md;
+  cursor: pointer;
+  font-weight: $font-semibold;
+  font-size: $font-sm;
+  border-radius: $radius-md;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: var(--color-azul);
+    color: $white;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    display: none;
   }
 }
 
@@ -76,6 +97,7 @@
   padding: $spacing-sm $spacing-lg;
   cursor: pointer;
   font-weight: $font-semibold;
+  font-size: $font-sm;
   border-radius: $radius-md;
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
@@ -95,9 +117,5 @@
 @media (prefers-color-scheme: dark) {
   .header {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  }
-
-  .guacamaya-logo {
-    filter: brightness(1.1);
   }
 }

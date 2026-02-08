@@ -31,26 +31,28 @@
   app-icon {
     position: absolute;
     left: $spacing-md;
-    color: $text-muted;
+    color: var(--text-muted);
   }
 
   .search-input {
     width: 100%;
     padding: $spacing-sm $spacing-lg;
     padding-left: 44px;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
     font-size: $font-sm;
-    transition: all $transition-base;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all var(--transition-theme);
 
     &:focus {
       outline: none;
-      border-color: $brand-blue;
-      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+      border-color: var(--color-azul);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
     }
 
     &::placeholder {
-      color: $text-muted;
+      color: var(--text-muted);
     }
   }
 
@@ -61,12 +63,13 @@
     border: none;
     cursor: pointer;
     padding: $spacing-xs;
-    color: $text-muted;
+    color: var(--text-muted);
     border-radius: $radius-sm;
+    transition: all var(--transition-theme);
 
     &:hover {
-      color: $text-primary;
-      background: $bg-light;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
     }
   }
 }
@@ -74,16 +77,18 @@
 .filter-wrapper {
   .status-filter {
     padding: $spacing-sm $spacing-lg;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
     font-size: $font-sm;
-    background: $bg-primary;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     min-width: 180px;
     cursor: pointer;
+    transition: all var(--transition-theme);
 
     &:focus {
       outline: none;
-      border-color: $brand-blue;
+      border-color: var(--color-azul);
     }
   }
 }
@@ -91,7 +96,7 @@
 .results-info {
   margin-top: $spacing-md;
   font-size: $font-sm;
-  color: $text-muted;
+  color: var(--text-muted);
 }
 
 // ===============================
@@ -106,7 +111,7 @@
   font-size: $font-sm;
   font-weight: $font-medium;
   cursor: pointer;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
   border: none;
   white-space: nowrap;
 
@@ -117,33 +122,38 @@
 }
 
 .btn-primary {
-  background: $brand-blue;
-  color: $white;
+  background: linear-gradient(135deg, var(--color-azul) 0%, var(--color-azul-dark) 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
 
   &:hover:not(:disabled) {
-    background: $brand-blue-dark;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    transform: translateY(-1px);
   }
 }
 
 .btn-outline {
-  background: $bg-primary;
-  border: 1px solid $border-color;
-  color: $text-secondary;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 
   &:hover:not(:disabled) {
-    background: $bg-light;
+    background: var(--bg-secondary);
+    border-color: var(--color-azul);
+    color: var(--color-azul);
   }
 }
 
 .link-btn {
   background: none;
   border: none;
-  color: $brand-blue;
+  color: var(--color-azul);
   cursor: pointer;
   text-decoration: underline;
+  transition: color var(--transition-theme);
 
   &:hover {
-    color: $brand-blue-dark;
+    color: var(--color-azul-dark);
   }
 }
 
@@ -158,8 +168,8 @@
 
 .loading-card {
   height: 60px;
-  background: $bg-primary;
-  border: 1px solid $border-color;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: $radius-md;
   position: relative;
   overflow: hidden;
@@ -173,7 +183,7 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba($brand-blue, 0.05) 50%,
+      rgba(0, 102, 204, 0.05) 50%,
       transparent 100%
     );
     animation: shimmer 1.5s infinite;
@@ -195,7 +205,7 @@
   justify-content: center;
   padding: $spacing-xl * 2;
   text-align: center;
-  color: $text-muted;
+  color: var(--text-muted);
 
   app-icon {
     margin-bottom: $spacing-md;
@@ -204,7 +214,7 @@
 
   h3 {
     margin: 0 0 $spacing-sm 0;
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 
   p {
@@ -218,9 +228,10 @@
 // ===============================
 .guides-table-container {
   overflow-x: auto;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color);
   border-radius: $radius-md;
-  background: $bg-primary;
+  background: var(--card-bg);
+  transition: all var(--transition-theme);
 }
 
 .guides-table {
@@ -231,13 +242,13 @@
   th, td {
     padding: $spacing-md;
     text-align: left;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--border-color);
   }
 
   th {
-    background: $bg-secondary;
+    background: var(--bg-tertiary);
     font-weight: $font-semibold;
-    color: $text-secondary;
+    color: var(--text-secondary);
     white-space: nowrap;
   }
 
@@ -246,14 +257,14 @@
   }
 
   tr:hover {
-    background: $bg-light;
+    background: var(--bg-secondary);
   }
 }
 
 .guide-id {
   .id-badge {
     font-weight: $font-semibold;
-    color: $brand-blue;
+    color: var(--color-azul);
   }
 }
 
@@ -264,12 +275,12 @@
 
   .person-name {
     font-weight: $font-medium;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 
   .person-phone {
     font-size: $font-xs;
-    color: $text-muted;
+    color: var(--text-muted);
   }
 }
 
@@ -281,11 +292,11 @@
 
     .city {
       font-size: $font-xs;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
 
     .arrow-icon {
-      color: $text-muted;
+      color: var(--text-muted);
       transform: rotate(180deg);
     }
   }
@@ -305,14 +316,14 @@
     border: none;
     cursor: pointer;
     padding: $spacing-xs;
-    color: $text-muted;
+    color: var(--text-muted);
     border-radius: $radius-sm;
     opacity: 0;
-    transition: all $transition-base;
+    transition: all var(--transition-theme);
 
     &:hover {
-      color: $brand-blue;
-      background: rgba($brand-blue, 0.1);
+      color: var(--color-azul);
+      background: rgba(0, 102, 204, 0.1);
     }
   }
 
@@ -327,10 +338,12 @@
 
     .status-select {
       padding: $spacing-xs $spacing-sm;
-      border: 1px solid $brand-blue;
+      border: 1px solid var(--color-azul);
       border-radius: $radius-sm;
       font-size: $font-xs;
-      background: $bg-primary;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      transition: all var(--transition-theme);
     }
 
     .edit-actions {
@@ -347,22 +360,23 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all var(--transition-theme);
 
       &.save {
-        background: $success-color;
-        color: $white;
+        background: var(--color-verde);
+        color: white;
 
         &:hover:not(:disabled) {
-          background: $success-dark;
+          background: var(--color-verde-dark);
         }
       }
 
       &.cancel {
-        background: $gray-200;
-        color: $text-secondary;
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
 
         &:hover:not(:disabled) {
-          background: $gray-300;
+          background: var(--bg-secondary);
         }
       }
 
@@ -377,12 +391,12 @@
 .value-cell {
   .value-amount {
     font-weight: $font-medium;
-    color: $success-color;
+    color: var(--color-verde);
   }
 }
 
 .date-cell {
-  color: $text-muted;
+  color: var(--text-muted);
   font-size: $font-xs;
   white-space: nowrap;
 }
@@ -392,19 +406,19 @@
     width: 36px;
     height: 36px;
     border-radius: $radius-md;
-    border: 1px solid $border-color;
-    background: $bg-primary;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $text-muted;
-    transition: all $transition-base;
+    color: var(--text-muted);
+    transition: all var(--transition-theme);
 
     &:hover {
-      background: $brand-blue;
-      border-color: $brand-blue;
-      color: $white;
+      background: var(--color-azul);
+      border-color: var(--color-azul);
+      color: white;
     }
   }
 }
@@ -421,28 +435,28 @@
 }
 
 .badge-warning {
-  background: $warning-light;
-  color: $warning-dark;
+  background: rgba(255, 215, 0, 0.15);
+  color: var(--color-amarillo-dark);
 }
 
 .badge-info {
-  background: $info-light;
-  color: $info-dark;
+  background: rgba(0, 102, 204, 0.15);
+  color: var(--color-azul);
 }
 
 .badge-secondary {
-  background: $gray-200;
-  color: $gray-700;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 .badge-primary {
-  background: rgba($brand-blue, 0.1);
-  color: $brand-blue-dark;
+  background: rgba(0, 102, 204, 0.1);
+  color: var(--color-azul);
 }
 
 .badge-success {
-  background: $success-light;
-  color: $success-dark;
+  background: rgba(0, 166, 81, 0.15);
+  color: var(--color-verde);
 }
 
 // ===============================
@@ -455,7 +469,7 @@
   gap: $spacing-lg;
   margin-top: $spacing-lg;
   padding-top: $spacing-lg;
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--border-color);
 }
 
 .pagination-btn {
@@ -463,18 +477,18 @@
   align-items: center;
   gap: $spacing-xs;
   padding: $spacing-sm $spacing-md;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color);
   border-radius: $radius-md;
-  background: $bg-primary;
-  color: $text-secondary;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
   font-size: $font-sm;
   cursor: pointer;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
 
   &:hover:not(:disabled) {
-    background: $bg-light;
-    border-color: $brand-blue;
-    color: $brand-blue;
+    background: var(--bg-secondary);
+    border-color: var(--color-azul);
+    color: var(--color-azul);
   }
 
   &:disabled {
@@ -489,5 +503,43 @@
 
 .pagination-info {
   font-size: $font-sm;
-  color: $text-muted;
+  color: var(--text-muted);
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .loading-card .loading-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(77, 154, 255, 0.08) 50%,
+      transparent 100%
+    );
+  }
+
+  .btn-primary {
+    box-shadow: 0 2px 8px rgba(77, 154, 255, 0.2);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 4px 12px rgba(77, 154, 255, 0.3);
+    }
+  }
+
+  .guides-table tr:hover {
+    background: rgba(77, 154, 255, 0.05);
+  }
+
+  .badge-warning {
+    background: rgba(255, 224, 51, 0.15);
+  }
+
+  .badge-info {
+    background: rgba(77, 154, 255, 0.15);
+  }
+
+  .badge-success {
+    background: rgba(51, 212, 127, 0.15);
+  }
 }

@@ -11,7 +11,7 @@
       transition: transform 0.1s ease;
 
       &:hover {
-        transform: scale(1.1);
+        transform: scale(1.15);
       }
     }
   }
@@ -27,14 +27,29 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #d1d5db; // Gray-300 - estrellas vacías
+  color: var(--border-color);
   transition: color 0.2s ease, transform 0.1s ease;
 
   &.filled {
-    color: #fbbf24; // Amber-400 - estrellas llenas
+    color: var(--color-amarillo);
+    filter: drop-shadow(0 1px 2px rgba(255, 215, 0, 0.3));
   }
 
   app-icon {
     display: flex;
+  }
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .star {
+    color: var(--border-color);
+
+    &.filled {
+      color: var(--color-amarillo);
+      filter: drop-shadow(0 1px 3px rgba(255, 224, 51, 0.4));
+    }
   }
 }

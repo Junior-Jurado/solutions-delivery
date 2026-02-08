@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: center;
   padding: $spacing-xl;
-  color: $text-secondary;
+  color: var(--text-secondary);
 
   p {
     margin-top: $spacing-md;
@@ -33,14 +33,21 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--card-bg);
   padding: $spacing-lg;
   border-radius: $radius-lg;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--card-border);
+  transition: all var(--transition-theme);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
 
   .stat-label {
     font-size: $font-sm;
-    color: $text-secondary;
+    color: var(--text-secondary);
     margin-bottom: $spacing-sm;
   }
 
@@ -48,30 +55,31 @@
     font-size: 2rem;
     font-weight: $font-bold;
     margin-bottom: $spacing-xs;
+    color: var(--text-primary);
 
     &.primary {
-      color: $brand-blue;
+      color: var(--color-azul);
     }
 
     &.success {
-      color: $success-color;
+      color: var(--color-verde);
     }
 
     &.warning {
-      color: $warning-color;
+      color: var(--color-amarillo);
     }
 
     &.rating {
-      color: $warning-color;
+      color: var(--color-amarillo);
     }
   }
 
   .stat-detail {
     font-size: $font-sm;
-    color: $text-muted;
+    color: var(--text-secondary);
 
     &.success {
-      color: $success-color;
+      color: var(--color-verde);
     }
   }
 }
@@ -83,4 +91,15 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .stat-card {
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+  }
 }

@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: center;
   padding: $spacing-xl;
-  color: $text-secondary;
+  color: var(--text-secondary);
 
   p {
     margin-top: $spacing-md;
@@ -18,9 +18,9 @@
 }
 
 .card {
-  background: white;
+  background: var(--card-bg);
   border-radius: $radius-lg;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   margin-bottom: $spacing-lg;
 
@@ -30,7 +30,7 @@
 
   .card-header {
     padding: $spacing-xl;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--border-color);
 
     @include respond-to($breakpoint-md) {
       padding: $spacing-lg;
@@ -42,12 +42,12 @@
       gap: $spacing-sm;
       font-size: $font-xl;
       font-weight: $font-bold;
-      color: $text-primary;
+      color: var(--text-primary);
       margin: 0 0 $spacing-xs 0;
     }
 
     .card-description {
-      color: $text-secondary;
+      color: var(--text-secondary);
       font-size: $font-sm;
       margin: 0;
     }
@@ -75,4 +75,18 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+// Dark mode adjustments
+:host-context([data-theme="dark"]) {
+  .card {
+    border: 1px solid var(--border-color);
+  }
+
+  .loading-state,
+  .empty-state {
+    app-icon {
+      opacity: 0.7;
+    }
+  }
 }

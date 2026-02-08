@@ -8,7 +8,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: $bg-overlay;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -23,15 +23,17 @@
 }
 
 .modal-content {
-  background: $bg-primary;
+  background: var(--card-bg);
   border-radius: $radius-lg;
   max-width: 900px;
   width: 100%;
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-  box-shadow: $shadow-xl;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   animation: slideUp 0.3s ease-out;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-theme);
 }
 
 @keyframes slideUp {
@@ -53,19 +55,21 @@
   align-items: center;
   justify-content: space-between;
   padding: $spacing-lg;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  transition: all var(--transition-theme);
 
   h2 {
     margin: 0;
     font-size: $font-xl;
     font-weight: $font-semibold;
-    color: $text-primary;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: $spacing-sm;
 
     app-icon {
-      color: $brand-blue;
+      color: var(--color-azul);
     }
   }
 
@@ -78,12 +82,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: $text-muted;
-    transition: all $transition-base;
+    color: var(--text-muted);
+    transition: all var(--transition-theme);
 
     &:hover {
-      background: $bg-light;
-      color: $text-primary;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
     }
   }
 }
@@ -95,6 +99,8 @@
   flex: 1;
   overflow-y: auto;
   padding: $spacing-lg;
+  background: var(--card-bg);
+  transition: background-color var(--transition-theme);
 
   &.loading-state {
     display: flex;
@@ -106,11 +112,11 @@
 
     .loading-spinner {
       animation: spin 1s linear infinite;
-      color: $brand-blue;
+      color: var(--color-azul);
     }
 
     p {
-      color: $text-muted;
+      color: var(--text-muted);
       margin: 0;
     }
   }
@@ -124,11 +130,11 @@
     gap: $spacing-md;
 
     .error-icon {
-      color: $error-color;
+      color: var(--color-rojo);
     }
 
     .error-message {
-      color: $error-color;
+      color: var(--color-rojo);
       margin: 0;
       text-align: center;
     }
@@ -144,16 +150,18 @@
 // STATUS SECTION
 // ===============================
 .status-section {
-  background: $bg-secondary;
+  background: var(--bg-tertiary);
   border-radius: $radius-md;
   padding: $spacing-lg;
   margin-bottom: $spacing-lg;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-theme);
 
   h3 {
     margin: 0 0 $spacing-md 0;
     font-size: $font-base;
     font-weight: $font-semibold;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 
   .current-status {
@@ -164,7 +172,7 @@
 
     .label {
       font-size: $font-sm;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
   }
 
@@ -176,7 +184,7 @@
     label {
       font-size: $font-sm;
       font-weight: $font-medium;
-      color: $text-secondary;
+      color: var(--text-secondary);
     }
 
     .status-select-wrapper {
@@ -190,21 +198,22 @@
       select {
         flex: 1;
         padding: $spacing-sm $spacing-md;
-        border: 1px solid $border-color;
+        border: 1px solid var(--border-color);
         border-radius: $radius-md;
         font-size: $font-sm;
-        background: $bg-primary;
-        color: $text-primary;
+        background: var(--bg-primary);
+        color: var(--text-primary);
         cursor: pointer;
+        transition: all var(--transition-theme);
 
         &:focus {
           outline: none;
-          border-color: $brand-blue;
-          box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+          border-color: var(--color-azul);
+          box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
         }
 
         &:disabled {
-          background: $bg-light;
+          background: var(--bg-secondary);
           cursor: not-allowed;
         }
       }
@@ -227,9 +236,11 @@
 }
 
 .info-card {
-  background: $bg-secondary;
+  background: var(--bg-tertiary);
   border-radius: $radius-md;
   padding: $spacing-md;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-theme);
 
   .info-header {
     display: flex;
@@ -237,17 +248,17 @@
     gap: $spacing-sm;
     margin-bottom: $spacing-md;
     padding-bottom: $spacing-sm;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--border-color);
 
     app-icon {
-      color: $brand-blue;
+      color: var(--color-azul);
     }
 
     h4 {
       margin: 0;
       font-size: $font-sm;
       font-weight: $font-semibold;
-      color: $text-primary;
+      color: var(--text-primary);
     }
   }
 
@@ -265,18 +276,18 @@
     font-size: $font-sm;
 
     .info-label {
-      color: $text-muted;
+      color: var(--text-muted);
       flex-shrink: 0;
     }
 
     .info-value {
-      color: $text-primary;
+      color: var(--text-primary);
       text-align: right;
       word-break: break-word;
 
       &.price {
         font-weight: $font-semibold;
-        color: $success-color;
+        color: var(--color-verde);
       }
     }
   }
@@ -286,21 +297,23 @@
 // HISTORY SECTION
 // ===============================
 .history-section {
-  background: $bg-secondary;
+  background: var(--bg-tertiary);
   border-radius: $radius-md;
   padding: $spacing-lg;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-theme);
 
   h3 {
     margin: 0 0 $spacing-md 0;
     font-size: $font-base;
     font-weight: $font-semibold;
-    color: $text-primary;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: $spacing-sm;
 
     app-icon {
-      color: $brand-blue;
+      color: var(--color-azul);
     }
   }
 }
@@ -324,22 +337,23 @@
     top: 24px;
     bottom: -$spacing-md;
     width: 2px;
-    background: $border-color;
+    background: var(--border-color);
   }
 
   .history-dot {
     width: 16px;
     height: 16px;
     border-radius: $radius-full;
-    background: $gray-300;
-    border: 3px solid $bg-primary;
+    background: var(--bg-tertiary);
+    border: 3px solid var(--bg-primary);
     flex-shrink: 0;
     margin-top: 2px;
-    box-shadow: 0 0 0 2px $gray-300;
+    box-shadow: 0 0 0 2px var(--border-color);
+    transition: all var(--transition-theme);
 
     &.active {
-      background: $brand-blue;
-      box-shadow: 0 0 0 2px $brand-blue;
+      background: var(--color-azul);
+      box-shadow: 0 0 0 2px var(--color-azul);
     }
   }
 
@@ -360,7 +374,7 @@
 
     .history-date {
       font-size: $font-xs;
-      color: $text-muted;
+      color: var(--text-muted);
     }
   }
 }
@@ -374,7 +388,9 @@
   justify-content: flex-end;
   gap: $spacing-md;
   padding: $spacing-lg;
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-tertiary);
+  transition: all var(--transition-theme);
 
   @include respond-to($breakpoint-sm) {
     flex-direction: column-reverse;
@@ -398,7 +414,7 @@
   align-items: center;
   justify-content: center;
   gap: $spacing-xs;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
   border: none;
 
   &:disabled {
@@ -408,31 +424,36 @@
 }
 
 .btn-primary {
-  background: $brand-blue;
-  color: $white;
+  background: linear-gradient(135deg, var(--color-azul) 0%, var(--color-azul-dark) 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
 
   &:hover:not(:disabled) {
-    background: $brand-blue-dark;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    transform: translateY(-1px);
   }
 }
 
 .btn-secondary {
-  background: $gray-700;
-  color: $white;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
 
   &:hover:not(:disabled) {
-    background: $gray-800;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
   }
 }
 
 .btn-outline {
-  background: $bg-primary;
-  border: 1px solid $border-color;
-  color: $text-secondary;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
 
   &:hover:not(:disabled) {
-    background: $bg-light;
-    border-color: $gray-400;
+    background: var(--bg-secondary);
+    border-color: var(--color-azul);
+    color: var(--color-azul);
   }
 }
 
@@ -454,31 +475,64 @@
 }
 
 .badge-warning {
-  background: $warning-light;
-  color: $warning-dark;
+  background: rgba(255, 215, 0, 0.15);
+  color: var(--color-amarillo-dark);
 }
 
 .badge-info {
-  background: $info-light;
-  color: $info-dark;
+  background: rgba(0, 102, 204, 0.15);
+  color: var(--color-azul);
 }
 
 .badge-secondary {
-  background: $gray-200;
-  color: $gray-700;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 .badge-primary {
-  background: rgba($brand-blue, 0.1);
-  color: $brand-blue-dark;
+  background: rgba(0, 102, 204, 0.1);
+  color: var(--color-azul);
 }
 
 .badge-success {
-  background: $success-light;
-  color: $success-dark;
+  background: rgba(0, 166, 81, 0.15);
+  color: var(--color-verde);
 }
 
 .badge-default {
-  background: $gray-100;
-  color: $gray-600;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.75);
+  }
+
+  .modal-content {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  .btn-primary {
+    box-shadow: 0 2px 8px rgba(77, 154, 255, 0.2);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 4px 12px rgba(77, 154, 255, 0.3);
+    }
+  }
+
+  .badge-warning {
+    background: rgba(255, 224, 51, 0.15);
+  }
+
+  .badge-info {
+    background: rgba(77, 154, 255, 0.15);
+  }
+
+  .badge-success {
+    background: rgba(51, 212, 127, 0.15);
+  }
 }

@@ -3,8 +3,8 @@
 @use "mixins" as *;
 
 .dashboard-header {
-  background: linear-gradient(135deg, $brand-blue-dark 0%, $brand-blue 100%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, var(--color-azul-dark) 0%, var(--color-azul) 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -38,6 +38,12 @@
       justify-content: center;
       backdrop-filter: blur(10px);
       color: white;
+      transition: all var(--transition-theme);
+
+      &:hover {
+        transform: scale(1.05);
+        background: rgba(255, 255, 255, 0.25);
+      }
     }
 
     .logo-text {
@@ -99,7 +105,7 @@
       font-weight: $font-medium;
       font-size: $font-sm;
       cursor: pointer;
-      transition: all $transition-base;
+      transition: all var(--transition-theme);
 
       @include respond-to($breakpoint-sm) {
         padding: $spacing-sm;
@@ -114,5 +120,15 @@
         transform: translateY(0);
       }
     }
+  }
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .dashboard-header {
+    background: linear-gradient(135deg, #003366 0%, var(--color-azul) 100%);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   }
 }

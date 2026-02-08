@@ -28,7 +28,8 @@
     label {
       font-size: $font-sm;
       font-weight: $font-medium;
-      color: $text-secondary;
+      color: var(--text-secondary);
+      transition: color var(--transition-theme);
 
       @include respond-to($breakpoint-xs) {
         font-size: $font-xs;
@@ -37,13 +38,13 @@
 
     .form-select {
       padding: 0.75rem;
-      border: 1px solid $border-color;
+      border: 1px solid var(--border-color);
       border-radius: $radius-md;
       font-size: $font-sm;
-      color: $text-primary;
-      background-color: $white;
+      color: var(--text-primary);
+      background-color: var(--bg-primary);
       cursor: pointer;
-      transition: all $transition-base;
+      transition: all var(--transition-theme);
 
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
       background-position: right 0.75rem center;
@@ -58,15 +59,17 @@
       }
 
       &:hover:not(:disabled) {
-        border-color: $brand-blue;
+        border-color: var(--color-azul);
       }
 
       &:focus {
-        @include input-focus;
+        outline: none;
+        border-color: var(--color-azul);
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
       }
 
       &:disabled {
-        background-color: $bg-light;
+        background-color: var(--bg-secondary);
         cursor: not-allowed;
         opacity: 0.6;
       }
@@ -81,11 +84,12 @@
   display: flex;
   gap: $spacing-md;
   padding: $spacing-md;
-  background: linear-gradient(135deg, $info-light 0%, rgba($info-color, 0.05) 100%);
-  border: 1px solid $info-color;
-  border-left: 4px solid $info-color;
+  background: rgba(0, 102, 204, 0.08);
+  border: 1px solid var(--color-azul);
+  border-left: 4px solid var(--color-azul);
   border-radius: $radius-md;
   animation: slideIn 0.3s ease-out;
+  transition: all var(--transition-theme);
 
   @include respond-to($breakpoint-xs) {
     padding: $spacing-sm;
@@ -94,7 +98,7 @@
 
   .info-icon {
     flex-shrink: 0;
-    color: $info-color;
+    color: var(--color-azul);
 
     svg {
       display: block;
@@ -103,7 +107,7 @@
 
   .info-text {
     font-size: $font-sm;
-    color: $info-color;
+    color: var(--color-azul);
     line-height: 1.6;
     font-weight: $font-medium;
 
@@ -113,7 +117,7 @@
 
     strong {
       font-weight: $font-bold;
-      color: darken($info-color, 10%);
+      color: var(--color-azul-dark);
     }
   }
 }
@@ -135,6 +139,26 @@
 .btn-large {
   width: 100%;
   margin-top: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  font-size: $font-base;
+  font-weight: $font-medium;
+  background: linear-gradient(135deg, var(--color-azul) 0%, var(--color-azul-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all var(--transition-theme);
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 .spinner {
@@ -166,5 +190,36 @@
 @media (max-width: $breakpoint-xs) {
   .cash-close-form {
     gap: $spacing-sm;
+  }
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .form-field .form-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23b0b0b0' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  }
+
+  .period-info {
+    background: rgba(77, 154, 255, 0.1);
+    border-color: rgba(77, 154, 255, 0.5);
+
+    .info-text,
+    .info-icon {
+      color: #4D9AFF;
+    }
+
+    .info-text strong {
+      color: #6EB3FF;
+    }
+  }
+
+  .btn-large {
+    box-shadow: 0 2px 8px rgba(77, 154, 255, 0.2);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 4px 12px rgba(77, 154, 255, 0.3);
+    }
   }
 }

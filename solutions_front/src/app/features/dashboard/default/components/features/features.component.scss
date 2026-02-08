@@ -72,10 +72,6 @@
   &:hover {
     box-shadow: var(--shadow-lg);
     transform: translateY(-4px);
-
-    .feature-guacamaya {
-      transform: scale(1.15) rotate(5deg);
-    }
   }
 
   &.border-amarillo {
@@ -92,16 +88,6 @@
 
   &.border-verde {
     border-left-color: var(--color-verde);
-  }
-
-  .feature-guacamaya {
-    position: absolute;
-    top: $spacing-sm;
-    right: $spacing-sm;
-    width: 22px;
-    height: 22px;
-    transition: transform 0.3s ease;
-    opacity: 0.85;
   }
 
   .feature-icon {
@@ -168,10 +154,6 @@
 // Dark mode adjustments
 @media (prefers-color-scheme: dark) {
   .feature-card {
-    .feature-guacamaya {
-      filter: brightness(1.15);
-    }
-
     .feature-icon {
       &.bg-amarillo {
         background-color: rgba(255, 224, 51, 0.18);

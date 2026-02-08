@@ -89,6 +89,7 @@ $info-light: #e0f2fe;
 
 // ===============================
 // UI COMPONENT COLORS (Aliases - Light mode defaults)
+// These are SCSS fallbacks, prefer using CSS variables: var(--xxx)
 // ===============================
 $border-color: $light-border;
 $border-color-light: $gray-100;
@@ -105,6 +106,15 @@ $bg-secondary: $light-bg-secondary;
 $bg-light: $gray-100;
 $bg-dark: $gray-800;
 $bg-overlay: rgba(0, 0, 0, 0.5);
+
+// ===============================
+// CSS VARIABLE REFERENCES (for SCSS files)
+// Use these for theme-aware colors
+// ===============================
+// Usage: background: cssvar(bg-primary);
+@function cssvar($name) {
+  @return var(--#{$name});
+}
 
 $shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 $shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1);

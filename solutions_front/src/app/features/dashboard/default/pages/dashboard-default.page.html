@@ -1,16 +1,19 @@
 <div class="min-h-screen">
-  <app-header (loginClick)="navigateToLogin()"></app-header>
-  
-  <app-hero (trackingSubmit)="handleTracking($event)"></app-hero>
-  
+  <app-header
+    (loginClick)="navigateToLogin()"
+    (registerClick)="handleCreateAccount()">
+  </app-header>
+
+  <app-hero></app-hero>
+
   <app-features></app-features>
-  
+
   <app-services></app-services>
-  
-  <app-cta 
+
+  <app-cta
     (createAccountClick)="handleCreateAccount()"
     (contactSalesClick)="handleContactSales()">
   </app-cta>
-  
+
   <app-footer></app-footer>
 </div>

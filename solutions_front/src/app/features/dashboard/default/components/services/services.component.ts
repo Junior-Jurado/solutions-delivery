@@ -11,7 +11,6 @@ interface Service {
   buttonText: string;
   buttonClass: string;
   color: 'blue' | 'red' | 'green' | 'yellow';
-  guacamayaImage: string;
   borderColor: string;
 }
 
@@ -38,7 +37,6 @@ export class ServicesComponent {
       buttonText: 'Cotizar Ahora',
       buttonClass: 'btn-azul',
       color: 'blue',
-      guacamayaImage: 'assets/guacamayas/guacamaya-service-blue.svg',
       borderColor: 'card-border-azul'
     },
     {
@@ -55,7 +53,6 @@ export class ServicesComponent {
       buttonText: 'Solicitar Servicio',
       buttonClass: 'btn-rojo',
       color: 'red',
-      guacamayaImage: 'assets/guacamayas/guacamaya-service-red.svg',
       borderColor: 'card-border-rojo'
     },
     {
@@ -72,7 +69,6 @@ export class ServicesComponent {
       buttonText: 'Contactar Ventas',
       buttonClass: 'btn-verde',
       color: 'green',
-      guacamayaImage: 'assets/guacamayas/guacamaya-service-green.svg',
       borderColor: 'card-border-verde'
     }
   ];

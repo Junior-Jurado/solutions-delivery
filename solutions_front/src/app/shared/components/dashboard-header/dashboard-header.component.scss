@@ -6,12 +6,13 @@
 // HEADER
 // ===============================
 .dashboard-header {
-  background: $white;
-  border-bottom: 1px solid $border-color;
-  box-shadow: $shadow-sm;
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: all var(--transition-theme);
 
   .header-content {
     max-width: 1400px;
@@ -43,12 +44,19 @@
     gap: $spacing-sm;
 
     .logo-circle {
-      background: $brand-blue;
+      background: linear-gradient(135deg, var(--color-azul) 0%, var(--color-azul-dark) 100%);
       padding: $spacing-sm;
       border-radius: $radius-md;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+      transition: all var(--transition-theme);
+
+      &:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+      }
 
       @include respond-to($breakpoint-xs) {
         padding: $spacing-xs;
@@ -63,7 +71,8 @@
     .logo-text {
       font-size: $font-xl;
       font-weight: $font-bold;
-      color: $text-primary;
+      color: var(--text-primary);
+      transition: color var(--transition-theme);
 
       @include respond-to($breakpoint-xs) {
         font-size: $font-sm;
@@ -91,7 +100,7 @@
     gap: $spacing-sm;
 
     .user-avatar {
-      background: $brand-red;
+      background: var(--color-rojo);
       padding: $spacing-sm;
       border-radius: $radius-full;
       display: flex;
@@ -107,17 +116,17 @@
       .user-role {
         font-weight: $font-semibold;
         font-size: $font-sm;
-        color: $text-primary;
+        color: var(--text-primary);
 
         @include respond-to($breakpoint-xs) {
-          color: $brand-blue;
+          color: var(--color-azul);
           font-size: $font-xs;
         }
       }
 
       .user-description {
         font-size: $font-xs;
-        color: $text-muted;
+        color: var(--text-secondary);
 
         @include respond-to($breakpoint-xs) {
           display: none;
@@ -134,15 +143,15 @@
     align-items: center;
     gap: $spacing-sm;
     padding: $spacing-sm $spacing-md;
-    background: linear-gradient(135deg, $brand-blue 0%, $brand-blue-dark 100%);
+    background: linear-gradient(135deg, var(--color-azul) 0%, var(--color-azul-dark) 100%);
     border: none;
     border-radius: $radius-base;
     cursor: pointer;
     font-size: $font-sm;
     font-weight: $font-medium;
-    color: $white;
-    transition: all $transition-base;
-    box-shadow: 0 2px 8px rgba($brand-blue, 0.3);
+    color: white;
+    transition: all var(--transition-theme);
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
 
     @include respond-to($breakpoint-md) {
       padding: $spacing-sm;
@@ -168,14 +177,14 @@
     }
 
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, $brand-blue-dark 0%, darken($brand-blue-dark, 5%) 100%);
-      box-shadow: 0 4px 12px rgba($brand-blue, 0.4);
+      background: linear-gradient(135deg, var(--color-azul-dark) 0%, #003366 100%);
+      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
       transform: translateY(-1px);
     }
 
     &:active:not(:disabled) {
       transform: translateY(0);
-      box-shadow: 0 2px 6px rgba($brand-blue, 0.3);
+      box-shadow: 0 2px 6px rgba(0, 102, 204, 0.3);
     }
 
     &:disabled {
@@ -184,7 +193,7 @@
     }
 
     &.refreshing {
-      background: linear-gradient(135deg, $brand-blue-light 0%, $brand-blue 100%);
+      background: linear-gradient(135deg, var(--color-azul-light) 0%, var(--color-azul) 100%);
     }
   }
 
@@ -202,14 +211,14 @@
     align-items: center;
     gap: $spacing-sm;
     padding: $spacing-sm $spacing-md;
-    background: $white;
-    border: 1px solid $border-color;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: $radius-base;
     cursor: pointer;
     font-size: $font-sm;
     font-weight: $font-medium;
-    color: $text-primary;
-    transition: all $transition-base;
+    color: var(--text-primary);
+    transition: all var(--transition-theme);
 
     @include respond-to($breakpoint-md) {
       padding: $spacing-sm;
@@ -232,12 +241,33 @@
     }
 
     &:hover {
-      background: $bg-light;
-      border-color: $brand-blue;
-      color: $brand-blue;
+      background: var(--bg-tertiary);
+      border-color: var(--color-azul);
+      color: var(--color-azul);
 
       app-icon {
-        color: $brand-blue;
+        color: var(--color-azul);
+      }
+    }
+  }
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .dashboard-header {
+    .btn-refresh {
+      box-shadow: 0 2px 8px rgba(77, 154, 255, 0.3);
+
+      &:hover:not(:disabled) {
+        box-shadow: 0 4px 12px rgba(77, 154, 255, 0.4);
+      }
+    }
+
+    .btn-logout {
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
       }
     }
   }

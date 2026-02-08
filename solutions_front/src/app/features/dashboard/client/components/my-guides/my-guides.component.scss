@@ -11,14 +11,16 @@
     h2 {
       margin: 0 0 $spacing-sm 0;
       font-size: $font-2xl;
-      color: $text-primary;
+      color: var(--text-primary);
       font-weight: $font-bold;
+      transition: color var(--transition-theme);
     }
 
     .subtitle {
       margin: 0 0 $spacing-md 0;
-      color: $text-secondary;
+      color: var(--text-secondary);
       font-size: $font-base;
+      transition: color var(--transition-theme);
     }
 
     .btn-refresh {
@@ -29,13 +31,13 @@
       align-items: center;
       gap: $spacing-xs;
       padding: $spacing-xs $spacing-md;
-      background: $bg-secondary;
-      border: 1px solid $border-color;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
       border-radius: $radius-base;
-      color: $text-primary;
+      color: var(--text-primary);
       font-size: $font-sm;
       cursor: pointer;
-      transition: all $transition-base;
+      transition: all var(--transition-theme);
 
       @include respond-to($breakpoint-md) {
         position: static;
@@ -43,9 +45,9 @@
       }
 
       &:hover:not(:disabled) {
-        background: $brand-blue;
+        background: var(--color-azul);
         color: white;
-        border-color: $brand-blue;
+        border-color: var(--color-azul);
       }
 
       &:disabled {
@@ -62,11 +64,11 @@
     justify-content: center;
     padding: $spacing-3xl;
     gap: $spacing-md;
-    color: $brand-blue;
+    color: var(--color-azul);
 
     p {
       margin: 0;
-      color: $text-secondary;
+      color: var(--text-secondary);
       font-size: $font-sm;
     }
   }
@@ -82,30 +84,31 @@
   }
 
   .guide-card {
-    background: white;
-    border: 2px solid $border-color;
+    background: var(--card-bg);
+    border: 2px solid var(--border-color);
     border-radius: $radius-lg;
     overflow: hidden;
-    transition: all $transition-base;
+    transition: all var(--transition-theme);
 
     &:hover {
-      border-color: $brand-blue;
-      box-shadow: 0 8px 24px rgba($brand-blue, 0.15);
+      border-color: var(--color-azul);
+      box-shadow: 0 8px 24px rgba(0, 102, 204, 0.15);
       transform: translateY(-4px);
     }
 
     .guide-card-header {
       padding: $spacing-md $spacing-lg;
-      background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
+      background: var(--bg-tertiary);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid $border-color;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color var(--transition-theme);
 
       .guide-number {
         font-weight: $font-bold;
         font-size: $font-base;
-        color: $brand-blue;
+        color: var(--color-azul);
       }
     }
 
@@ -114,12 +117,13 @@
       display: flex;
       flex-direction: column;
       gap: $spacing-md;
+      background: var(--card-bg);
 
       .guide-info-row {
         display: flex;
         align-items: center;
         gap: $spacing-sm;
-        color: $text-secondary;
+        color: var(--text-secondary);
         font-size: $font-sm;
       }
 
@@ -135,13 +139,13 @@
           gap: $spacing-sm;
           font-size: $font-sm;
           font-weight: $font-medium;
-          color: $text-primary;
+          color: var(--text-primary);
         }
 
         .route-line {
           width: 2px;
           height: 20px;
-          background: linear-gradient(to bottom, $brand-blue, $brand-red);
+          background: linear-gradient(to bottom, var(--color-azul), var(--color-rojo));
           margin-left: 5px;
         }
       }
@@ -151,7 +155,7 @@
         grid-template-columns: repeat(2, 1fr);
         gap: $spacing-sm;
         padding-top: $spacing-md;
-        border-top: 1px solid $border-color;
+        border-top: 1px solid var(--border-color);
 
         .detail-item {
           display: flex;
@@ -160,16 +164,16 @@
           font-size: $font-sm;
 
           .detail-label {
-            color: $text-secondary;
+            color: var(--text-secondary);
             font-size: $font-xs;
           }
 
           .detail-value {
-            color: $text-primary;
+            color: var(--text-primary);
             font-weight: $font-medium;
 
             &.price {
-              color: $success-color;
+              color: var(--color-verde);
               font-weight: $font-semibold;
             }
           }
@@ -179,10 +183,11 @@
 
     .guide-card-footer {
       padding: $spacing-md $spacing-lg;
-      background: $bg-secondary;
-      border-top: 1px solid $border-color;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-color);
       display: flex;
       gap: $spacing-sm;
+      transition: background-color var(--transition-theme);
 
       button {
         flex: 1;
@@ -198,19 +203,30 @@
     padding: $spacing-3xl;
     text-align: center;
     gap: $spacing-lg;
-    color: $text-disabled;
+    color: var(--text-muted);
 
     h3 {
       margin: 0;
       font-size: $font-xl;
-      color: $text-primary;
+      color: var(--text-primary);
       font-weight: $font-bold;
     }
 
     p {
       margin: 0;
-      color: $text-secondary;
+      color: var(--text-secondary);
       font-size: $font-base;
+    }
+  }
+}
+
+// ===== DARK MODE ADJUSTMENTS =====
+@media (prefers-color-scheme: dark) {
+  .guides-section {
+    .guide-card {
+      &:hover {
+        box-shadow: 0 8px 24px rgba(77, 154, 255, 0.2);
+      }
     }
   }
 }

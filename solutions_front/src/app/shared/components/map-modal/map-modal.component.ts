@@ -172,7 +172,7 @@ export interface MapLocation {
     }
 
     .dlv-map-modal-content {
-      background: #f8fafc;
+      background: var(--bg-secondary, #f8fafc);
       border-radius: 20px;
       width: 100%;
       max-width: 420px;
@@ -206,7 +206,7 @@ export interface MapLocation {
       align-items: center;
       justify-content: space-between;
       padding: 16px 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--color-azul, #0066CC) 0%, #764ba2 100%);
       color: white;
       flex-shrink: 0;
     }
@@ -278,15 +278,15 @@ export interface MapLocation {
       display: flex;
       gap: 14px;
       padding: 18px 20px;
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
+      background: var(--card-bg, #ffffff);
+      border-bottom: 1px solid var(--border-color, #e5e7eb);
     }
 
     .dlv-address-icon {
       flex-shrink: 0;
       width: 50px;
       height: 50px;
-      background: #f1f5f9;
+      background: var(--bg-tertiary, #f1f5f9);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -301,14 +301,14 @@ export interface MapLocation {
     .dlv-address-main {
       font-size: 15px;
       font-weight: 600;
-      color: #1f2937;
+      color: var(--text-primary, #1f2937);
       line-height: 1.4;
       margin-bottom: 4px;
     }
 
     .dlv-address-city {
       font-size: 13px;
-      color: #6b7280;
+      color: var(--text-secondary, #6b7280);
       margin-bottom: 8px;
     }
 
@@ -317,7 +317,7 @@ export interface MapLocation {
       align-items: center;
       gap: 6px;
       font-size: 13px;
-      color: #3b82f6;
+      color: var(--color-azul, #3b82f6);
       font-weight: 500;
     }
 
@@ -331,14 +331,14 @@ export interface MapLocation {
       align-items: center;
       gap: 12px;
       padding: 14px 20px;
-      background: white;
+      background: var(--card-bg, #ffffff);
     }
 
     .dlv-nav-icon {
       flex-shrink: 0;
       width: 40px;
       height: 40px;
-      background: #f1f5f9;
+      background: var(--bg-tertiary, #f1f5f9);
       border-radius: 10px;
       display: flex;
       align-items: center;
@@ -354,12 +354,12 @@ export interface MapLocation {
     .dlv-nav-title {
       font-size: 14px;
       font-weight: 600;
-      color: #374151;
+      color: var(--text-primary, #374151);
     }
 
     .dlv-nav-subtitle {
       font-size: 12px;
-      color: #9ca3af;
+      color: var(--text-muted, #9ca3af);
     }
 
     /* Action Buttons */
@@ -368,7 +368,7 @@ export interface MapLocation {
       flex-direction: column;
       gap: 10px;
       padding: 16px 20px;
-      background: white;
+      background: var(--card-bg, #ffffff);
     }
 
     .dlv-nav-btn {
@@ -418,7 +418,7 @@ export interface MapLocation {
 
     /* Google Maps Button */
     .dlv-btn-google {
-      background: linear-gradient(135deg, #4285f4 0%, #1a73e8 100%);
+      background: linear-gradient(135deg, var(--color-azul, #4285f4) 0%, #1a73e8 100%);
       color: white;
     }
 
@@ -448,7 +448,7 @@ export interface MapLocation {
 
     /* Call Button */
     .dlv-btn-call {
-      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      background: linear-gradient(135deg, var(--color-verde, #22c55e) 0%, #16a34a 100%);
       color: white;
     }
 
@@ -464,17 +464,17 @@ export interface MapLocation {
     /* Footer */
     .dlv-map-modal-footer {
       padding: 16px 20px;
-      background: #f8fafc;
-      border-top: 1px solid #e5e7eb;
+      background: var(--bg-secondary, #f8fafc);
+      border-top: 1px solid var(--border-color, #e5e7eb);
     }
 
     .dlv-btn-cancel {
       width: 100%;
       padding: 12px;
-      border: 1px solid #d1d5db;
+      border: 1px solid var(--border-color, #d1d5db);
       border-radius: 10px;
-      background: white;
-      color: #6b7280;
+      background: var(--card-bg, #ffffff);
+      color: var(--text-secondary, #6b7280);
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
@@ -482,8 +482,8 @@ export interface MapLocation {
     }
 
     .dlv-btn-cancel:hover {
-      background: #f3f4f6;
-      border-color: #9ca3af;
+      background: var(--bg-tertiary, #f3f4f6);
+      border-color: var(--text-muted, #9ca3af);
     }
 
     /* Mobile */
@@ -551,6 +551,54 @@ export interface MapLocation {
 
       .dlv-map-modal-footer {
         padding: 14px 16px;
+      }
+    }
+
+    /* ===== DARK MODE ADJUSTMENTS ===== */
+    @media (prefers-color-scheme: dark) {
+      .dlv-map-modal-overlay {
+        background: rgba(0, 0, 0, 0.75);
+      }
+
+      .dlv-map-modal-content {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      .dlv-map-modal-header {
+        background: linear-gradient(135deg, #4D9AFF 0%, #8B5CF6 100%);
+      }
+
+      .dlv-address-contact {
+        color: #4D9AFF;
+      }
+
+      .dlv-btn-google {
+        background: linear-gradient(135deg, #4D9AFF 0%, #3B82F6 100%);
+      }
+
+      .dlv-btn-google:hover {
+        box-shadow: 0 4px 12px rgba(77, 154, 255, 0.4);
+      }
+
+      .dlv-btn-waze {
+        background: linear-gradient(135deg, #4DD4FF 0%, #00C4E6 100%);
+        color: #0D0D0D;
+      }
+
+      .dlv-btn-waze:hover {
+        box-shadow: 0 4px 12px rgba(77, 212, 255, 0.4);
+      }
+
+      .dlv-btn-call {
+        background: linear-gradient(135deg, #33D47F 0%, #22C55E 100%);
+      }
+
+      .dlv-btn-call:hover {
+        box-shadow: 0 4px 12px rgba(51, 212, 127, 0.4);
+      }
+
+      .dlv-nav-icon svg {
+        stroke: var(--text-muted, #9ca3af);
       }
     }
   `]

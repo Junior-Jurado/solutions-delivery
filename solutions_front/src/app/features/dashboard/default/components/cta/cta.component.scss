@@ -53,31 +53,11 @@
 
   .cta-description {
     font-size: $font-lg;
-    margin-bottom: $spacing-lg;
+    margin-bottom: $spacing-xl;
     opacity: 0.95;
 
     @media (min-width: $breakpoint-md) {
       font-size: $font-xl;
-    }
-  }
-
-  .cta-guacamaya-container {
-    margin-bottom: $spacing-lg;
-
-    .cta-guacamaya {
-      width: 50px;
-      height: auto;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
-      animation: guacamayaFlight 4s ease-in-out infinite;
-    }
-  }
-
-  @keyframes guacamayaFlight {
-    0%, 100% {
-      transform: translateY(0) rotate(-2deg);
-    }
-    50% {
-      transform: translateY(-10px) rotate(2deg);
     }
   }
 
@@ -91,50 +71,6 @@
       flex-direction: row;
     }
   }
-}
-
-// Decorative feathers
-.cta-feathers {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  z-index: 0;
-
-  .cta-feather {
-    position: absolute;
-    opacity: 0.4;
-    width: 20px;
-  }
-
-  .feather-1 {
-    top: 20%;
-    left: 8%;
-    animation-delay: 0s;
-  }
-
-  .feather-2 {
-    top: 30%;
-    right: 10%;
-    animation-delay: -2s;
-  }
-}
-
-@keyframes featherFloat {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.3;
-  }
-  50% {
-    transform: translateY(-15px) rotate(10deg);
-    opacity: 0.5;
-  }
-}
-
-.feather-float {
-  animation: featherFloat 6s ease-in-out infinite;
 }
 
 // Button styles
@@ -185,14 +121,6 @@
 @media (prefers-color-scheme: dark) {
   .cta {
     background: linear-gradient(135deg, #004D99 0%, #003366 100%);
-
-    .cta-guacamaya {
-      filter: brightness(1.15) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-    }
-
-    .cta-feather {
-      filter: brightness(1.2);
-    }
   }
 
   .btn-cta-primary {

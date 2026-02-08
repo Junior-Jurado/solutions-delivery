@@ -71,10 +71,6 @@
   &:hover {
     box-shadow: var(--shadow-lg);
     transform: translateY(-4px);
-
-    .service-guacamaya {
-      transform: scale(1.15) rotate(5deg);
-    }
   }
 
   // Colored top borders
@@ -92,17 +88,6 @@
 
   &.card-border-amarillo {
     border-top: 4px solid var(--color-amarillo);
-  }
-
-  // Guacamaya decoration
-  .service-guacamaya {
-    position: absolute;
-    top: $spacing-sm;
-    right: $spacing-sm;
-    width: 24px;
-    height: 24px;
-    transition: transform 0.3s ease;
-    opacity: 0.9;
   }
 
   .service-icon {
@@ -283,10 +268,6 @@
 // Dark mode adjustments
 @media (prefers-color-scheme: dark) {
   .service-card {
-    .service-guacamaya {
-      filter: brightness(1.15);
-    }
-
     .service-icon {
       &.bg-azul {
         background-color: rgba(77, 154, 255, 0.15);

@@ -27,6 +27,7 @@ export class EmployeeListComponent {
 
   // Available roles for assignment (ADMIN excluded)
   roles: { value: UserRole; label: string }[] = [
+    { value: 'CLIENT', label: 'Cliente' },
     { value: 'SECRETARY', label: 'Secretaria' },
     { value: 'DELIVERY', label: 'Entregador' }
   ];

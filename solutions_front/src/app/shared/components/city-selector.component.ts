@@ -135,15 +135,22 @@ import { LocationService, Department, City, DepartmentWithCities } from '@core/s
         .search-input {
             width: 100%;
             padding: 0.625rem 2.5rem 0.625rem 0.625rem;
-            border: 1px solid #d1d5db;
+            border: 1px solid var(--border-color, #d1d5db);
             border-radius: 0.375rem;
             font-size: 0.875rem;
+            background-color: var(--bg-primary, #ffffff);
+            color: var(--text-primary, #111827);
+            transition: all 0.2s ease;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #0066cc;
+            border-color: var(--color-azul, #0066cc);
             box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-muted, #9ca3af);
         }
 
         .search-icon,
@@ -152,14 +159,14 @@ import { LocationService, Department, City, DepartmentWithCities } from '@core/s
             right: 0.625rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #6b7280;
+            color: var(--text-muted, #6b7280);
         }
 
         .spinner-small {
             width: 18px;
             height: 18px;
-            border: 2px solid #e5e7eb;
-            border-top-color: #0066cc;
+            border: 2px solid var(--border-color, #e5e7eb);
+            border-top-color: var(--color-azul, #0066cc);
             border-radius: 50%;
             animation: spin 0.6s linear infinite;
         }
@@ -173,13 +180,13 @@ import { LocationService, Department, City, DepartmentWithCities } from '@core/s
             top: 100%;
             left: 0;
             right: 0;
-            background: white;
-            border: 1px solid #d1d5db;
+            background: var(--card-bg, #ffffff);
+            border: 1px solid var(--border-color, #d1d5db);
             border-radius: 0.375rem;
             margin-top: 0.25rem;
             max-height: 300px;
             overflow-y: auto;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             z-index: 1000;
         }
 
@@ -189,11 +196,12 @@ import { LocationService, Department, City, DepartmentWithCities } from '@core/s
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #f3f4f6;
+            border-bottom: 1px solid var(--border-color, #f3f4f6);
+            transition: background-color 0.15s ease;
         }
 
         .search-result-item:hover {
-            background: #f9fafb;
+            background: var(--bg-secondary, #f9fafb);
         }
 
         .search-result-item:last-child {
@@ -202,12 +210,12 @@ import { LocationService, Department, City, DepartmentWithCities } from '@core/s
 
         .city-name {
             font-weight: 500;
-            color: #111827;
+            color: var(--text-primary, #111827);
         }
 
         .department-name {
             font-size: 0.75rem;
-            color: #6b7280;
+            color: var(--text-secondary, #6b7280);
         }
 
         .selected-city-badge {
@@ -215,10 +223,11 @@ import { LocationService, Department, City, DepartmentWithCities } from '@core/s
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 0.75rem;
-            background: #e0f2fe;
-            border: 1px solid #0066cc;
+            background: rgba(0, 102, 204, 0.1);
+            border: 1px solid var(--color-azul, #0066cc);
             border-radius: 0.375rem;
             margin-top: 0.5rem;
+            color: var(--color-azul, #0066cc);
         }
 
         .clear-btn {
@@ -226,17 +235,18 @@ import { LocationService, Department, City, DepartmentWithCities } from '@core/s
             border: none;
             font-size: 1.25rem;
             cursor: pointer;
-            color: #6b7280;
+            color: var(--text-muted, #6b7280);
             padding: 0;
             width: 20px;
             height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: color 0.15s ease;
         }
 
         .clear-btn:hover {
-            color: #111827;
+            color: var(--text-primary, #111827);
         }
 
         .cascade-mode {
@@ -250,17 +260,20 @@ import { LocationService, Department, City, DepartmentWithCities } from '@core/s
         .city-select-grouped {
             width: 100%;
             padding: 0.625rem;
-            border: 1px solid #d1d5db;
+            border: 1px solid var(--border-color, #d1d5db);
             border-radius: 0.375rem;
             font-size: 0.875rem;
             cursor: pointer;
+            background-color: var(--bg-primary, #ffffff);
+            color: var(--text-primary, #111827);
+            transition: all 0.2s ease;
         }
 
         .department-select:focus,
         .city-select:focus,
         .city-select-grouped:focus {
             outline: none;
-            border-color: #0066cc;
+            border-color: var(--color-azul, #0066cc);
             box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
         }
 
@@ -270,17 +283,43 @@ import { LocationService, Department, City, DepartmentWithCities } from '@core/s
             align-items: center;
             gap: 0.5rem;
             font-size: 0.875rem;
-            color: #6b7280;
+            color: var(--text-muted, #6b7280);
         }
 
         select:disabled {
-            background-color: #f3f4f6;
+            background-color: var(--bg-secondary, #f3f4f6);
             cursor: not-allowed;
+            opacity: 0.7;
         }
 
         @media (max-width: 640px) {
             .cascade-mode {
                 grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark mode adjustments */
+        @media (prefers-color-scheme: dark) {
+            .search-input:focus,
+            .department-select:focus,
+            .city-select:focus,
+            .city-select-grouped:focus {
+                box-shadow: 0 0 0 3px rgba(77, 154, 255, 0.15);
+            }
+
+            .search-results {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            }
+
+            .selected-city-badge {
+                background: rgba(77, 154, 255, 0.15);
+                border-color: #4D9AFF;
+                color: #4D9AFF;
+            }
+
+            .spinner-small {
+                border-color: var(--border-color, #404040);
+                border-top-color: #4D9AFF;
             }
         }
     `]

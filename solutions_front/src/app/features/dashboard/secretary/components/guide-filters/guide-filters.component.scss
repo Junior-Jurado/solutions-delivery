@@ -25,7 +25,7 @@
   // Tablet: 2 columnas
   @media (min-width: $breakpoint-sm) {
     grid-template-columns: repeat(2, 1fr);
-    
+
     .filter-actions {
       grid-column: span 2;
     }
@@ -33,13 +33,13 @@
 
   // Desktop: layout optimizado
   @media (min-width: $breakpoint-lg) {
-    grid-template-columns: 
+    grid-template-columns:
       minmax(150px, 0.8fr)  /* Estado */
       minmax(150px, 0.8fr)  /* Ciudad */
       minmax(180px, 1.2fr)  /* Fecha desde */
       minmax(180px, 1.2fr)  /* Fecha hasta */
       auto                   /* Botones */;
-    
+
     .filter-actions {
       grid-column: auto;
     }
@@ -47,7 +47,7 @@
 
   // Pantallas muy grandes
   @media (min-width: $breakpoint-xl) {
-    grid-template-columns: 
+    grid-template-columns:
       minmax(160px, 0.7fr)
       minmax(160px, 0.7fr)
       minmax(200px, 1.3fr)
@@ -67,7 +67,7 @@
   .filter-label {
     font-size: $font-sm;
     font-weight: $font-medium;
-    color: $text-secondary;
+    color: var(--text-secondary);
 
     @include respond-to($breakpoint-xs) {
       font-size: $font-xs;
@@ -76,13 +76,13 @@
 
   .filter-select {
     padding: 0.75rem;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
     font-size: $font-sm;
-    color: $text-primary;
-    background-color: $white;
+    color: var(--text-primary);
+    background-color: var(--card-bg);
     cursor: pointer;
-    transition: all $transition-base;
+    transition: all var(--transition-theme);
 
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
     background-position: right 0.75rem center;
@@ -97,7 +97,7 @@
     }
 
     &:hover:not(:disabled) {
-      border-color: $brand-blue;
+      border-color: var(--color-azul);
     }
 
     &:focus {
@@ -105,7 +105,7 @@
     }
 
     &:disabled {
-      background-color: $bg-light;
+      background-color: var(--bg-tertiary);
       cursor: not-allowed;
       opacity: 0.6;
     }
@@ -122,11 +122,12 @@
   .date-input {
     width: 100%;
     padding: 0.75rem 2.5rem 0.75rem 0.75rem;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
     font-size: $font-sm;
-    color: $text-primary;
-    transition: all $transition-base;
+    color: var(--text-primary);
+    background-color: var(--card-bg);
+    transition: all var(--transition-theme);
     font-family: monospace;
     letter-spacing: 0.5px;
 
@@ -142,7 +143,7 @@
     }
 
     &:hover:not(:disabled) {
-      border-color: $brand-blue;
+      border-color: var(--color-azul);
     }
 
     &:focus {
@@ -150,7 +151,7 @@
     }
 
     &:disabled {
-      background-color: $bg-light;
+      background-color: var(--bg-tertiary);
       cursor: not-allowed;
       opacity: 0.6;
     }
@@ -205,10 +206,10 @@
   gap: $spacing-sm;
   padding: $spacing-sm $spacing-md;
   background: $info-light;
-  border: 1px solid $info-color;
+  border: 1px solid var(--color-azul);
   border-radius: $radius-md;
   font-size: $font-sm;
-  color: $info-color;
+  color: var(--color-azul);
 
   @include respond-to($breakpoint-xs) {
     font-size: $font-xs;
@@ -229,15 +230,38 @@
 // ===============================
 .date-input-wrapper.invalid {
   .date-input {
-    border-color: $error-color;
+    border-color: var(--color-rojo);
 
     &:focus {
-      border-color: $error-color;
-      box-shadow: 0 0 0 3px rgba($error-color, 0.1);
+      border-color: var(--color-rojo);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
     }
   }
 
   .date-icon {
-    color: $error-color;
+    color: var(--color-rojo);
+  }
+}
+
+// ===============================
+// DARK MODE
+// ===============================
+:host-context(.dark-mode) {
+  .filter-field {
+    .filter-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    }
+  }
+
+  .active-filters-indicator {
+    background: rgba(59, 130, 246, 0.1);
+  }
+
+  .date-input-wrapper.invalid {
+    .date-input {
+      &:focus {
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+      }
+    }
   }
 }

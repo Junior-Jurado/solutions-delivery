@@ -26,16 +26,12 @@ import { FooterComponent } from "../components/footer/footer.component";
 export class DashboardDefaultPage {
     constructor(private router: Router) {}
 
-    handleTracking(trackingNumber: string): void {
-        this.router.navigate(['/tracking', trackingNumber]);
-    }
-
     navigateToLogin(): void {
         this.router.navigate(['/login']);
     }
 
     handleCreateAccount(): void {
-        this.router.navigate(['/register']);
+        this.router.navigate(['/login'], { queryParams: { tab: 'register' } });
     }
 
     handleContactSales(): void {

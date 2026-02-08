@@ -10,14 +10,16 @@
     h2 {
       margin: 0 0 $spacing-sm 0;
       font-size: $font-2xl;
-      color: $text-primary;
+      color: var(--text-primary);
       font-weight: $font-bold;
+      transition: color var(--transition-theme);
     }
 
     .subtitle {
       margin: 0 0 $spacing-md 0;
-      color: $text-secondary;
+      color: var(--text-secondary);
       font-size: $font-base;
+      transition: color var(--transition-theme);
     }
   }
 
@@ -37,14 +39,15 @@
 // ===== CARD COMÚN =====
 .quote-form-card,
 .quote-result-card {
-  background: white;
-  border: 2px solid $border-color;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: $radius-lg;
   overflow: hidden;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
+  box-shadow: var(--card-shadow);
 
   &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-md);
   }
 }
 
@@ -53,24 +56,25 @@
   align-items: center;
   gap: $spacing-md;
   padding: $spacing-lg $spacing-xl;
-  background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
-  border-bottom: 2px solid $border-color;
-  color: $brand-blue;
+  background: var(--bg-tertiary);
+  border-bottom: 2px solid var(--border-color);
+  color: var(--color-azul);
+  transition: all var(--transition-theme);
 
   h3 {
     margin: 0;
     font-size: $font-lg;
-    color: $text-primary;
+    color: var(--text-primary);
     font-weight: $font-bold;
   }
 
   &.success {
-    background: linear-gradient(135deg, $success-light 0%, lighten($success-light, 5%) 100%);
-    border-bottom-color: $success-color;
-    color: $success-color;
+    background: rgba(0, 166, 81, 0.1);
+    border-bottom-color: var(--color-verde);
+    color: var(--color-verde);
 
     h3 {
-      color: $success-dark;
+      color: var(--color-verde-dark);
     }
   }
 }
@@ -81,6 +85,7 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+  background: var(--card-bg);
 }
 
 .quote-form-row {
@@ -111,33 +116,41 @@
     gap: $spacing-xs;
     font-size: $font-sm;
     font-weight: $font-semibold;
-    color: $text-primary;
+    color: var(--text-primary);
+    transition: color var(--transition-theme);
 
     app-icon {
-      color: $brand-blue;
+      color: var(--color-azul);
     }
   }
 
   input,
   select {
     padding: $spacing-sm $spacing-md;
-    border: 2px solid $border-color;
+    border: 2px solid var(--border-color);
     border-radius: $radius-base;
     font-size: $font-sm;
-    transition: all $transition-base;
-    background: white;
+    transition: all var(--transition-theme);
+    background: var(--bg-primary);
+    color: var(--text-primary);
     font-family: inherit;
     width: 100%;
     box-sizing: border-box;
 
     &:focus {
       outline: none;
-      border-color: $brand-blue;
-      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+      border-color: var(--color-azul);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
     }
 
     &::placeholder {
-      color: $text-disabled;
+      color: var(--text-muted);
+    }
+
+    &:disabled {
+      background: var(--bg-tertiary);
+      cursor: not-allowed;
+      opacity: 0.7;
     }
   }
 
@@ -154,7 +167,7 @@
 
 .quote-input-hint {
   font-size: $font-xs;
-  color: $text-secondary;
+  color: var(--text-secondary);
   font-style: italic;
   margin-top: 2px;
 }
@@ -168,6 +181,24 @@
   align-items: center;
   justify-content: center;
   gap: $spacing-sm;
+  background: linear-gradient(135deg, var(--color-amarillo) 0%, var(--color-amarillo-dark) 100%);
+  color: #333333;
+  border: none;
+  border-radius: $radius-base;
+  font-weight: $font-semibold;
+  cursor: pointer;
+  transition: all var(--transition-theme);
+  box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+
+  &:hover:not(:disabled) {
+    box-shadow: 0 6px 16px rgba(255, 215, 0, 0.4);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }
 
 // ===== ÁREA DE RESULTADO =====
@@ -181,20 +212,22 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+  background: var(--card-bg);
 }
 
 .quote-price-display {
   text-align: center;
   padding: $spacing-xl;
-  background: linear-gradient(135deg, $success-light 0%, lighten($success-light, 5%) 100%);
-  border: 3px solid $success-color;
+  background: rgba(0, 166, 81, 0.1);
+  border: 3px solid var(--color-verde);
   border-radius: $radius-lg;
+  transition: all var(--transition-theme);
 
   .quote-price-label {
     display: block;
     font-size: $font-sm;
     font-weight: $font-semibold;
-    color: $success-dark;
+    color: var(--color-verde-dark);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: $spacing-sm;
@@ -204,7 +237,7 @@
     display: block;
     font-size: 2.5rem;
     font-weight: $font-bold;
-    color: $success-dark;
+    color: var(--color-verde);
     line-height: 1;
 
     @include respond-to($breakpoint-sm) {
@@ -215,15 +248,17 @@
 
 // ===== DESGLOSE =====
 .quote-breakdown {
-  background: $bg-secondary;
+  background: var(--bg-secondary);
   border-radius: $radius-base;
   padding: $spacing-lg;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-theme);
 
   h4 {
     margin: 0 0 $spacing-md 0;
     font-size: $font-sm;
     font-weight: $font-bold;
-    color: $text-primary;
+    color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -237,49 +272,51 @@
 
   .quote-breakdown-label {
     font-size: $font-sm;
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 
   .quote-breakdown-value {
     font-size: $font-sm;
     font-weight: $font-semibold;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 
   &.total {
     margin-top: $spacing-sm;
     padding-top: $spacing-md;
-    border-top: 2px solid $border-color;
+    border-top: 2px solid var(--border-color);
 
     .quote-breakdown-label {
       font-weight: $font-bold;
-      color: $text-primary;
+      color: var(--text-primary);
     }
 
     .quote-breakdown-value {
       font-size: $font-lg;
-      color: $success-color;
+      color: var(--color-verde);
     }
   }
 }
 
 .quote-breakdown-divider {
   height: 1px;
-  background: $border-color;
+  background: var(--border-color);
   margin: $spacing-sm 0;
 }
 
 // ===== RESUMEN =====
 .quote-summary {
-  background: $bg-secondary;
+  background: var(--bg-secondary);
   border-radius: $radius-base;
   padding: $spacing-lg;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-theme);
 
   h4 {
     margin: 0 0 $spacing-md 0;
     font-size: $font-sm;
     font-weight: $font-bold;
-    color: $text-primary;
+    color: var(--text-primary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -302,12 +339,12 @@
   font-size: $font-sm;
 
   .label {
-    color: $text-secondary;
+    color: var(--text-secondary);
   }
 
   .value {
     font-weight: $font-semibold;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 }
 
@@ -317,13 +354,15 @@
   align-items: flex-start;
   gap: $spacing-sm;
   padding: $spacing-sm $spacing-md;
-  background: rgba($brand-blue, 0.05);
+  background: rgba(0, 102, 204, 0.1);
   border-radius: $radius-base;
   font-size: $font-xs;
-  color: $text-secondary;
+  color: var(--text-secondary);
+  border: 1px solid rgba(0, 102, 204, 0.2);
+  transition: all var(--transition-theme);
 
   app-icon {
-    color: $brand-blue;
+    color: var(--color-azul);
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -353,9 +392,10 @@
   align-items: center;
   justify-content: center;
   min-height: 450px;
-  background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
-  border: 2px dashed $border-color;
+  background: var(--bg-tertiary);
+  border: 2px dashed var(--border-color);
   border-radius: $radius-lg;
+  transition: all var(--transition-theme);
 }
 
 .quote-placeholder-content {
@@ -364,36 +404,37 @@
   max-width: 320px;
 
   > app-icon {
-    color: $text-disabled;
+    color: var(--text-muted);
     margin-bottom: $spacing-lg;
   }
 
   h3 {
     margin: 0 0 $spacing-sm 0;
     font-size: $font-xl;
-    color: $text-primary;
+    color: var(--text-primary);
     font-weight: $font-bold;
   }
 
   p {
     margin: 0 0 $spacing-xl 0;
-    color: $text-secondary;
+    color: var(--text-secondary);
     font-size: $font-base;
   }
 }
 
 .quote-pricing-info {
   text-align: left;
-  background: white;
+  background: var(--card-bg);
   padding: $spacing-lg;
   border-radius: $radius-base;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color);
+  transition: all var(--transition-theme);
 
   h4 {
     margin: 0 0 $spacing-md 0;
     font-size: $font-sm;
     font-weight: $font-bold;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 
   ul {
@@ -409,11 +450,37 @@
       align-items: center;
       gap: $spacing-sm;
       font-size: $font-sm;
-      color: $text-secondary;
+      color: var(--text-secondary);
 
       app-icon {
-        color: $success-color;
+        color: var(--color-verde);
       }
+    }
+  }
+}
+
+// ===== DARK MODE ADJUSTMENTS =====
+@media (prefers-color-scheme: dark) {
+  .quote-form-group {
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23b0b0b0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    }
+  }
+
+  .quote-price-display {
+    background: rgba(51, 212, 127, 0.15);
+  }
+
+  .quote-info-notice {
+    background: rgba(77, 154, 255, 0.1);
+    border-color: rgba(77, 154, 255, 0.2);
+  }
+
+  .btn-quote-calculate {
+    box-shadow: 0 4px 12px rgba(255, 224, 51, 0.2);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 6px 16px rgba(255, 224, 51, 0.3);
     }
   }
 }

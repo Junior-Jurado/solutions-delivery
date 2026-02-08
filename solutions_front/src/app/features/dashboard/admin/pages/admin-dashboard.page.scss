@@ -7,7 +7,8 @@
 // ===============================
 .dashboard-container {
   min-height: 100vh;
-  background-color: $bg-secondary;
+  background-color: var(--bg-secondary);
+  transition: background-color var(--transition-theme);
 }
 
 // ===============================
@@ -33,7 +34,7 @@
 .tabs-navigation {
   display: flex;
   gap: $spacing-sm;
-  border-bottom: 2px solid $border-color;
+  border-bottom: 2px solid var(--border-color);
   margin-bottom: $spacing-xl;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -44,11 +45,11 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: $gray-50;
+    background: var(--bg-tertiary);
   }
 
   &::-webkit-scrollbar-thumb {
-    background: $gray-300;
+    background: var(--border-color);
     border-radius: 2px;
   }
 
@@ -69,8 +70,8 @@
     cursor: pointer;
     font-size: $font-sm;
     font-weight: $font-medium;
-    color: $text-muted;
-    transition: all $transition-base;
+    color: var(--text-secondary);
+    transition: all var(--transition-theme);
     white-space: nowrap;
     flex-shrink: 0;
 
@@ -89,13 +90,13 @@
     }
 
     &:hover {
-      color: $brand-blue;
-      background: $bg-light;
+      color: var(--color-azul);
+      background: var(--bg-tertiary);
     }
 
     &.active {
-      color: $brand-blue;
-      border-bottom-color: $brand-blue;
+      color: var(--color-azul);
+      border-bottom-color: var(--color-azul);
     }
   }
 }
@@ -126,7 +127,7 @@
   gap: $spacing-sm;
   margin-bottom: $spacing-lg;
   padding: $spacing-sm;
-  background: $bg-light;
+  background: var(--bg-tertiary);
   border-radius: $radius-lg;
 
   .sub-tab {
@@ -140,20 +141,20 @@
     cursor: pointer;
     font-size: $font-sm;
     font-weight: $font-medium;
-    color: $text-muted;
-    transition: all $transition-base;
+    color: var(--text-secondary);
+    transition: all var(--transition-theme);
     white-space: nowrap;
 
     &:hover {
-      color: $brand-blue;
-      background: rgba($brand-blue, 0.05);
+      color: var(--color-azul);
+      background: rgba(0, 102, 204, 0.05);
     }
 
     &.active {
-      color: $brand-blue;
-      background: $white;
-      border-color: $brand-blue;
-      box-shadow: 0 2px 8px rgba($brand-blue, 0.15);
+      color: var(--color-azul);
+      background: var(--card-bg);
+      border-color: var(--color-azul);
+      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.15);
     }
   }
 
@@ -179,14 +180,14 @@
 // Sub-tabs secundarios (nivel 2)
 .sub-tabs.secondary {
   margin-top: $spacing-md;
-  background: rgba($gray-100, 0.5);
+  background: var(--bg-secondary);
 
   .sub-tab {
     padding: $spacing-xs $spacing-md;
     font-size: $font-xs;
 
     &.active {
-      background: rgba($white, 0.8);
+      background: var(--card-bg);
     }
   }
 }
@@ -219,10 +220,11 @@
 // CARD STYLES
 // ===============================
 .card {
-  background: $white;
-  border: 1px solid $border-color;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: $radius-md;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--card-shadow);
+  transition: all var(--transition-theme);
 
   &.mb-6 {
     margin-bottom: $spacing-lg;
@@ -230,7 +232,7 @@
 
   .card-header {
     padding: $spacing-lg;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--border-color);
 
     @include respond-to($breakpoint-md) {
       padding: $spacing-md;
@@ -243,7 +245,7 @@
     .card-title {
       font-size: $font-xl;
       font-weight: $font-semibold;
-      color: $text-primary;
+      color: var(--text-primary);
       margin: 0 0 $spacing-sm 0;
       display: flex;
       align-items: center;
@@ -258,13 +260,13 @@
       }
 
       &.alert-title {
-        color: $warning-color;
+        color: var(--color-amarillo);
       }
     }
 
     .card-description {
       font-size: $font-sm;
-      color: $text-muted;
+      color: var(--text-secondary);
       margin: 0;
 
       @include respond-to($breakpoint-xs) {
@@ -297,20 +299,20 @@
   height: 56px;
   border-radius: 50%;
   border: none;
-  background: $brand-blue;
+  background: var(--color-azul);
   color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba($brand-blue, 0.4);
-  transition: all $transition-base;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+  transition: all var(--transition-theme);
   z-index: 1000;
 
   &:hover:not(:disabled) {
-    background: darken($brand-blue, 8%);
+    background: var(--color-azul-dark);
     transform: scale(1.05);
-    box-shadow: 0 6px 16px rgba($brand-blue, 0.5);
+    box-shadow: 0 6px 16px rgba(0, 102, 204, 0.5);
   }
 
   &:active:not(:disabled) {
@@ -323,7 +325,7 @@
   }
 
   &.refreshing {
-    background: $brand-blue;
+    background: var(--color-azul);
 
     app-icon,
     ::ng-deep svg {
@@ -360,4 +362,29 @@
 // ===============================
 .mb-6 {
   margin-bottom: $spacing-lg;
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .tabs-navigation .tab-button {
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  .sub-tabs .sub-tab {
+    &:hover {
+      background: rgba(77, 154, 255, 0.1);
+    }
+  }
+
+  .floating-refresh-btn {
+    box-shadow: 0 4px 12px rgba(77, 154, 255, 0.3);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 6px 16px rgba(77, 154, 255, 0.4);
+    }
+  }
 }

@@ -8,7 +8,6 @@ interface Feature {
   title: string;
   description: string;
   color: 'amarillo' | 'azul' | 'rojo' | 'verde';
-  guacamayaImage: string;
 }
 
 @Component({
@@ -24,25 +23,22 @@ export class FeaturesComponent {
       icon: 'shield',
       iconCategory: 'misc',
       title: 'Seguridad Garantizada',
-      description: 'Seguros completos y rastreo GPS en tiempo real para todos tus envios.',
-      color: 'azul',
-      guacamayaImage: 'assets/guacamayas/guacamaya-service-blue.svg'
+      description: 'Seguros completos y rastreo GPS en tiempo real para todos tus envíos.',
+      color: 'azul'
     },
     {
       icon: 'clock',
       iconCategory: 'delivery',
-      title: 'Entrega Rapida',
-      description: 'Entrega en 24-48 horas en principales ciudades. Express en el mismo dia.',
-      color: 'rojo',
-      guacamayaImage: 'assets/guacamayas/guacamaya-service-red.svg'
+      title: 'Entrega Rápida',
+      description: 'Entrega en 24-48 horas en principales ciudades. Express en el mismo día.',
+      color: 'rojo'
     },
     {
       icon: 'star',
       iconCategory: 'misc',
       title: 'Excelencia',
       description: '98.5% de entregas exitosas. Soporte personalizado 24/7.',
-      color: 'verde',
-      guacamayaImage: 'assets/guacamayas/guacamaya-service-green.svg'
+      color: 'verde'
     }
   ];
 }

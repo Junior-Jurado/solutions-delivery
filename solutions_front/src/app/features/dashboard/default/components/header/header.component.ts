@@ -1,6 +1,7 @@
 import { Component, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '@shared/components/icon/icon.component';
+
 @Component({
   selector: 'app-header',
   standalone: true,
@@ -10,8 +11,13 @@ import { IconComponent } from '@shared/components/icon/icon.component';
 })
 export class HeaderComponent {
   @Output() loginClick = new EventEmitter<void>();
+  @Output() registerClick = new EventEmitter<void>();
 
   onLoginClick(): void {
     this.loginClick.emit();
+  }
+
+  onRegisterClick(): void {
+    this.registerClick.emit();
   }
 }

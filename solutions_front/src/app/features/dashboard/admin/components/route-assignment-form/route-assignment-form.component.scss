@@ -16,17 +16,18 @@
   label {
     font-size: $font-sm;
     font-weight: $font-medium;
-    color: $text-primary;
+    color: var(--text-primary);
+    transition: color var(--transition-theme);
   }
 
   select {
     padding: $spacing-sm $spacing-md;
     font-size: $font-base;
-    color: $text-primary;
-    background-color: $white;
-    border: 1px solid $border-color;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
-    transition: all $transition-base;
+    transition: all var(--transition-theme);
     cursor: pointer;
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
@@ -37,8 +38,8 @@
 
     &:focus {
       outline: none;
-      border-color: $brand-blue;
-      box-shadow: 0 0 0 3px rgba($brand-blue, 0.1);
+      border-color: var(--color-azul);
+      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
     }
   }
 }
@@ -50,34 +51,36 @@
   align-items: center;
   justify-content: center;
   padding: $spacing-xl $spacing-md;
-  border: 2px dashed $border-color;
+  border: 2px dashed var(--border-color);
   border-radius: $radius-md;
-  background: $gray-50;
+  background: var(--bg-secondary);
   text-align: center;
   min-height: 160px;
+  transition: all var(--transition-theme);
 
   .empty-icon {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: $gray-100;
+    background: var(--bg-tertiary);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: $spacing-sm;
-    color: $gray-400;
+    color: var(--text-muted);
+    transition: all var(--transition-theme);
   }
 
   .empty-text {
     font-size: $font-sm;
     font-weight: $font-medium;
-    color: $text-primary;
+    color: var(--text-primary);
     margin: 0 0 $spacing-xs 0;
   }
 
   .empty-hint {
     font-size: $font-xs;
-    color: $text-muted;
+    color: var(--text-muted);
     margin: 0;
     max-width: 240px;
   }
@@ -86,9 +89,11 @@
 .packages-list {
   max-height: 160px;
   overflow-y: auto;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color);
   border-radius: $radius-md;
   padding: $spacing-sm;
+  background: var(--card-bg);
+  transition: all var(--transition-theme);
 
   .package-item {
     display: flex;
@@ -97,22 +102,22 @@
     padding: $spacing-xs;
     cursor: pointer;
     border-radius: $radius-sm;
-    transition: background-color $transition-base;
+    transition: background-color var(--transition-theme);
 
     &:hover {
-      background-color: $bg-light;
+      background-color: var(--bg-secondary);
     }
 
     input[type="checkbox"] {
       width: 16px;
       height: 16px;
       cursor: pointer;
-      accent-color: $brand-blue;
+      accent-color: var(--color-azul);
     }
 
     label {
       font-size: $font-sm;
-      color: $text-primary;
+      color: var(--text-primary);
       cursor: pointer;
       flex: 1;
     }
@@ -124,20 +129,37 @@
   padding: $spacing-sm $spacing-lg;
   font-size: $font-base;
   font-weight: $font-medium;
-  color: $white;
-  background-color: $brand-blue;
+  color: white;
+  background: linear-gradient(135deg, var(--color-azul) 0%, var(--color-azul-dark) 100%);
   border: none;
   border-radius: $radius-md;
   cursor: pointer;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
   margin-top: $spacing-sm;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
 
   &:hover:not(:disabled) {
-    background-color: $brand-blue-dark;
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+    transform: translateY(-1px);
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+  }
+}
+
+// ===== DARK MODE ADJUSTMENTS =====
+@media (prefers-color-scheme: dark) {
+  .form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23b0b0b0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+
+  .submit-button {
+    box-shadow: 0 2px 8px rgba(77, 154, 255, 0.2);
+
+    &:hover:not(:disabled) {
+      box-shadow: 0 4px 12px rgba(77, 154, 255, 0.3);
+    }
   }
 }

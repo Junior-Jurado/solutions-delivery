@@ -13,14 +13,15 @@
   align-items: center;
   justify-content: space-between;
   padding: $spacing-sm $spacing-md;
-  background: $bg-light;
+  background: var(--bg-tertiary);
   border-radius: $radius-md;
   margin-bottom: $spacing-sm;
+  transition: background-color var(--transition-theme);
 
   .total-count {
     font-size: $font-sm;
     font-weight: $font-medium;
-    color: $text-muted;
+    color: var(--text-muted);
   }
 }
 
@@ -37,13 +38,13 @@
     margin: $spacing-md 0 $spacing-sm;
     font-size: $font-lg;
     font-weight: $font-semibold;
-    color: $text-primary;
+    color: var(--text-primary);
   }
 
   p {
     margin: 0;
     font-size: $font-sm;
-    color: $text-muted;
+    color: var(--text-muted);
     max-width: 300px;
     line-height: 1.5;
   }
@@ -54,10 +55,10 @@
   grid-template-columns: 1fr auto auto;
   align-items: center;
   padding: $spacing-md $spacing-lg;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color);
   border-radius: $radius-lg;
-  background: $white;
-  transition: all $transition-base;
+  background: var(--card-bg);
+  transition: all var(--transition-theme);
   gap: $spacing-lg;
 
   @include respond-to($breakpoint-md) {
@@ -66,8 +67,8 @@
   }
 
   &:hover {
-    border-color: $brand-blue;
-    box-shadow: 0 4px 12px rgba($brand-blue, 0.1);
+    border-color: var(--color-azul);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
   }
 
   .delivery-main {
@@ -84,10 +85,10 @@
         align-items: center;
         gap: $spacing-xs;
         font-weight: $font-semibold;
-        color: $text-primary;
+        color: var(--text-primary);
 
         span {
-          color: $brand-blue;
+          color: var(--color-azul);
         }
       }
 
@@ -95,9 +96,10 @@
         padding: 2px $spacing-sm;
         font-size: $font-xs;
         font-weight: $font-medium;
-        background: $bg-light;
-        color: $text-muted;
+        background: var(--bg-tertiary);
+        color: var(--text-muted);
         border-radius: $radius-full;
+        transition: all var(--transition-theme);
       }
     }
 
@@ -107,7 +109,7 @@
       align-items: center;
       gap: $spacing-xs;
       font-size: $font-sm;
-      color: $text-muted;
+      color: var(--text-muted);
       margin-bottom: $spacing-xs;
 
       &:last-child {
@@ -142,23 +144,23 @@
       letter-spacing: 0.3px;
 
       &.badge-success {
-        background: #d1fae5;
-        color: #047857;
+        background: rgba(0, 166, 81, 0.15);
+        color: var(--color-verde);
       }
 
       &.badge-info {
-        background: #dbeafe;
-        color: #1d4ed8;
+        background: rgba(0, 102, 204, 0.15);
+        color: var(--color-azul);
       }
 
       &.badge-warning {
-        background: #fef3c7;
-        color: #b45309;
+        background: rgba(255, 215, 0, 0.15);
+        color: var(--color-amarillo-dark);
       }
 
       &.badge-secondary {
-        background: $gray-200;
-        color: $gray-700;
+        background: var(--bg-tertiary);
+        color: var(--text-secondary);
       }
     }
 
@@ -167,7 +169,7 @@
       align-items: center;
       gap: $spacing-xs;
       font-size: $font-sm;
-      color: $text-primary;
+      color: var(--text-primary);
       font-weight: $font-medium;
     }
 
@@ -176,7 +178,7 @@
       align-items: center;
       gap: 4px;
       font-size: $font-xs;
-      color: $text-disabled;
+      color: var(--text-muted);
     }
   }
 
@@ -189,26 +191,26 @@
       width: 100%;
       justify-content: flex-end;
       padding-top: $spacing-sm;
-      border-top: 1px solid $border-color;
+      border-top: 1px solid var(--border-color);
     }
 
     .btn-view {
       width: 40px;
       height: 40px;
       border-radius: $radius-lg;
-      border: 1px solid $border-color;
-      background: $white;
+      border: 1px solid var(--border-color);
+      background: var(--bg-primary);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: $text-muted;
-      transition: all $transition-base;
+      color: var(--text-muted);
+      transition: all var(--transition-theme);
 
       &:hover {
-        background: $brand-blue;
-        border-color: $brand-blue;
-        color: $white;
+        background: var(--color-azul);
+        border-color: var(--color-azul);
+        color: white;
         transform: scale(1.05);
       }
     }
@@ -223,8 +225,8 @@
 
   .loading-item {
     height: 90px;
-    background: $white;
-    border: 1px solid $border-color;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: $radius-lg;
     position: relative;
     overflow: hidden;
@@ -238,7 +240,7 @@
       background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba($brand-blue, 0.05) 50%,
+        rgba(0, 102, 204, 0.05) 50%,
         transparent 100%
       );
       animation: shimmer 1.5s infinite;
@@ -252,5 +254,35 @@
   }
   100% {
     transform: translateX(100%);
+  }
+}
+
+// ===== DARK MODE ADJUSTMENTS =====
+@media (prefers-color-scheme: dark) {
+  .delivery-item:hover {
+    box-shadow: 0 4px 12px rgba(77, 154, 255, 0.15);
+  }
+
+  .loading-container .loading-item .loading-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(77, 154, 255, 0.08) 50%,
+      transparent 100%
+    );
+  }
+
+  .delivery-meta .badge {
+    &.badge-success {
+      background: rgba(51, 212, 127, 0.15);
+    }
+
+    &.badge-info {
+      background: rgba(77, 154, 255, 0.15);
+    }
+
+    &.badge-warning {
+      background: rgba(255, 224, 51, 0.12);
+    }
   }
 }

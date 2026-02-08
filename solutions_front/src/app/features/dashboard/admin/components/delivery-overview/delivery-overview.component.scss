@@ -18,15 +18,16 @@
 }
 
 .overview-card {
-  background: $white;
-  border: 1px solid $border-color;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: $radius-lg;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
 
   &:hover {
-    box-shadow: $shadow-md;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
   }
 
   .card-header {
@@ -34,19 +35,22 @@
     align-items: center;
     gap: $spacing-sm;
     padding: $spacing-md $spacing-lg;
-    border-bottom: 1px solid $border-color;
-    background: $bg-light;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-tertiary);
+    transition: all var(--transition-theme);
 
     h3 {
       font-size: $font-base;
       font-weight: $font-semibold;
-      color: $text-primary;
+      color: var(--text-primary);
       margin: 0;
     }
   }
 
   .card-content {
     padding: $spacing-lg;
+    background: var(--card-bg);
+    transition: background-color var(--transition-theme);
 
     .big-number {
       font-size: 2.5rem;
@@ -61,7 +65,7 @@
 
     .sub-text {
       font-size: $font-sm;
-      color: $text-muted;
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       flex-wrap: wrap;
@@ -72,28 +76,28 @@
       font-weight: $font-medium;
 
       &.success {
-        color: $success-color;
+        color: var(--color-verde);
       }
 
       &.warning {
-        color: $warning-color;
+        color: var(--color-amarillo-dark);
       }
     }
 
     .stat-separator {
-      color: $text-disabled;
+      color: var(--text-muted);
     }
 
     .progress-bar {
       margin-top: $spacing-md;
       height: 6px;
-      background: $gray-200;
+      background: var(--bg-tertiary);
       border-radius: $radius-full;
       overflow: hidden;
 
       .progress-fill {
         height: 100%;
-        background: linear-gradient(90deg, $brand-blue, $success-color);
+        background: linear-gradient(90deg, var(--color-azul) 0%, var(--color-verde) 100%);
         border-radius: $radius-full;
         transition: width 0.5s ease;
       }
@@ -101,26 +105,63 @@
   }
 
   &.primary {
-    border-top: 3px solid $brand-blue;
+    border-top: 3px solid var(--color-azul);
 
     .card-content .big-number {
-      color: $brand-blue;
+      color: var(--color-azul);
     }
   }
 
   &.warning {
-    border-top: 3px solid $warning-color;
+    border-top: 3px solid var(--color-amarillo);
 
     .card-content .big-number {
-      color: $warning-color;
+      color: var(--color-amarillo-dark);
     }
   }
 
   &.success {
-    border-top: 3px solid $success-color;
+    border-top: 3px solid var(--color-verde);
 
     .card-content .big-number {
-      color: $success-color;
+      color: var(--color-verde);
+    }
+  }
+}
+
+// ===== DARK MODE ADJUSTMENTS =====
+@media (prefers-color-scheme: dark) {
+  .overview-card {
+    &:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-content .progress-bar .progress-fill {
+      background: linear-gradient(90deg, #4D9AFF 0%, #33D47F 100%);
+    }
+
+    &.primary {
+      border-top-color: #4D9AFF;
+
+      .card-content .big-number {
+        color: #4D9AFF;
+      }
+    }
+
+    &.warning {
+      border-top-color: #FFE033;
+
+      .card-content .big-number {
+        color: #FFE033;
+      }
+    }
+
+    &.success {
+      border-top-color: #33D47F;
+
+      .card-content .big-number {
+        color: #33D47F;
+      }
     }
   }
 }

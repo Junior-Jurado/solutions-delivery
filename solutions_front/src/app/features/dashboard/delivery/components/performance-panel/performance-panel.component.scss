@@ -8,7 +8,7 @@
   align-items: center;
   justify-content: center;
   padding: $spacing-xl;
-  color: $text-secondary;
+  color: var(--text-secondary);
 
   p {
     margin-top: $spacing-md;
@@ -33,14 +33,14 @@
 }
 
 .stat-card {
-  background: white;
+  background: var(--card-bg);
   padding: $spacing-lg;
   border-radius: $radius-lg;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-sm);
 
   .stat-label {
     font-size: $font-sm;
-    color: $text-secondary;
+    color: var(--text-secondary);
     margin-bottom: $spacing-sm;
   }
 
@@ -50,28 +50,28 @@
     margin-bottom: $spacing-xs;
 
     &.primary {
-      color: $brand-blue;
+      color: var(--color-azul);
     }
 
     &.success {
-      color: $success-color;
+      color: var(--color-verde);
     }
 
     &.warning {
-      color: $warning-color;
+      color: var(--color-amarillo);
     }
 
     &.rating {
-      color: $warning-color;
+      color: var(--color-amarillo);
     }
   }
 
   .stat-detail {
     font-size: $font-sm;
-    color: $text-muted;
+    color: var(--text-secondary);
 
     &.success {
-      color: $success-color;
+      color: var(--color-verde);
     }
   }
 }
@@ -87,14 +87,14 @@
 }
 
 .card {
-  background: white;
+  background: var(--card-bg);
   border-radius: $radius-lg;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
 
   .card-header {
     padding: $spacing-xl;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--border-color);
 
     @include respond-to($breakpoint-md) {
       padding: $spacing-lg;
@@ -103,12 +103,12 @@
     .card-title {
       font-size: $font-lg;
       font-weight: $font-bold;
-      color: $text-primary;
+      color: var(--text-primary);
       margin: 0 0 $spacing-xs 0;
     }
 
     .card-description {
-      color: $text-secondary;
+      color: var(--text-secondary);
       font-size: $font-sm;
       margin: 0;
     }
@@ -133,12 +133,13 @@
     justify-content: space-between;
     align-items: center;
     padding: $spacing-md;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
     border-radius: $radius-base;
+    background: var(--card-bg);
 
     .performance-day {
       font-weight: $font-medium;
-      color: $text-primary;
+      color: var(--text-primary);
     }
 
     .performance-stats {
@@ -151,11 +152,11 @@
 
         .value {
           font-weight: $font-semibold;
-          color: $text-primary;
+          color: var(--text-primary);
         }
 
         .target {
-          color: $text-secondary;
+          color: var(--text-secondary);
         }
       }
     }
@@ -169,8 +170,9 @@
 
   .review-item {
     padding: $spacing-md;
-    border: 1px solid $border-color;
+    border: 1px solid var(--border-color);
     border-radius: $radius-base;
+    background: var(--card-bg);
 
     .review-header {
       display: flex;
@@ -184,30 +186,30 @@
 
         .star {
           font-size: $font-base;
-          color: $text-muted;
+          color: var(--text-secondary);
 
           &.filled {
-            color: $warning-color;
+            color: var(--color-amarillo);
           }
         }
       }
 
       .review-date {
         font-size: $font-xs;
-        color: $text-secondary;
+        color: var(--text-secondary);
       }
     }
 
     .review-comment {
       font-size: $font-sm;
-      color: $text-secondary;
+      color: var(--text-secondary);
       margin-bottom: $spacing-xs;
       font-style: italic;
     }
 
     .review-client {
       font-size: $font-xs;
-      color: $text-muted;
+      color: var(--text-secondary);
     }
   }
 }
@@ -222,13 +224,13 @@
   font-weight: $font-medium;
 
   &.badge-success {
-    background: rgba($success-color, 0.1);
-    color: $success-color;
+    background: rgba(var(--color-verde-rgb, 34, 197, 94), 0.1);
+    color: var(--color-verde);
   }
 
   &.badge-secondary {
-    background: $bg-secondary;
-    color: $text-secondary;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
   }
 }
 
@@ -239,4 +241,29 @@
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+// Dark mode adjustments
+:host-context([data-theme="dark"]) {
+  .stat-card,
+  .card {
+    border: 1px solid var(--border-color);
+  }
+
+  .performance-item,
+  .review-item {
+    background: var(--bg-secondary);
+  }
+
+  .badge {
+    &.badge-success {
+      background: rgba(var(--color-verde-rgb, 34, 197, 94), 0.2);
+    }
+  }
+
+  .loading-state {
+    app-icon {
+      opacity: 0.7;
+    }
+  }
 }

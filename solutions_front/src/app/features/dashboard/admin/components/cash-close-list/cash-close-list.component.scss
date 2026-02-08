@@ -6,7 +6,9 @@
 // LOADING STATE
 // ===============================
 .loading-container {
-  @include flex-center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
   padding: $spacing-3xl;
   gap: $spacing-md;
@@ -14,21 +16,21 @@
   .spinner {
     width: 48px;
     height: 48px;
-    border: 4px solid $gray-200;
-    border-top-color: $brand-blue;
+    border: 4px solid var(--bg-tertiary);
+    border-top-color: var(--color-azul);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
 
   p {
-    color: $text-muted;
+    color: var(--text-muted);
     font-size: $font-sm;
   }
 }
 
 @keyframes spin {
-  to { 
-    transform: rotate(360deg); 
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -38,17 +40,18 @@
 .empty-state {
   text-align: center;
   padding: $spacing-3xl;
-  color: $text-muted;
+  color: var(--text-muted);
 
   svg {
-    color: $gray-300;
+    color: var(--text-muted);
     margin-bottom: $spacing-md;
+    opacity: 0.5;
   }
 
   h3 {
     font-size: $font-lg;
     font-weight: $font-semibold;
-    color: $text-primary;
+    color: var(--text-primary);
     margin-bottom: $spacing-sm;
   }
 
@@ -70,14 +73,15 @@
 // CLOSE ITEM
 // ===============================
 .close-item {
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color);
   border-radius: $radius-md;
-  background: $white;
+  background: var(--card-bg);
   overflow: hidden;
-  transition: box-shadow $transition-base;
+  transition: all var(--transition-theme);
 
   &:hover {
-    box-shadow: $shadow-md;
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-azul);
   }
 
   .close-header {
@@ -85,9 +89,10 @@
     justify-content: space-between;
     align-items: flex-start;
     padding: $spacing-lg;
-    background: linear-gradient(135deg, $gray-50 0%, $white 100%);
-    border-bottom: 1px solid $border-color;
+    background: var(--bg-tertiary);
+    border-bottom: 1px solid var(--border-color);
     gap: $spacing-md;
+    transition: all var(--transition-theme);
 
     @include respond-to($breakpoint-sm) {
       flex-direction: column;
@@ -100,7 +105,7 @@
       .close-id {
         font-size: $font-xl;
         font-weight: $font-bold;
-        color: $text-primary;
+        color: var(--text-primary);
         margin-bottom: $spacing-sm;
 
         @include respond-to($breakpoint-xs) {
@@ -116,7 +121,7 @@
 
         .close-date {
           font-size: $font-sm;
-          color: $text-muted;
+          color: var(--text-muted);
 
           @include respond-to($breakpoint-xs) {
             font-size: $font-xs;
@@ -135,14 +140,14 @@
 
       .total-label {
         font-size: $font-sm;
-        color: $text-muted;
+        color: var(--text-muted);
         margin-bottom: 0.25rem;
       }
 
       .total-amount {
         font-size: 1.75rem;
         font-weight: $font-bold;
-        color: $brand-blue;
+        color: var(--color-azul);
 
         @include respond-to($breakpoint-xs) {
           font-size: 1.5rem;
@@ -153,8 +158,9 @@
 
   .close-summary {
     padding: $spacing-lg;
-    background: $white;
-    border-bottom: 1px solid $border-color;
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
+    transition: all var(--transition-theme);
 
     @include respond-to($breakpoint-sm) {
       padding: $spacing-md;
@@ -195,19 +201,19 @@
         }
 
         svg {
-          color: $white;
+          color: white;
         }
 
         &.cash {
-          background: linear-gradient(135deg, $success-color 0%, darken($success-color, 10%) 100%);
+          background: linear-gradient(135deg, var(--color-verde) 0%, var(--color-verde-dark) 100%);
         }
 
         &.cod {
-          background: linear-gradient(135deg, $warning-color 0%, darken($warning-color, 10%) 100%);
+          background: linear-gradient(135deg, var(--color-amarillo) 0%, var(--color-amarillo-dark) 100%);
         }
 
         &.credit {
-          background: linear-gradient(135deg, $brand-blue 0%, darken($brand-blue, 10%) 100%);
+          background: linear-gradient(135deg, var(--color-azul) 0%, var(--color-azul-dark) 100%);
         }
 
         &.guides {
@@ -221,7 +227,7 @@
 
         .summary-label {
           font-size: $font-xs;
-          color: $text-muted;
+          color: var(--text-muted);
           margin-bottom: 0.125rem;
 
           @include respond-to($breakpoint-xs) {
@@ -232,7 +238,7 @@
         .summary-value {
           font-size: $font-base;
           font-weight: $font-semibold;
-          color: $text-primary;
+          color: var(--text-primary);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -247,10 +253,11 @@
 
   .close-details {
     padding: $spacing-lg;
-    background: $gray-50;
+    background: var(--bg-secondary);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: $spacing-md;
+    transition: all var(--transition-theme);
 
     @include respond-to($breakpoint-md) {
       grid-template-columns: repeat(2, 1fr);
@@ -273,12 +280,12 @@
       }
 
       .detail-label {
-        color: $text-muted;
+        color: var(--text-muted);
         font-weight: $font-medium;
       }
 
       .detail-value {
-        color: $text-primary;
+        color: var(--text-primary);
         font-weight: $font-semibold;
       }
     }
@@ -289,9 +296,10 @@
     justify-content: space-between;
     align-items: center;
     padding: $spacing-md $spacing-lg;
-    background: $white;
-    border-top: 1px solid $border-color;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border-color);
     gap: $spacing-md;
+    transition: all var(--transition-theme);
 
     @include respond-to($breakpoint-sm) {
       flex-direction: column;
@@ -304,14 +312,14 @@
       align-items: center;
       gap: $spacing-xs;
       font-size: $font-sm;
-      color: $text-muted;
+      color: var(--text-muted);
 
       @include respond-to($breakpoint-xs) {
         font-size: $font-xs;
       }
 
       svg {
-        color: $text-muted;
+        color: var(--text-muted);
         flex-shrink: 0;
       }
     }
@@ -336,8 +344,8 @@
   white-space: nowrap;
 
   &.badge-secondary {
-    background: #e0e7ff;
-    color: #4f46e5;
+    background: rgba(0, 102, 204, 0.15);
+    color: var(--color-azul);
   }
 }
 
@@ -350,7 +358,7 @@
   justify-content: center;
   gap: $spacing-md;
   padding: $spacing-lg 0;
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--border-color);
   margin-top: $spacing-lg;
 
   @include respond-to($breakpoint-sm) {
@@ -364,17 +372,57 @@
 
   .pagination-info {
     font-size: $font-sm;
-    color: $text-muted;
+    color: var(--text-muted);
     min-width: 120px;
     text-align: center;
   }
 
   .btn {
     min-width: 100px;
+    padding: $spacing-sm $spacing-md;
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all var(--transition-theme);
+
+    &:hover:not(:disabled) {
+      background: var(--bg-secondary);
+      border-color: var(--color-azul);
+      color: var(--color-azul);
+    }
 
     &:disabled {
       opacity: 0.5;
       cursor: not-allowed;
     }
+  }
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .close-item:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .summary-item .summary-icon {
+    &.cash {
+      background: linear-gradient(135deg, #33D47F 0%, #00A651 100%);
+    }
+
+    &.cod {
+      background: linear-gradient(135deg, #FFE033 0%, #CCB300 100%);
+    }
+
+    &.credit {
+      background: linear-gradient(135deg, #4D9AFF 0%, #0052A3 100%);
+    }
+  }
+
+  .badge.badge-secondary {
+    background: rgba(77, 154, 255, 0.15);
   }
 }

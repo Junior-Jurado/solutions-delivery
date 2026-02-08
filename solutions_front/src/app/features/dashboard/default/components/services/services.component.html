@@ -11,13 +11,6 @@
 
     <div class="services-grid">
       <div *ngFor="let service of services" class="service-card" [ngClass]="service.borderColor">
-        <!-- Guacamaya decorativa -->
-        <img
-          [src]="service.guacamayaImage"
-          alt=""
-          class="service-guacamaya guacamaya-hover"
-        />
-
         <div
           class="service-icon"
           [class.bg-azul]="service.color === 'blue'"

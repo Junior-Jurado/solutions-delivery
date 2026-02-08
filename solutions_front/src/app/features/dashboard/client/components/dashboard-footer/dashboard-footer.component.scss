@@ -3,9 +3,10 @@
 @use "mixins" as *;
 
 .dashboard-footer {
-  background: linear-gradient(135deg, $brand-black 0%, $brand-black-light 100%);
+  background: linear-gradient(135deg, #1A1A1A 0%, #2D2D2D 100%);
   padding: $spacing-xl 0;
   margin-top: auto;
+  transition: all var(--transition-theme);
 
   .footer-content {
     max-width: 1400px;
@@ -22,12 +23,82 @@
       border-radius: $radius-base;
       backdrop-filter: blur(10px);
       color: white;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: rgba(0, 102, 204, 0.3);
+        transform: scale(1.05);
+      }
     }
 
     p {
       margin: 0;
       color: rgba(255, 255, 255, 0.8);
       font-size: $font-sm;
+    }
+
+    // Colombian colors bar
+    .colombian-colors {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin-top: $spacing-md;
+      border-radius: $radius-sm;
+      overflow: hidden;
+      max-width: 200px;
+
+      .color-bar {
+        height: 3px;
+        flex: 1;
+        transition: height 0.3s ease;
+
+        &.amarillo {
+          background-color: var(--color-amarillo);
+        }
+
+        &.azul {
+          background-color: var(--color-azul);
+        }
+
+        &.rojo {
+          background-color: var(--color-rojo);
+        }
+
+        &.verde {
+          background-color: var(--color-verde);
+        }
+      }
+
+      &:hover .color-bar {
+        height: 5px;
+      }
+    }
+  }
+}
+
+// ===== DARK MODE ADJUSTMENTS =====
+@media (prefers-color-scheme: dark) {
+  .dashboard-footer {
+    background: linear-gradient(135deg, #0D0D0D 0%, #1A1A1A 100%);
+
+    .footer-content {
+      .colombian-colors .color-bar {
+        &.amarillo {
+          background-color: #FFE033;
+        }
+
+        &.azul {
+          background-color: #4D9AFF;
+        }
+
+        &.rojo {
+          background-color: #FF5C5C;
+        }
+
+        &.verde {
+          background-color: #33D47F;
+        }
+      }
     }
   }
 }

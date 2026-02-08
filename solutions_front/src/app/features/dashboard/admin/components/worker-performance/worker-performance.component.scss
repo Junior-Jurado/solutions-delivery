@@ -13,25 +13,27 @@
   align-items: center;
   justify-content: space-between;
   padding: $spacing-md;
-  border: 1px solid $border-color;
+  border: 1px solid var(--border-color);
   border-radius: $radius-md;
-  transition: all $transition-base;
+  background: var(--card-bg);
+  transition: all var(--transition-theme);
 
   &:hover {
-    background-color: $bg-light;
-    border-color: $brand-blue;
+    background-color: var(--bg-secondary);
+    border-color: var(--color-azul);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.1);
   }
 
   .worker-info {
     .worker-name {
       font-weight: $font-medium;
-      color: $text-primary;
+      color: var(--text-primary);
       margin-bottom: $spacing-xs;
     }
 
     .worker-deliveries {
       font-size: $font-sm;
-      color: $text-muted;
+      color: var(--text-muted);
     }
   }
 
@@ -44,13 +46,13 @@
       border-radius: $radius-full;
 
       &.badge-success {
-        background-color: $success-light;
-        color: $success-color;
+        background-color: rgba(0, 166, 81, 0.15);
+        color: var(--color-verde);
       }
 
       &.badge-secondary {
-        background-color: $gray-100;
-        color: $gray-600;
+        background-color: var(--bg-tertiary);
+        color: var(--text-secondary);
       }
     }
   }
@@ -64,8 +66,8 @@
 
   .loading-item {
     height: 64px;
-    background: $bg-primary;
-    border: 1px solid $border-color;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: $radius-md;
     position: relative;
     overflow: hidden;
@@ -79,7 +81,7 @@
       background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba($brand-blue, 0.05) 50%,
+        rgba(0, 102, 204, 0.05) 50%,
         transparent 100%
       );
       animation: shimmer 1.5s infinite;
@@ -93,5 +95,25 @@
   }
   100% {
     transform: translateX(100%);
+  }
+}
+
+// ===== DARK MODE ADJUSTMENTS =====
+@media (prefers-color-scheme: dark) {
+  .worker-item:hover {
+    box-shadow: 0 4px 12px rgba(77, 154, 255, 0.15);
+  }
+
+  .loading-container .loading-item .loading-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(77, 154, 255, 0.08) 50%,
+      transparent 100%
+    );
+  }
+
+  .worker-badge .badge.badge-success {
+    background-color: rgba(51, 212, 127, 0.15);
   }
 }

@@ -663,7 +663,7 @@ func GetPendingPickups() ([]models.PendingGuide, error) {
 			SELECT 1 FROM delivery_assignments da
 			WHERE da.guide_id = sg.guide_id
 			AND da.assignment_type = 'PICKUP'
-			AND da.status NOT IN ('CANCELLED')
+			AND da.status IN ('PENDING', 'IN_PROGRESS')
 		)
 		ORDER BY sg.created_at ASC
 	`
@@ -748,7 +748,7 @@ func GetPendingDeliveries() ([]models.PendingGuide, error) {
 			SELECT 1 FROM delivery_assignments da
 			WHERE da.guide_id = sg.guide_id
 			AND da.assignment_type = 'DELIVERY'
-			AND da.status NOT IN ('CANCELLED')
+			AND da.status IN ('PENDING', 'IN_PROGRESS')
 		)
 		ORDER BY sg.created_at ASC
 	`

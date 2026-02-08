@@ -3,13 +3,14 @@
 @use "mixins" as *;
 
 .delivery-card {
-  border: 1px solid $border-color;
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
   border-radius: $radius-base;
   padding: $spacing-lg;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
 
   &:hover {
-    box-shadow: $shadow-md;
+    box-shadow: var(--shadow-md);
   }
 
   .delivery-header {
@@ -27,7 +28,7 @@
       .delivery-id {
         font-size: $font-lg;
         font-weight: $font-semibold;
-        color: $text-primary;
+        color: var(--text-primary);
         margin-bottom: $spacing-xs;
       }
 
@@ -36,7 +37,7 @@
         align-items: center;
         gap: $spacing-xs;
         font-size: $font-sm;
-        color: $text-secondary;
+        color: var(--text-secondary);
       }
     }
 
@@ -65,25 +66,25 @@
         gap: $spacing-xs;
         font-size: $font-sm;
         font-weight: $font-medium;
-        color: $text-primary;
+        color: var(--text-primary);
         margin-bottom: $spacing-xs;
       }
 
       .detail-value {
         font-size: $font-sm;
-        color: $text-primary;
+        color: var(--text-primary);
         margin-bottom: $spacing-xs;
 
         &.muted {
-          color: $text-secondary;
+          color: var(--text-secondary);
         }
       }
     }
   }
 
   .delivery-instructions {
-    background: $warning-light;
-    border: 1px solid $warning-color;
+    background: rgba(var(--color-amarillo-rgb, 245, 158, 11), 0.1);
+    border: 1px solid var(--color-amarillo);
     border-radius: $radius-base;
     padding: $spacing-md;
     margin-bottom: $spacing-lg;
@@ -91,13 +92,13 @@
     .instructions-label {
       font-size: $font-sm;
       font-weight: $font-medium;
-      color: $warning-dark;
+      color: var(--color-amarillo-dark, #b45309);
       margin-bottom: $spacing-xs;
     }
 
     .instructions-text {
       font-size: $font-sm;
-      color: $warning-dark;
+      color: var(--color-amarillo-dark, #b45309);
     }
   }
 
@@ -126,14 +127,23 @@
     gap: $spacing-xs;
     margin-top: $spacing-md;
     padding: $spacing-sm $spacing-md;
-    background: rgba($info-color, 0.1);
+    background: rgba(var(--color-azul-rgb, 59, 130, 246), 0.1);
     border-radius: $radius-sm;
     font-size: $font-xs;
-    color: $info-dark;
+    color: var(--color-azul-dark);
 
     app-icon {
-      color: $info-color;
+      color: var(--color-azul);
       flex-shrink: 0;
+    }
+
+    &.in-progress {
+      background: rgba(var(--color-verde-rgb, 34, 197, 94), 0.1);
+      color: var(--color-verde-dark, #15803d);
+
+      app-icon {
+        color: var(--color-verde);
+      }
     }
   }
 }
@@ -148,33 +158,33 @@
   font-weight: $font-medium;
 
   &.badge-primary {
-    background: rgba($brand-blue, 0.1);
-    color: $brand-blue;
+    background: rgba(var(--color-azul-rgb, 59, 130, 246), 0.1);
+    color: var(--color-azul);
   }
 
   &.badge-success {
-    background: rgba($success-color, 0.1);
-    color: $success-color;
+    background: rgba(var(--color-verde-rgb, 34, 197, 94), 0.1);
+    color: var(--color-verde);
   }
 
   &.badge-warning {
-    background: rgba($warning-color, 0.1);
-    color: $warning-color;
+    background: rgba(var(--color-amarillo-rgb, 245, 158, 11), 0.1);
+    color: var(--color-amarillo);
   }
 
   &.badge-error {
-    background: rgba($error-color, 0.1);
-    color: $error-color;
+    background: rgba(var(--color-rojo-rgb, 239, 68, 68), 0.1);
+    color: var(--color-rojo);
   }
 
   &.badge-info {
-    background: rgba($info-color, 0.1);
-    color: $info-color;
+    background: rgba(var(--color-azul-rgb, 59, 130, 246), 0.1);
+    color: var(--color-azul);
   }
 
   &.badge-secondary {
-    background: $bg-secondary;
-    color: $text-secondary;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
   }
 }
 
@@ -190,7 +200,7 @@
   font-weight: $font-medium;
   font-size: $font-base;
   cursor: pointer;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
   white-space: nowrap;
 
   &:disabled {
@@ -199,30 +209,69 @@
   }
 
   &.btn-primary {
-    background: $brand-blue;
+    background: var(--color-azul);
     color: white;
 
     &:hover:not(:disabled) {
-      background: darken($brand-blue, 10%);
+      background: var(--color-azul-dark);
     }
   }
 
   &.btn-secondary {
-    background: $bg-secondary;
-    color: $text-primary;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
 
     &:hover:not(:disabled) {
-      background: darken($bg-secondary, 5%);
+      background: var(--bg-tertiary);
     }
   }
 
   &.btn-outline {
     background: transparent;
-    border: 1px solid $border-color;
-    color: $text-primary;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
 
     &:hover:not(:disabled) {
-      background: $bg-secondary;
+      background: var(--bg-secondary);
+    }
+  }
+}
+
+// Dark mode adjustments
+:host-context([data-theme="dark"]) {
+  .delivery-card {
+    .delivery-instructions {
+      background: rgba(var(--color-amarillo-rgb, 245, 158, 11), 0.15);
+    }
+
+    .status-change-info {
+      background: rgba(var(--color-azul-rgb, 59, 130, 246), 0.15);
+
+      &.in-progress {
+        background: rgba(var(--color-verde-rgb, 34, 197, 94), 0.15);
+      }
+    }
+  }
+
+  .badge {
+    &.badge-primary,
+    &.badge-success,
+    &.badge-warning,
+    &.badge-error,
+    &.badge-info {
+      background: rgba(var(--color-azul-rgb, 59, 130, 246), 0.2);
+    }
+
+    &.badge-success {
+      background: rgba(var(--color-verde-rgb, 34, 197, 94), 0.2);
+    }
+
+    &.badge-warning {
+      background: rgba(var(--color-amarillo-rgb, 245, 158, 11), 0.2);
+    }
+
+    &.badge-error {
+      background: rgba(var(--color-rojo-rgb, 239, 68, 68), 0.2);
     }
   }
 }

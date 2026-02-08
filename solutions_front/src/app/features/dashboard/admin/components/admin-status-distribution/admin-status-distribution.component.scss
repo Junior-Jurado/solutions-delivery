@@ -12,6 +12,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: $spacing-sm;
+  border-radius: $radius-md;
+  transition: all var(--transition-theme);
+
+  &:hover {
+    background: var(--bg-secondary);
+  }
 
   .status-info {
     display: flex;
@@ -24,25 +31,29 @@
       border-radius: $radius-full;
 
       &.status-dot-success {
-        background-color: $success-color;
+        background-color: var(--color-verde);
+        box-shadow: 0 0 8px rgba(0, 166, 81, 0.4);
       }
 
       &.status-dot-primary {
-        background-color: $brand-blue;
+        background-color: var(--color-azul);
+        box-shadow: 0 0 8px rgba(0, 102, 204, 0.4);
       }
 
       &.status-dot-warning {
-        background-color: $warning-color;
+        background-color: var(--color-amarillo);
+        box-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
       }
 
       &.status-dot-error {
-        background-color: $brand-red;
+        background-color: var(--color-rojo);
+        box-shadow: 0 0 8px rgba(227, 30, 36, 0.4);
       }
     }
 
     .status-name {
       font-weight: $font-medium;
-      color: $text-primary;
+      color: var(--text-primary);
     }
   }
 
@@ -51,12 +62,12 @@
 
     .status-count {
       font-weight: $font-bold;
-      color: $text-primary;
+      color: var(--text-primary);
     }
 
     .status-percentage {
       font-size: $font-sm;
-      color: $text-muted;
+      color: var(--text-muted);
     }
   }
 }
@@ -69,7 +80,7 @@
 
   .loading-item {
     height: 32px;
-    background: $bg-light;
+    background: var(--bg-secondary);
     border-radius: $radius-md;
     position: relative;
     overflow: hidden;
@@ -83,7 +94,7 @@
       background: linear-gradient(
         90deg,
         transparent 0%,
-        rgba($brand-blue, 0.05) 50%,
+        rgba(0, 102, 204, 0.05) 50%,
         transparent 100%
       );
       animation: shimmer 1.5s infinite;
@@ -97,5 +108,39 @@
   }
   100% {
     transform: translateX(100%);
+  }
+}
+
+// ===== DARK MODE ADJUSTMENTS =====
+@media (prefers-color-scheme: dark) {
+  .status-item .status-info .status-dot {
+    &.status-dot-success {
+      background-color: #33D47F;
+      box-shadow: 0 0 8px rgba(51, 212, 127, 0.4);
+    }
+
+    &.status-dot-primary {
+      background-color: #4D9AFF;
+      box-shadow: 0 0 8px rgba(77, 154, 255, 0.4);
+    }
+
+    &.status-dot-warning {
+      background-color: #FFE033;
+      box-shadow: 0 0 8px rgba(255, 224, 51, 0.4);
+    }
+
+    &.status-dot-error {
+      background-color: #FF5C5C;
+      box-shadow: 0 0 8px rgba(255, 92, 92, 0.4);
+    }
+  }
+
+  .loading-container .loading-item .loading-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(77, 154, 255, 0.08) 50%,
+      transparent 100%
+    );
   }
 }

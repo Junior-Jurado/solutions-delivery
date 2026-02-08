@@ -1,0 +1,21 @@
+// ===============================
+// INTER FONT - LOCAL VARIABLE FONT
+// ===============================
+// Usando la fuente variable para mejor rendimiento
+// Un solo archivo soporta todos los pesos (100-900)
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/assets/fonts/Inter/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/assets/fonts/Inter/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+}

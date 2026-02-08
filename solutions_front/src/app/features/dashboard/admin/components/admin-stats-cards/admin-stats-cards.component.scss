@@ -24,11 +24,11 @@
 // STAT CARD
 // ===============================
 .stat-card {
-  background: $bg-primary;
-  border: 1px solid $border-color;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: $radius-md;
   padding: $spacing-lg;
-  transition: all $transition-base;
+  transition: all var(--transition-theme);
   position: relative;
   overflow: hidden;
 
@@ -44,28 +44,28 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: $brand-blue;
-    transition: height $transition-base;
+    background: var(--color-azul);
+    transition: height var(--transition-theme);
   }
 
   &[data-type="primary"]::before {
-    background: $brand-blue;
+    background: var(--color-azul);
   }
 
   &[data-type="success"]::before {
-    background: $success-color;
+    background: var(--color-verde);
   }
 
   &[data-type="warning"]::before {
-    background: $brand-red;
+    background: var(--color-rojo);
   }
 
   &[data-type="info"]::before {
-    background: $brand-black;
+    background: var(--color-amarillo);
   }
 
   &:hover {
-    box-shadow: $shadow-md;
+    box-shadow: var(--shadow-md);
     transform: translateY(-2px);
 
     &::before {
@@ -81,36 +81,36 @@
 
     app-icon,
     svg {
-      color: $text-muted;
+      color: var(--text-secondary);
       flex-shrink: 0;
     }
 
     h3 {
       font-size: $font-sm;
       font-weight: $font-medium;
-      color: $text-muted;
+      color: var(--text-secondary);
       margin: 0;
     }
   }
 
   &[data-type="primary"] .stat-header app-icon,
   &[data-type="primary"] .stat-header svg {
-    color: $brand-blue;
+    color: var(--color-azul);
   }
 
   &[data-type="success"] .stat-header app-icon,
   &[data-type="success"] .stat-header svg {
-    color: $success-color;
+    color: var(--color-verde);
   }
 
   &[data-type="warning"] .stat-header app-icon,
   &[data-type="warning"] .stat-header svg {
-    color: $brand-red;
+    color: var(--color-rojo);
   }
 
   &[data-type="info"] .stat-header app-icon,
   &[data-type="info"] .stat-header svg {
-    color: $brand-black;
+    color: var(--color-amarillo);
   }
 
   .stat-value {
@@ -118,48 +118,49 @@
     font-weight: $font-bold;
     margin-bottom: $spacing-xs;
     line-height: 1.2;
+    color: var(--text-primary);
 
     @include respond-to($breakpoint-xs) {
       font-size: 1.5rem;
     }
 
     &.primary {
-      color: $brand-blue;
+      color: var(--color-azul);
     }
 
     &.success {
-      color: $success-color;
+      color: var(--color-verde);
     }
 
     &.warning {
-      color: $brand-red;
+      color: var(--color-rojo);
     }
 
     &.info {
-      color: $brand-black;
+      color: var(--color-amarillo);
     }
   }
 
   .stat-subtitle {
     font-size: $font-xs;
-    color: $text-muted;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     gap: $spacing-xs;
 
     &.positive {
-      color: $success-color;
+      color: var(--color-verde);
 
       app-icon {
-        color: $success-color;
+        color: var(--color-verde);
       }
     }
 
     &.negative {
-      color: $error-color;
+      color: var(--color-rojo);
 
       app-icon {
-        color: $error-color;
+        color: var(--color-rojo);
       }
     }
 
@@ -188,8 +189,8 @@
   }
 
   .loading-card {
-    background: $bg-primary;
-    border: 1px solid $border-color;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: $radius-md;
     padding: $spacing-lg;
     height: 120px;
@@ -206,7 +207,7 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba($brand-blue, 0.05) 50%,
+      rgba(0, 102, 204, 0.05) 50%,
       transparent 100%
     );
     animation: shimmer 1.5s infinite;
@@ -219,5 +220,25 @@
   }
   100% {
     transform: translateX(100%);
+  }
+}
+
+// ===============================
+// DARK MODE ADJUSTMENTS
+// ===============================
+@media (prefers-color-scheme: dark) {
+  .stat-card {
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  .stats-loading .loading-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(77, 154, 255, 0.1) 50%,
+      transparent 100%
+    );
   }
 }
