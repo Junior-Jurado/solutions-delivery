@@ -13,7 +13,8 @@ func SignUp(sig models.SignUp) error {
 	err := DbConnect()
 
 	if err != nil {
-		return nil
+		fmt.Println("Error de conexión a BD:", err.Error())
+		return err
 	}
 	defer Db.Close()
 

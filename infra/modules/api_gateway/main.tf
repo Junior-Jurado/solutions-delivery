@@ -3,9 +3,7 @@ resource "aws_apigatewayv2_api" "api" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_origins = [
-      "http://localhost:4200"
-    ]
+    allow_origins = var.cors_allowed_origins
 
     allow_methods = [
       "GET",
@@ -21,11 +19,11 @@ resource "aws_apigatewayv2_api" "api" {
       "Authorization"
     ]
 
-    expose_headers = [ 
+    expose_headers = [
       "Authorization"
-     ]
+    ]
 
-     max_age = 3600
+    max_age = 3600
   }
 }
 

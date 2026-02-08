@@ -21,3 +21,9 @@ variable "lambda_api_name" {
 variable "environment" {
   type = string
 }
+
+variable "cors_allowed_origins" {
+  description = "Lista de orígenes permitidos para CORS"
+  type        = list(string)
+  default     = ["http://localhost:4200"]
+}

@@ -13,7 +13,12 @@ func GetRole(userUUID string) (int, string) {
 	user, err := bd.GetUserRole(userUUID)
 
 	if err != nil {
-		return 404, err.Error()
+		fmt.Printf("GetRole -> Error: %s\n", err.Error())
+		errorResponse, _ := json.Marshal(map[string]string{
+			"error":    err.Error(),
+			"userUUID": userUUID,
+		})
+		return 404, string(errorResponse)
 	}
 
 	// Actualizar last_login (no crítico, solo log si falla)

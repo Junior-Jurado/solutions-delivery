@@ -46,7 +46,14 @@ func EjecutarLambda(ctx context.Context, request events.APIGatewayV2HTTPRequest)
 	body := request.Body
 	header := request.Headers
 
-	bd.ReadSecret()
+	err := bd.ReadSecret()
+	if err != nil {
+		return &events.APIGatewayProxyResponse{
+			StatusCode: 500,
+			Body:       `{"error": "Error interno: no se pudo leer configuración de BD"}`,
+			Headers:    map[string]string{"Content-Type": "application/json"},
+		}, nil
+	}
 
 	status, message := handlers.Manejadores(path, method, body, header, request)
 
