@@ -3,11 +3,18 @@ module github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend
 go 1.24.3
 
 require (
+	github.com/aws/aws-lambda-go v1.50.0
+	github.com/aws/aws-sdk-go-v2 v1.41.0
+	github.com/aws/aws-sdk-go-v2/config v1.32.2
+	github.com/aws/aws-sdk-go-v2/service/lambda v1.87.0
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.0
+	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.40.2
+	github.com/go-sql-driver/mysql v1.9.3
+)
+
+require (
 	filippo.io/edwards25519 v1.1.0 // indirect
-	github.com/aws/aws-lambda-go v1.50.0 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.41.0 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.4 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.32.2 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.19.2 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.14 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.16 // indirect
@@ -18,14 +25,9 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.7 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.16 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.16 // indirect
-	github.com/aws/aws-sdk-go-v2/service/lambda v1.87.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.95.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/secretsmanager v1.40.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/signin v1.0.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.30.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.35.10 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.41.2 // indirect
 	github.com/aws/smithy-go v1.24.0 // indirect
-	github.com/go-sql-driver/mysql v1.9.3 // indirect
-	github.com/jung-kurt/gofpdf v1.16.2 // indirect
 )

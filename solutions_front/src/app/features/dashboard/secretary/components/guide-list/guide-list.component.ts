@@ -11,10 +11,10 @@ import { ShippingGuide, GuideStatus, PaymentMethod, ServiceType } from '@core/se
 })
 export class GuideListComponent {
   @Input() guides: ShippingGuide[] = [];
-  @Input() isLoading: boolean = false;
-  @Input() totalGuides: number = 0;
-  @Input() currentPage: number = 0;
-  @Input() pageSize: number = 20;
+  @Input() isLoading = false;
+  @Input() totalGuides = 0;
+  @Input() currentPage = 0;
+  @Input() pageSize = 20;
 
   @Output() statusUpdate = new EventEmitter<{ guideId: number; newStatus: GuideStatus }>();
   @Output() viewDetails = new EventEmitter<number>();

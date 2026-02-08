@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "@environments/environments.dev";
-import { Observable, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 // Tipos
 export type DeliveryStatus = 'PENDING' | 'IN_ROUTE' | 'DELIVERED' | 'FAILED';
 export type DeliveryPriority = 'Normal' | 'Express' | 'Urgente';

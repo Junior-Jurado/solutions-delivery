@@ -17,7 +17,7 @@ export interface ShipmentStatus {
 })
 export class AdminStatusDistributionComponent {
   @Input() statusData: ShipmentStatus[] = [];
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
 
   getColorClass(color: string): string {
     return `status-dot-${color}`;

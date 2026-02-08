@@ -16,7 +16,7 @@ export class IconService {
     private sanitizer: DomSanitizer
   ) {}
 
-  getIcon(category: string, name: string, preserveColors: boolean = false): Observable<SafeHtml> {
+  getIcon(category: string, name: string, preserveColors = false): Observable<SafeHtml> {
     const key = `${category}/${name}${preserveColors ? '-preserved' : ''}`;
     
     if (!this.iconCache.has(key)) {

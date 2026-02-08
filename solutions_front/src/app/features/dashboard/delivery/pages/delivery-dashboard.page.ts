@@ -58,32 +58,32 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   // Assignments
   pickups: DeliveryAssignment[] = [];
   deliveries: DeliveryAssignment[] = [];
-  isLoadingDeliveries: boolean = false;
+  isLoadingDeliveries = false;
   stats: MyAssignmentStats | null = null;
 
   // Confirm Delivery
   selectedAssignmentId: number | null = null;
-  isConfirming: boolean = false;
+  isConfirming = false;
 
   // Report Issue
-  isReporting: boolean = false;
+  isReporting = false;
 
   // Performance
   performanceStats: PerformanceStats | null = null;
-  isLoadingPerformance: boolean = false;
+  isLoadingPerformance = false;
 
   // Device detection
-  isMobile: boolean = false;
+  isMobile = false;
 
   // Refresh
-  isRefreshing: boolean = false;
+  isRefreshing = false;
 
   // User data
-  userName: string = '';
-  userRole: string = 'DELIVERY';
+  userName = '';
+  userRole = 'DELIVERY';
 
   // Map modal
-  isMapModalOpen: boolean = false;
+  isMapModalOpen = false;
   selectedMapLocation: MapLocation | null = null;
 
   constructor(
@@ -294,9 +294,10 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
       // Go back to deliveries tab
       this.setActiveTab('deliveries');
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error confirming delivery:', error);
-      this.toastService.error(error.message || 'Error al confirmar la entrega');
+      const message = error instanceof Error ? error.message : 'Error al confirmar la entrega';
+      this.toastService.error(message);
     } finally {
       this.isConfirming = false;
       this.cdr.detectChanges();
@@ -332,9 +333,10 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
       // Reload deliveries
       await this.loadDeliveries();
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error reporting issue:', error);
-      this.toastService.error(error.message || 'Error al reportar el problema');
+      const message = error instanceof Error ? error.message : 'Error al reportar el problema';
+      this.toastService.error(message);
     } finally {
       this.isReporting = false;
       this.cdr.detectChanges();

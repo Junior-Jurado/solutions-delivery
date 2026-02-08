@@ -19,7 +19,7 @@ export interface ActiveRoute {
 })
 export class ActiveRoutesComponent {
   @Input() routes: ActiveRoute[] = [];
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
 
   getStatusClass(status: string): string {
     return status === 'Completado' ? 'badge-success' : 'badge-secondary';

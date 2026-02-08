@@ -22,14 +22,14 @@ export interface ConfirmDeliveryData {
 export class ConfirmDeliveryFormComponent {
   @Input() assignmentsInProgress: DeliveryAssignment[] = [];
   @Input() selectedAssignmentId: number | null = null;
-  @Input() isConfirming: boolean = false;
+  @Input() isConfirming = false;
 
   @Output() assignmentSelected = new EventEmitter<number | null>();
-  @Output() confirm = new EventEmitter<ConfirmDeliveryData>();
+  @Output() confirmAction = new EventEmitter<ConfirmDeliveryData>();
 
-  deliveryNotes: string = '';
+  deliveryNotes = '';
   packageCondition: PackageCondition = 'perfect';
-  deliveryPhotoBase64: string = '';
+  deliveryPhotoBase64 = '';
 
   get selectedAssignmentData(): DeliveryAssignment | null {
     if (!this.selectedAssignmentId) return null;
@@ -84,7 +84,7 @@ export class ConfirmDeliveryFormComponent {
   onSubmit(): void {
     if (!this.selectedAssignmentId) return;
 
-    this.confirm.emit({
+    this.confirmAction.emit({
       assignmentId: this.selectedAssignmentId,
       notes: this.deliveryNotes,
       condition: this.packageCondition,

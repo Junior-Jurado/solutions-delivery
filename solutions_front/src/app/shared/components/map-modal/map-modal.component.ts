@@ -3,11 +3,6 @@ import {
   Input,
   Output,
   EventEmitter,
-  OnDestroy,
-  OnChanges,
-  SimpleChanges,
-  ElementRef,
-  ViewChild,
   PLATFORM_ID,
   Inject,
   ChangeDetectorRef,
@@ -603,28 +598,20 @@ export interface MapLocation {
     }
   `]
 })
-export class MapModalComponent implements OnDestroy, OnChanges {
-  @Input() isOpen: boolean = false;
+export class MapModalComponent {
+  @Input() isOpen = false;
   @Input() location: MapLocation | null = null;
-  @Input() isMobile: boolean = false;
+  @Input() isMobile = false;
 
   @Output() closeModal = new EventEmitter<void>();
 
   private isBrowser: boolean;
 
   constructor(
-    @Inject(PLATFORM_ID) platformId: Object,
+    @Inject(PLATFORM_ID) platformId: object,
     private cdr: ChangeDetectorRef
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    // No map initialization needed anymore
-  }
-
-  ngOnDestroy(): void {
-    // No cleanup needed
   }
 
   close(): void {

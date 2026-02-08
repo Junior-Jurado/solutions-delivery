@@ -161,9 +161,9 @@ export class FrequentPartyService {
     /**
      * Registra o actualiza una parte frecuente
      */
-    upsertFrequentParty(request: CreateFrequentPartyRequest): Observable<any> {
+    upsertFrequentParty(request: CreateFrequentPartyRequest): Observable<FrequentParty> {
         const headers = this.getHeaders();
-        return this.http.post(this.BASE_URL, request, { headers }).pipe(
+        return this.http.post<FrequentParty>(this.BASE_URL, request, { headers }).pipe(
             catchError(error => {
                 console.error('Error al registrar parte frecuente:', error);
                 throw error;

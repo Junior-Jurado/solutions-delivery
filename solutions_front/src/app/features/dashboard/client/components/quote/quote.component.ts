@@ -37,7 +37,7 @@ export class QuoteComponent {
   @Input() result: number | null = null;
   
   @Output() calculate = new EventEmitter<QuoteData>();
-  @Output() reset = new EventEmitter<void>();
+  @Output() resetQuote = new EventEmitter<void>();
   @Output() proceedToCreate = new EventEmitter<void>();
 
   constructor(public translationService: TranslationService) {}
@@ -47,7 +47,7 @@ export class QuoteComponent {
   }
 
   onReset(): void {
-    this.reset.emit();
+    this.resetQuote.emit();
   }
 
   onProceedToCreate(): void {

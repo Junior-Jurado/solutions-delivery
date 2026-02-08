@@ -23,14 +23,14 @@ export interface ReportIssueData {
 export class ReportIssueFormComponent {
   @Input() pendingPickups: DeliveryAssignment[] = [];
   @Input() pendingDeliveries: DeliveryAssignment[] = [];
-  @Input() isReporting: boolean = false;
+  @Input() isReporting = false;
 
   @Output() report = new EventEmitter<ReportIssueData>();
 
   selectedIssueAssignmentId: number | null = null;
   issueType: IssueType | '' = '';
-  issueDescription: string = '';
-  attemptedResolution: string = '';
+  issueDescription = '';
+  attemptedResolution = '';
   issuePhotos: string[] = [];
 
   constructor(private cdr: ChangeDetectorRef) {}

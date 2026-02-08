@@ -7,7 +7,7 @@ import { Subject, takeUntil } from 'rxjs';
 // Services
 import { AuthService } from '@core/services/auth.service';
 import { ClientService, ClientProfile } from '@core/services/client.service';
-import { GuideService, ShippingGuide, CreateGuideRequest } from '@core/services/guide.service';
+import { GuideService, ShippingGuide, GuideFormValue } from '@core/services/guide.service';
 import { RatingService, PendingRating } from '@core/services/rating.service';
 import { ToastService } from '@shared/services/toast.service';
 import { TranslationService } from '@shared/services/translation.service';
@@ -15,7 +15,7 @@ import { DeviceDetectionService } from '@shared/services/device-detection.servic
 
 // Components
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { GuidePreviewData, GuidePreviewModalComponent } from '@shared/components/guide-preview-modal/guide-preview-modal.component';
+import { GuidePreviewModalComponent } from '@shared/components/guide-preview-modal/guide-preview-modal.component';
 import { GuideFormComponent } from '@shared/components/guide-form/guide-form.component';
 import { GuideDetailsModalComponent } from '@shared/components/guide-details-modal.component';
 import { TrackingComponent } from '../components/tracking/tracking.component';
@@ -72,23 +72,23 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
 
   // User data
   currentUser: ClientProfile | null = null;
-  userId: string = '';
+  userId = '';
 
   // Active tab
   activeTab: 'tracking' | 'my-guides' | 'history' | 'quote' | 'create' = 'tracking';
   
   // Tracking
   trackingResult: ShippingGuide | null = null;
-  isTracking: boolean = false;
-  trackingError: string = '';
+  isTracking = false;
+  trackingError = '';
 
   // My Guides
   myGuides: ShippingGuide[] = [];
-  loadingMyGuides: boolean = false;
+  loadingMyGuides = false;
 
   // History
   guidesHistory: ShippingGuide[] = [];
-  loadingHistory: boolean = false;
+  loadingHistory = false;
 
   // Quote
   quoteData: QuoteData = {
@@ -104,26 +104,26 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   quoteResult: number | null = null;
 
   // Create Guide
-  showGuidePreview: boolean = false;
+  showGuidePreview = false;
   guidePreviewData: GuidePreview | null = null;
-  pendingGuideData: any = null;
-  isCreatingGuide: boolean = false;
+  pendingGuideData: GuideFormValue | null = null;
+  isCreatingGuide = false;
 
   // Guide Details Modal
   selectedGuide: ShippingGuide | null = null;
-  showDetailsModal: boolean = false;
+  showDetailsModal = false;
 
   // Device detection
-  isMobile: boolean = false;
+  isMobile = false;
 
   // Refresh
-  isRefreshing: boolean = false;
+  isRefreshing = false;
 
   // Rating
   pendingRatings: PendingRating[] = [];
-  showRatingModal: boolean = false;
+  showRatingModal = false;
   selectedRating: PendingRating | null = null;
-  isSubmittingRating: boolean = false;
+  isSubmittingRating = false;
 
   constructor(
     private authService: AuthService,
@@ -238,7 +238,7 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
       }
       
       this.cdr.detectChanges();
-    } catch (error: any) {
+    } catch {
       this.trackingError = 'No se encontró la guía. Verifique el número e intente nuevamente.';
       this.toastService.error('Guía no encontrada');
       this.cdr.detectChanges();
@@ -399,7 +399,7 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   /**
    * Cuando el formulario se envía
    */
-  onGuideFormSubmit(formData: any): void {
+  onGuideFormSubmit(formData: GuideFormValue): void {
     const calculatedPrice = this.guideService.calculatePrice(formData);
     
     this.pendingGuideData = formData;
@@ -407,26 +407,26 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
     this.guidePreviewData = {
       // Remitente
       senderName: formData.senderName,
-      senderCity: formData.senderCityName,
+      senderCity: formData.senderCityName || '',
       senderAddress: formData.senderAddress,
       senderPhone: formData.senderPhone,
-      senderDoc: `${formData.senderDocType} ${formData.senderDoc}`,
-      
+      senderDoc: `${formData.senderDocType || 'CC'} ${formData.senderDoc}`,
+
       // Destinatario
       receiverName: formData.receiverName,
-      receiverCity: formData.receiverCityName,
+      receiverCity: formData.receiverCityName || '',
       receiverAddress: formData.receiverAddress,
       receiverPhone: formData.receiverPhone,
-      receiverDoc: `${formData.receiverDocType} ${formData.receiverDoc}`,
-      
+      receiverDoc: `${formData.receiverDocType || 'CC'} ${formData.receiverDoc}`,
+
       // Paquete
-      weight: formData.weight,
-      declaredValue: formData.declaredValue,
+      weight: Number(formData.weight) || 0,
+      declaredValue: Number(formData.declaredValue) || 0,
       serviceType: formData.serviceType,
-      pieces: formData.pieces,
-      dimensions: formData.dimensions,
-      content: formData.content,
-      
+      pieces: Number(formData.pieces) || 1,
+      dimensions: formData.dimensions || '20x15x10',
+      content: formData.content || 'GENERAL',
+
       // Precio
       calculatedPrice: calculatedPrice
     };
@@ -463,9 +463,10 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
       this.setActiveTab('my-guides');
       await this.loadMyGuides();
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error creating guide:', error);
-      this.toastService.error(error.message || 'Error al crear la guía');
+      const message = error instanceof Error ? error.message : 'Error al crear la guía';
+      this.toastService.error(message);
     } finally {
       this.isCreatingGuide = false;
       this.cdr.detectChanges();
@@ -587,9 +588,10 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
       );
       this.cdr.detectChanges();
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error submitting rating:', error);
-      this.toastService.error(error.message || 'Error al enviar la calificación');
+      const message = error instanceof Error ? error.message : 'Error al enviar la calificación';
+      this.toastService.error(message);
     } finally {
       this.isSubmittingRating = false;
       this.cdr.detectChanges();

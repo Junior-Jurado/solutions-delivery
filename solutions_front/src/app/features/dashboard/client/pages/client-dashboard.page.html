@@ -111,7 +111,7 @@
             [quoteData]="quoteData"
             [result]="quoteResult"
             (calculate)="calculateQuote($event)"
-            (reset)="resetQuote()"
+            (resetQuote)="resetQuote()"
             (proceedToCreate)="proceedToCreateGuide()">
           </app-quote>
         </div>
@@ -141,8 +141,8 @@
     [isCreating]="isCreatingGuide"
     title="Confirmar Creación de Guía"
     warningMessage="Una vez creada, la guía no se puede cancelar. Verifique la información antes de continuar."
-    (confirm)="confirmGuideCreation()"
-    (cancel)="cancelGuideCreation()"
+    (confirmAction)="confirmGuideCreation()"
+    (cancelAction)="cancelGuideCreation()"
     (closeModal)="cancelGuideCreation()">
   </app-guide-preview-modal>
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environments.dev';
 
 // Interfaces para el request
@@ -78,6 +78,37 @@ export type GuideStatus =
 
 export type ServiceType = 'NORMAL' | 'PRIORITY' | 'EXPRESS';
 export type PaymentMethod = 'CASH' | 'COD' | 'CREDIT';
+
+// Interface para el formulario de guía (flexible para compatibilidad)
+export interface GuideFormValue {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string]: any;
+    serviceType: string;
+    declaredValue: string | number;
+    senderCity: number | { city_id: number };
+    receiverCity: number | { city_id: number };
+    senderName: string;
+    senderDocType?: string;
+    senderDoc: string;
+    senderPhone: string;
+    senderEmail?: string;
+    senderAddress: string;
+    senderCityName?: string;
+    receiverName: string;
+    receiverDocType?: string;
+    receiverDoc: string;
+    receiverPhone: string;
+    receiverEmail?: string;
+    receiverAddress: string;
+    receiverCityName?: string;
+    weight: string | number;
+    pieces?: string | number;
+    dimensions?: string;
+    insurance?: string;
+    content?: string;
+    observations?: string;
+    priority?: string;
+}
 // Interfaces para los modelos de guía
 export interface ShippingGuide {
     guide_id: number;
@@ -203,14 +234,14 @@ export class GuideService {
 
             console.log('Guía creada exitosamente:', response);
             return response;
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error al crear la guía:', error);
-            
-            if (error.error) {
-                const errorResponse = error.error as GuideErrorResponse;
+
+            if (error && typeof error === 'object' && 'error' in error) {
+                const errorResponse = (error as { error: GuideErrorResponse }).error;
                 throw new Error(errorResponse.details || errorResponse.error || 'Error desconocido al crear la guía');
             }
-            
+
             throw new Error('Error de conexión al crear la guía');
         }
     }
@@ -343,7 +374,7 @@ export class GuideService {
     // BUILDER METHODS
     // ==========================================
 
-    buildGuideRequest(formValue: any, userId: string, customPrice?: number): CreateGuideRequest {
+    buildGuideRequest(formValue: GuideFormValue, userId: string, customPrice?: number): CreateGuideRequest {
         const dimensions = this.parseDimensions(formValue.dimensions || '20x15x10');
 
         // Usar precio personalizado si se proporciona, sino calcular
@@ -361,7 +392,7 @@ export class GuideService {
             },
 
             pricing: {
-                declared_value: parseFloat(formValue.declaredValue) || 0,
+                declared_value: parseFloat(String(formValue.declaredValue)) || 0,
                 price: finalPrice
             },
 
@@ -393,8 +424,8 @@ export class GuideService {
             },
 
             package: {
-                weight_kg: parseFloat(formValue.weight) || 0,
-                pieces: parseInt(formValue.pieces) || 1,
+                weight_kg: parseFloat(String(formValue.weight)) || 0,
+                pieces: parseInt(String(formValue.pieces ?? '1')) || 1,
                 length_cm: dimensions.length,
                 width_cm: dimensions.width,
                 height_cm: dimensions.height,
@@ -424,17 +455,21 @@ export class GuideService {
         return phone.replace(/\D/g, '');
     }
 
-    private getCityId(cityIdOrName: string | number): number {
-        if (typeof cityIdOrName === 'number') {
-            return cityIdOrName;
+    private getCityId(cityValue: number | string | { city_id: number }): number {
+        if (typeof cityValue === 'number') {
+            return cityValue;
         }
-        
-        const parsed = parseInt(cityIdOrName);
+
+        if (typeof cityValue === 'object' && cityValue !== null && 'city_id' in cityValue) {
+            return cityValue.city_id;
+        }
+
+        const parsed = parseInt(String(cityValue));
         if (!isNaN(parsed)) {
             return parsed;
         }
-        
-        console.warn('No se pudo obtener el ID de la ciudad:', cityIdOrName);
+
+        console.warn('No se pudo obtener el ID de la ciudad:', cityValue);
         return 0;
     }
 
@@ -480,8 +515,8 @@ export class GuideService {
      * Este método es público para permitir calcular el precio antes de crear la guía
      * IMPORTANTE: Esta lógica debe coincidir con la del backend
      */
-    calculatePrice(formValue: any): number {
-        const weight = parseFloat(formValue.weight) || 0;
+    calculatePrice(formValue: Partial<GuideFormValue>): number {
+        const weight = parseFloat(String(formValue.weight ?? '0')) || 0;
         const basePrice = 15000;
         const pricePerKg = 3000;
         

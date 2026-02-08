@@ -188,10 +188,10 @@ import { ToastType } from '@shared/services/toast.service';
   `]
 })
 export class ToastComponent {
-  @Input() message: string = '';
+  @Input() message = '';
   @Input() type: ToastType = 'info';
   @Input() position: 'top' | 'bottom' | 'center' = 'bottom';
-  @Input() allowHtml: boolean = false;
+  @Input() allowHtml = false;
   
-  show: boolean = false;
+  show = false;
 }

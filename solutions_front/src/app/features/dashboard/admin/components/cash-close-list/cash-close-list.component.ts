@@ -11,10 +11,10 @@ import { CashClose, PeriodType } from '@core/services/cash-close.service';
 })
 export class CashCloseListComponent {
   @Input() closes: CashClose[] = [];
-  @Input() isLoading: boolean = false;
-  @Input() totalCloses: number = 0;
-  @Input() currentPage: number = 0;
-  @Input() pageSize: number = 10;
+  @Input() isLoading = false;
+  @Input() totalCloses = 0;
+  @Input() currentPage = 0;
+  @Input() pageSize = 10;
 
   @Output() downloadPDF = new EventEmitter<number>();
   @Output() pageChange = new EventEmitter<'prev' | 'next'>();

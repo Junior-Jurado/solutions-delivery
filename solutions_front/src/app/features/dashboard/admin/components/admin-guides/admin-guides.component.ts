@@ -2,7 +2,7 @@ import { Component, OnInit, Output, EventEmitter, ChangeDetectorRef } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { GuideService, ShippingGuide, GuideStatus, GuidesListResponse } from '@core/services/guide.service';
+import { GuideService, ShippingGuide, GuideStatus } from '@core/services/guide.service';
 import { TranslationService } from '@shared/services/translation.service';
 import { ToastService } from '@shared/services/toast.service';
 
@@ -17,16 +17,16 @@ export class AdminGuidesComponent implements OnInit {
   @Output() viewGuide = new EventEmitter<number>();
 
   // Search & Filters
-  searchTerm: string = '';
-  selectedStatus: string = '';
-  isSearching: boolean = false;
+  searchTerm = '';
+  selectedStatus = '';
+  isSearching = false;
 
   // Guides list
   guides: ShippingGuide[] = [];
-  isLoading: boolean = false;
-  totalGuides: number = 0;
-  currentPage: number = 0;
-  pageSize: number = 10;
+  isLoading = false;
+  totalGuides = 0;
+  currentPage = 0;
+  pageSize = 10;
 
   // Status options for filter
   statusOptions: { value: string; label: string }[] = [
@@ -41,7 +41,7 @@ export class AdminGuidesComponent implements OnInit {
   // Inline editing
   editingGuideId: number | null = null;
   editingStatus: GuideStatus | null = null;
-  isUpdatingStatus: boolean = false;
+  isUpdatingStatus = false;
 
   constructor(
     private guideService: GuideService,
@@ -59,17 +59,17 @@ export class AdminGuidesComponent implements OnInit {
     this.cdr.detectChanges();
 
     try {
-      const filters: any = {
+      const filters: Record<string, string | number> = {
         limit: this.pageSize,
         offset: this.currentPage * this.pageSize
       };
 
       if (this.selectedStatus) {
-        filters.status = this.selectedStatus;
+        filters['status'] = this.selectedStatus;
       }
 
       if (this.searchTerm && this.searchTerm.length >= 3) {
-        filters.search = this.searchTerm;
+        filters['search'] = this.searchTerm;
       }
 
       const response = await this.guideService.listGuides(filters);
@@ -178,7 +178,7 @@ export class AdminGuidesComponent implements OnInit {
   }
 
   getStatusBadgeClass(status: string): string {
-    const classMap: { [key: string]: string } = {
+    const classMap: Record<string, string> = {
       'CREATED': 'badge-warning',
       'IN_ROUTE': 'badge-info',
       'IN_WAREHOUSE': 'badge-secondary',

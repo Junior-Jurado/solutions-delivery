@@ -19,7 +19,7 @@ export interface CashCloseFormData {
   imports: [CommonModule, FormsModule]
 })
 export class CashCloseFormComponent implements OnInit {
-  @Input() isGenerating: boolean = false;
+  @Input() isGenerating = false;
   @Output() generateClose = new EventEmitter<CashCloseFormData>();
 
   // Valores del formulario
@@ -125,9 +125,10 @@ export class CashCloseFormComponent implements OnInit {
       case 'WEEKLY':
         return `Se generará un cierre semanal comenzando el ${this.selectedDay}/${this.selectedMonth}/${this.selectedYear} (7 días consecutivos)`;
       
-      case 'MONTHLY':
+      case 'MONTHLY': {
         const monthName = this.months.find(m => m.value === Number(this.selectedMonth))?.label || '';
         return `Se generará un cierre para todo el mes de ${monthName} ${this.selectedYear}`;
+      }
       
       case 'YEARLY':
         return `Se generará un cierre para todo el año ${this.selectedYear}`;

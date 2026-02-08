@@ -16,7 +16,7 @@ export interface WorkerPerformance {
 })
 export class WorkerPerformanceComponent {
   @Input() workers: WorkerPerformance[] = [];
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
 
   getBadgeClass(efficiency: number): string {
     return efficiency > 90 ? 'badge-success' : 'badge-secondary';

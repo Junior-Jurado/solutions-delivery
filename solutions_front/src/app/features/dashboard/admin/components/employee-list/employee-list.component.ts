@@ -14,16 +14,16 @@ import { IconComponent } from '@shared/components/icon/icon.component';
 })
 export class EmployeeListComponent {
   @Input() employees: Employee[] = [];
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
   @Output() employeeUpdated = new EventEmitter<Employee>();
 
   // Editing state
   editingUserId: string | null = null;
   editingRole: UserRole | '' = '';
-  isUpdating: boolean = false;
+  isUpdating = false;
 
   // Filter
-  filterRole: string = '';
+  filterRole = '';
 
   // Available roles for assignment (ADMIN excluded)
   roles: { value: UserRole; label: string }[] = [

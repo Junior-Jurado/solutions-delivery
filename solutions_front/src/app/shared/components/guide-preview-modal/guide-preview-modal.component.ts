@@ -40,22 +40,22 @@ export interface GuidePreviewData {
   styleUrls: ['./guide-preview-modal.component.scss']
 })
 export class GuidePreviewModalComponent {
-  @Input() isOpen: boolean = false;
+  @Input() isOpen = false;
   @Input() guideData: GuidePreviewData | null = null;
-  @Input() isCreating: boolean = false;
-  @Input() title: string = 'Confirmar Creación de Guía';
-  @Input() warningMessage: string = 'Verifique toda la información antes de confirmar la creación de la guía.';
-  @Input() confirmButtonText: string = 'Confirmar y Crear Guía';
-  @Input() cancelButtonText: string = 'Cancelar';
-  @Input() allowPriceEdit: boolean = false; // Permite editar el precio (solo admin)
+  @Input() isCreating = false;
+  @Input() title = 'Confirmar Creación de Guía';
+  @Input() warningMessage = 'Verifique toda la información antes de confirmar la creación de la guía.';
+  @Input() confirmButtonText = 'Confirmar y Crear Guía';
+  @Input() cancelButtonText = 'Cancelar';
+  @Input() allowPriceEdit = false; // Permite editar el precio (solo admin)
 
-  @Output() confirm = new EventEmitter<number>(); // Emite el precio final
-  @Output() cancel = new EventEmitter<void>();
+  @Output() confirmAction = new EventEmitter<number>(); // Emite el precio final
+  @Output() cancelAction = new EventEmitter<void>();
   @Output() closeModal = new EventEmitter<void>();
 
   // Estado de edición del precio
-  isEditingPrice: boolean = false;
-  customPrice: number = 0;
+  isEditingPrice = false;
+  customPrice = 0;
 
   constructor(
     public translationService: TranslationService,
@@ -99,14 +99,14 @@ export class GuidePreviewModalComponent {
   onConfirm(): void {
     if (!this.isCreating) {
       // Emitir el precio final (personalizado o calculado)
-      this.confirm.emit(this.currentPrice);
+      this.confirmAction.emit(this.currentPrice);
     }
   }
 
   onCancel(): void {
     if (!this.isCreating) {
       this.resetToCalculatedPrice();
-      this.cancel.emit();
+      this.cancelAction.emit();
     }
   }
 

@@ -15,7 +15,7 @@ import { AssignmentCardComponent } from '../assignment-card/assignment-card.comp
 export class AssignmentsListComponent {
   @Input() pickups: DeliveryAssignment[] = [];
   @Input() deliveries: DeliveryAssignment[] = [];
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
 
   @Output() startRoute = new EventEmitter<DeliveryAssignment>();
   @Output() confirmDelivery = new EventEmitter<DeliveryAssignment>();

@@ -22,44 +22,44 @@ export class AuthComponent implements OnInit {
     // ==========================================
     // LOGIN FIELDS
     // ==========================================
-    email: string = '';
-    password: string = '';
+    email = '';
+    password = '';
 
     // ==========================================
     // REGISTER FIELDS
     // ==========================================
-    regFullName: string = '';
-    regEmail: string = '';
-    regPhone: string = '';
-    regTypeDocument: string = '';
-    regNumberDocument: string = '';
-    regPassword: string = '';
+    regFullName = '';
+    regEmail = '';
+    regPhone = '';
+    regTypeDocument = '';
+    regNumberDocument = '';
+    regPassword = '';
 
     // ==========================================
     // CONFIRMATION FIELDS
     // ==========================================
-    confirmEmail: string = '';
-    confirmCode: string = '';
+    confirmEmail = '';
+    confirmCode = '';
 
     // ==========================================
     // UI STATE
     // ==========================================
     authTab: 'login' | 'register' | 'confirm' = 'login';
-    isLoading: boolean = false;
-    isResendingCode: boolean = false;
+    isLoading = false;
+    isResendingCode = false;
 
     // ==========================================
     // VALIDATION ERRORS
     // ==========================================
-    emailError: string = '';
-    passwordError: string = '';
-    regFullNameError: string = '';
-    regEmailError: string = '';
-    regPhoneError: string = '';
-    regTypeDocumentError: string = '';
-    regNumberDocumentError: string = '';
-    regPasswordError: string = '';
-    confirmCodeError: string = '';
+    emailError = '';
+    passwordError = '';
+    regFullNameError = '';
+    regEmailError = '';
+    regPhoneError = '';
+    regTypeDocumentError = '';
+    regNumberDocumentError = '';
+    regPasswordError = '';
+    confirmCodeError = '';
 
     // ==========================================
     // CONSTRUCTOR
@@ -156,7 +156,7 @@ export class AuthComponent implements OnInit {
             return ''; // Opcional
         }
         
-        const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+        const cleanPhone = phone.replace(/[\s\-()]/g, '');
         const phoneRegex = /^(\+57)?[1-9][0-9]{9}$/;
         
         if (!phoneRegex.test(cleanPhone)) {
@@ -188,7 +188,7 @@ export class AuthComponent implements OnInit {
             return 'Por favor ingresa el número de documento';
         }
         
-        const docRegex = /^[0-9\-]+$/;
+        const docRegex = /^[0-9-]+$/;
         if (!docRegex.test(numberDoc)) {
             return 'El número de documento solo puede contener números y guiones';
         }
@@ -238,10 +238,11 @@ export class AuthComponent implements OnInit {
     // ERROR HANDLER
     // ==========================================
 
-    private getErrorMessage(error: any): string {
+    private getErrorMessage(error: unknown): string {
         // Errores HTTP del backend
-        if (error?.status) {
-            switch (error.status) {
+        const httpError = error as { status?: number; message?: string };
+        if (httpError?.status) {
+            switch (httpError.status) {
                 case 404:
                     return 'Tu cuenta no está registrada en el sistema. Contacta al administrador.';
                 case 401:
@@ -255,7 +256,7 @@ export class AuthComponent implements OnInit {
             }
         }
 
-        const errorMessage = error?.message || error?.toString() || '';
+        const errorMessage = (error as { message?: string })?.message || String(error) || '';
         
         // Errores específicos de Cognito
         if (errorMessage.includes('Incorrect username or password')) {
@@ -339,7 +340,7 @@ export class AuthComponent implements OnInit {
             const targetRoute = roleRouteMap[role] ?? 'secretary';
             this.router.navigate(['/dashboard', targetRoute]);
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error en login:', error);
             const friendlyMessage = this.getErrorMessage(error);
             this.toast.error(friendlyMessage);
@@ -407,7 +408,7 @@ export class AuthComponent implements OnInit {
             this.regNumberDocument = '';
             this.regPassword = '';
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error en registro:', error);
             const friendlyMessage = this.getErrorMessage(error);
             this.toast.error(friendlyMessage);
@@ -455,7 +456,7 @@ export class AuthComponent implements OnInit {
                 this.cdr.detectChanges(); 
             }, 1000);
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error en confirmación:', error);
             const friendlyMessage = this.getErrorMessage(error);
             this.toast.error(friendlyMessage);
@@ -478,7 +479,7 @@ export class AuthComponent implements OnInit {
         try {
             await this.authService.resendConfirmationCode(this.confirmEmail);
             this.toast.success('Código reenviado exitosamente. Revisa tu correo electrónico.');
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error al reenviar código:', error);
             const friendlyMessage = this.getErrorMessage(error);
             this.toast.error(friendlyMessage);

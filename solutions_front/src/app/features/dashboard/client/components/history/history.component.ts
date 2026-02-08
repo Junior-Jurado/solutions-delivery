@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { ShippingGuide } from '@core/services/guide.service';
+import { ShippingGuide, GuideStatus } from '@core/services/guide.service';
 import { TranslationService } from '@shared/services/translation.service';
 
 @Component({
@@ -14,7 +14,7 @@ import { TranslationService } from '@shared/services/translation.service';
 })
 export class HistoryComponent {
   @Input() guides: ShippingGuide[] = [];
-  @Input() loading: boolean = false;
+  @Input() loading = false;
   
   @Output() viewDetails = new EventEmitter<number>();
   @Output() downloadPDF = new EventEmitter<number>();
@@ -30,11 +30,11 @@ export class HistoryComponent {
   }
 
   getStatusClass(status: string): string {
-    return this.translationService.getStatusBadgeClass(status as any);
+    return this.translationService.getStatusBadgeClass(status as GuideStatus);
   }
 
   getStatusText(status: string): string {
-    return this.translationService.translateGuideStatus(status as any);
+    return this.translationService.translateGuideStatus(status as GuideStatus);
   }
 
   formatDate(dateString: string): string {

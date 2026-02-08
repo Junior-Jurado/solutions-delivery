@@ -8,8 +8,8 @@ import {
 
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, from, of } from 'rxjs';
-import { firstValueFrom, map, catchError } from 'rxjs';
+import { from, of, Observable } from 'rxjs';
+import { firstValueFrom, catchError } from 'rxjs';
 import { environment } from '../../environments/environments.dev';
 
 const poolData = {
@@ -109,7 +109,7 @@ export class AuthService {
     /**
      * Registra un nuevo usuario
      */
-    async registerUser(data: RegisterData): Promise<any> {
+    async registerUser(data: RegisterData): Promise<{ user: CognitoUser | undefined; userConfirmed: boolean }> {
         const phoneFormatted = this.formatPhoneNumber(data.phone);
 
         const attributes: CognitoUserAttribute[] = [
@@ -134,7 +134,7 @@ export class AuthService {
                     }
 
                     console.log('Usuario registrado exitosamente:', result);
-                    resolve(result);
+                    resolve({ user: result?.user, userConfirmed: result?.userConfirmed ?? false });
                 }
             );
         });

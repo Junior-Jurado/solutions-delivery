@@ -17,7 +17,7 @@ import { ColombiaMapComponent } from '../colombia-map/colombia-map.component';
 export class HeroComponent {
   @Input() mapType: 'static' | 'dynamic' = 'dynamic';
 
-  onCitySelected(city: any) {
+  onCitySelected(city: { name: string; packages?: number }) {
     console.log('Ciudad seleccionada:', city);
   }
 }

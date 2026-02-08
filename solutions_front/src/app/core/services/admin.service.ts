@@ -185,10 +185,10 @@ export class AdminService {
      */
     async getEmployees(role?: UserRole): Promise<EmployeesListResponse> {
         const headers = this.getHeaders();
-        let params: any = {};
+        const params: Record<string, string> = {};
 
         if (role) {
-            params.role = role;
+            params['role'] = role;
         }
 
         try {
@@ -281,15 +281,15 @@ export class AdminService {
      */
     async getClientRanking(filters?: ClientRankingFilters): Promise<ClientRankingResponse> {
         const headers = this.getHeaders();
-        let params: any = {};
+        const params: Record<string, string> = {};
 
         if (filters) {
-            if (filters.sort_by) params.sort_by = filters.sort_by;
-            if (filters.order) params.order = filters.order;
-            if (filters.limit) params.limit = filters.limit.toString();
-            if (filters.min_guides) params.min_guides = filters.min_guides.toString();
-            if (filters.date_from) params.date_from = filters.date_from;
-            if (filters.date_to) params.date_to = filters.date_to;
+            if (filters.sort_by) params['sort_by'] = filters.sort_by;
+            if (filters.order) params['order'] = filters.order;
+            if (filters.limit) params['limit'] = filters.limit.toString();
+            if (filters.min_guides) params['min_guides'] = filters.min_guides.toString();
+            if (filters.date_from) params['date_from'] = filters.date_from;
+            if (filters.date_to) params['date_to'] = filters.date_to;
         }
 
         try {
@@ -334,7 +334,7 @@ export class AdminService {
      * Transforma el status de la guía a español
      */
     translateStatus(status: string): string {
-        const statusMap: { [key: string]: string } = {
+        const statusMap: Record<string, string> = {
             'CREATED': 'Creado',
             'IN_ROUTE': 'En ruta',
             'IN_WAREHOUSE': 'En bodega',
@@ -348,7 +348,7 @@ export class AdminService {
      * Obtiene el color para el status
      */
     getStatusColor(status: string): string {
-        const colorMap: { [key: string]: string } = {
+        const colorMap: Record<string, string> = {
             'CREATED': 'warning',
             'IN_ROUTE': 'primary',
             'IN_WAREHOUSE': 'secondary',
@@ -362,7 +362,7 @@ export class AdminService {
      * Transforma el role a español
      */
     translateRole(role: UserRole): string {
-        const roleMap: { [key: string]: string } = {
+        const roleMap: Record<string, string> = {
             'CLIENT': 'Cliente',
             'ADMIN': 'Administrador',
             'SECRETARY': 'Secretaria',

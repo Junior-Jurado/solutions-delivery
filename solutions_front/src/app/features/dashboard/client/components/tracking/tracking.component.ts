@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '@shared/components/icon/icon.component';
-import { ShippingGuide } from '@core/services/guide.service';
+import { ShippingGuide, GuideStatus } from '@core/services/guide.service';
 import { TranslationService } from '@shared/services/translation.service';
 
 @Component({
@@ -14,15 +14,15 @@ import { TranslationService } from '@shared/services/translation.service';
   styleUrls: ['./tracking.component.scss']
 })
 export class TrackingComponent {
-  @Input() isTracking: boolean = false;
-  @Input() trackingError: string = '';
+  @Input() isTracking = false;
+  @Input() trackingError = '';
   @Input() trackingResult: ShippingGuide | null = null;
   
   @Output() track = new EventEmitter<string>();
   @Output() clear = new EventEmitter<void>();
   @Output() viewDetails = new EventEmitter<number>();
 
-  trackingNumber: string = '';
+  trackingNumber = '';
 
   constructor(public translationService: TranslationService) {}
 
@@ -42,11 +42,11 @@ export class TrackingComponent {
   }
 
   getStatusClass(status: string): string {
-    return this.translationService.getStatusBadgeClass(status as any);
+    return this.translationService.getStatusBadgeClass(status as GuideStatus);
   }
 
   getStatusText(status: string): string {
-    return this.translationService.translateGuideStatus(status as any);
+    return this.translationService.translateGuideStatus(status as GuideStatus);
   }
 
   formatDate(dateString: string): string {

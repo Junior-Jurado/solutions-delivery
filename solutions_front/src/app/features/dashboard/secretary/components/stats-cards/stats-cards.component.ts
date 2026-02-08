@@ -17,10 +17,10 @@ export interface StatCard {
   imports: [CommonModule]
 })
 export class StatsCardsComponent {
-  @Input() isLoading: boolean = false;
-  @Input() totalToday: number = 0;
-  @Input() totalProcessed: number = 0;
-  @Input() totalPending: number = 0;
+  @Input() isLoading = false;
+  @Input() totalToday = 0;
+  @Input() totalProcessed = 0;
+  @Input() totalPending = 0;
 
   /**
    * Obtiene las tarjetas de estadísticas

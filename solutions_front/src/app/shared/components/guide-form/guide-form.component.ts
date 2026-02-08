@@ -5,7 +5,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil } fro
 
 // Services
 import { City } from '@core/services/location.service';
-import { CreateGuideResponse } from '@core/services/guide.service';
+import { CreateGuideResponse, GuideFormValue } from '@core/services/guide.service';
 import { AuthService } from '@core/services/auth.service';
 import { ClientService, ClientProfile } from '@core/services/client.service';
 import {
@@ -32,28 +32,28 @@ import { IconComponent } from '@shared/components/icon/icon.component';
     ]
 })
 export class GuideFormComponent implements OnInit, OnDestroy {
-    @Input() currentUserId: string = '';
+    @Input() currentUserId = '';
     @Output() guideCreated = new EventEmitter<CreateGuideResponse>();
-    @Output() formSubmit = new EventEmitter<any>();
+    @Output() formSubmit = new EventEmitter<GuideFormValue>();
 
     guideForm: FormGroup;
-    isSubmitting: boolean = false;
+    isSubmitting = false;
 
     // ==========================================
     // CONTROL DE ACCESO POR ROL
     // ==========================================
-    userRole: string = '';
-    enableAutocomplete: boolean = false; // Solo ADMIN y SECRETARY
-    enableAddressHistory: boolean = false;      // TODOS pueden ver direcciones (propias o de clientes)
+    userRole = '';
+    enableAutocomplete = false; // Solo ADMIN y SECRETARY
+    enableAddressHistory = false;      // TODOS pueden ver direcciones (propias o de clientes)
 
 
     // ==========================================
     // AUTOCARGA DE DATOS PARA CLIENT
     // ==========================================
-    isLoadingClientData: boolean = false;
-    clientDataLoaded: boolean = false;
-    clientDocumentNumber: string = '';          // Número de documento del CLIENT para buscar sus direcciones
-    isClientReadonly: boolean = false;
+    isLoadingClientData = false;
+    clientDataLoaded = false;
+    clientDocumentNumber = '';          // Número de documento del CLIENT para buscar sus direcciones
+    isClientReadonly = false;
 
     // ==========================================
     // AUTOCOMPLETADO DE REMITENTE
@@ -63,9 +63,9 @@ export class GuideFormComponent implements OnInit, OnDestroy {
     selectedSenderClient: FrequentPartyUnique | null = null;
     selectedSenderCity: City | null = null;
     senderAddresses: FrequentParty[] = [];
-    showSenderSuggestions: boolean = false;
-    isLoadingSenderSuggestions: boolean = false;
-    isLoadingSenderAddresses: boolean = false;
+    showSenderSuggestions = false;
+    isLoadingSenderSuggestions = false;
+    isLoadingSenderAddresses = false;
 
     // ==========================================
     // AUTOCOMPLETADO DE DESTINATARIO
@@ -75,9 +75,9 @@ export class GuideFormComponent implements OnInit, OnDestroy {
     selectedReceiverClient: FrequentPartyUnique | null = null;
     selectedReceiverCity: City | null = null;
     receiverAddresses: FrequentParty[] = [];
-    showReceiverSuggestions: boolean = false;
-    isLoadingReceiverSuggestions: boolean = false;
-    isLoadingReceiverAddresses: boolean = false;
+    showReceiverSuggestions = false;
+    isLoadingReceiverSuggestions = false;
+    isLoadingReceiverAddresses = false;
 
     // Opciones de formulario
     serviceTypes: string[] = ['Contado', 'Contra Entrega', 'Crédito'];
@@ -110,7 +110,7 @@ export class GuideFormComponent implements OnInit, OnDestroy {
     // ==========================================
     private detectUserRole(): void {
         this.authService.getUserRole$().subscribe({
-            next: async (role) => {
+            next: async (role: string) => {
                 this.userRole = role;
                 
                 // ADMIN y SECRETARY: Pueden buscar clientes Y ver direcciones de cualquier cliente
@@ -137,7 +137,7 @@ export class GuideFormComponent implements OnInit, OnDestroy {
                     await this.loadClientDataAsSender();
                 }
             },
-            error: (error) => {
+            error: (error: Error) => {
                 console.error('[GuideForm] Error al obtener rol:', error);
                 this.enableAutocomplete = false;
                 this.enableAddressHistory = false;
@@ -199,7 +199,7 @@ export class GuideFormComponent implements OnInit, OnDestroy {
             console.log('[GuideForm] Datos del cliente autocargados como remitente');
             console.log('[GuideForm] Document number guardado para historial:', this.clientDocumentNumber);
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('[GuideForm] Error al cargar datos del cliente:', error);
         } finally {
             this.isLoadingClientData = false;
@@ -604,7 +604,7 @@ export class GuideFormComponent implements OnInit, OnDestroy {
         });
     }
 
-    private getDefaultFormValues(): any {
+    private getDefaultFormValues(): Partial<Record<string, string | number>> {
         return {
             senderDocType: 'CC',
             receiverDocType: 'CC',

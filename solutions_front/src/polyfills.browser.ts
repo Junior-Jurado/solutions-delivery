@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// Polyfills for Node.js compatibility in browser (required by amazon-cognito-identity-js)
 import { Buffer } from "buffer";
 
 (window as any).global = window;

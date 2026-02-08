@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, fromEvent, Observable } from 'rxjs';
-import { debounceTime, map, startWith } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
 
 export interface DeviceInfo {
     isMobile: boolean;
@@ -73,6 +73,6 @@ export class DeviceDetectionService {
     isTouchDevice(): boolean {
         return 'ontouchstart' in window || 
                navigator.maxTouchPoints > 0 ||
-               (navigator as any).msMaxTouchPoints > 0;
+               ((navigator as Navigator & { msMaxTouchPoints?: number }).msMaxTouchPoints ?? 0) > 0;
     }
 }

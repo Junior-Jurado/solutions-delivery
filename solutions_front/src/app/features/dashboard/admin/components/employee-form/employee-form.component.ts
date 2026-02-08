@@ -17,16 +17,16 @@ export class EmployeeFormComponent {
   @Output() userFound = new EventEmitter<Employee>();
 
   // Search
-  documentNumber: string = '';
-  isSearching: boolean = false;
+  documentNumber = '';
+  isSearching = false;
 
   // User found
   foundUser: Employee | null = null;
-  searchError: string = '';
+  searchError = '';
 
   // Role editing
   selectedRole: UserRole | '' = '';
-  isUpdating: boolean = false;
+  isUpdating = false;
 
   // Available roles for assignment (ADMIN excluded)
   roles: { value: UserRole; label: string }[] = [
@@ -67,8 +67,9 @@ export class EmployeeFormComponent {
       this.selectedRole = user.role;
       // Emit event so parent can load statistics for this user
       this.userFound.emit(user);
-    } catch (error: any) {
-      if (error.status === 404) {
+    } catch (error) {
+      const httpError = error as { status?: number };
+      if (httpError.status === 404) {
         this.searchError = 'No se encontró ningún usuario con ese número de documento';
       } else {
         this.searchError = 'Error al buscar el usuario';
@@ -114,7 +115,7 @@ export class EmployeeFormComponent {
       this.toast.success(`Rol actualizado a ${this.getRoleLabel(this.selectedRole as UserRole)}`);
       this.userUpdated.emit(updatedUser);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error updating role:', error);
       this.toast.error('Error al actualizar el rol del usuario');
     } finally {

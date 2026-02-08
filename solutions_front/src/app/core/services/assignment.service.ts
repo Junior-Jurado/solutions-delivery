@@ -88,7 +88,7 @@ export interface AssignmentStatsResponse {
     in_progress_pickups: number;
     in_progress_deliveries: number;
     completed_today: number;
-    by_delivery_user: { [key: string]: number };
+    by_delivery_user: Record<string, number>;
 }
 
 export interface AssignmentsListResponse {
@@ -196,14 +196,14 @@ export class AssignmentService {
     async getAssignments(filters?: AssignmentFilters): Promise<AssignmentsListResponse> {
         const headers = this.getHeaders();
 
-        let params: any = {};
+        const params: Record<string, string> = {};
         if (filters) {
-            if (filters.status) params.status = filters.status;
-            if (filters.assignment_type) params.assignment_type = filters.assignment_type;
-            if (filters.delivery_user_id) params.delivery_user_id = filters.delivery_user_id;
-            if (filters.guide_id) params.guide_id = filters.guide_id;
-            if (filters.limit) params.limit = filters.limit;
-            if (filters.offset) params.offset = filters.offset;
+            if (filters.status) params['status'] = filters.status;
+            if (filters.assignment_type) params['assignment_type'] = filters.assignment_type;
+            if (filters.delivery_user_id) params['delivery_user_id'] = filters.delivery_user_id;
+            if (filters.guide_id) params['guide_id'] = String(filters.guide_id);
+            if (filters.limit) params['limit'] = String(filters.limit);
+            if (filters.offset) params['offset'] = String(filters.offset);
         }
 
         try {

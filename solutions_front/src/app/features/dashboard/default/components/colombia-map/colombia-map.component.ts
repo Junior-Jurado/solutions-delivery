@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface City {
@@ -27,10 +27,10 @@ interface AnimatedPackage {
   templateUrl: './colombia-map.component.html',
   styleUrls: ['./colombia-map.component.scss']
 })
-export class ColombiaMapComponent implements OnInit {
+export class ColombiaMapComponent implements OnInit, OnDestroy {
   Math = Math;
 
-  @Input() showAnimations: boolean = true;
+  @Input() showAnimations = true;
   @Output() citySelected = new EventEmitter<City>();
 
   // ✅ COORDENADAS PRE-CALCULADAS MANUALMENTE
@@ -55,7 +55,7 @@ export class ColombiaMapComponent implements OnInit {
 
   selectedCity: City | null = null;
   animatedPackages: AnimatedPackage[] = [];
-  private animationInterval: any;
+  private animationInterval: ReturnType<typeof setInterval> | null = null;
 
   ngOnInit() {
     // Ya no necesitamos calcular nada - las coordenadas están hardcodeadas

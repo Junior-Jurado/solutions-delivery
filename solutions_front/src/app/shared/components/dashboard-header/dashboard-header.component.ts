@@ -11,14 +11,14 @@ import { IconComponent } from '@shared/components/icon/icon.component';
   styleUrls: ['./dashboard-header.component.scss']
 })
 export class DashboardHeaderComponent {
-  @Input() userRole: string = 'Usuario';
-  @Input() userDescription: string = 'Panel de gestión';
-  @Input() userName: string = '';
-  @Input() companyName: string = 'SOLUCIONES';
-  @Input() showUserName: boolean = false;
-  @Input() isMobile: boolean = false;
-  @Input() showRefresh: boolean = false;
-  @Input() isRefreshing: boolean = false;
+  @Input() userRole = 'Usuario';
+  @Input() userDescription = 'Panel de gestión';
+  @Input() userName = '';
+  @Input() companyName = 'SOLUCIONES';
+  @Input() showUserName = false;
+  @Input() isMobile = false;
+  @Input() showRefresh = false;
+  @Input() isRefreshing = false;
 
   @Output() logout = new EventEmitter<void>();
   @Output() refresh = new EventEmitter<void>();

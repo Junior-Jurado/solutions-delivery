@@ -343,11 +343,13 @@ export class CitySelectorComponent implements OnInit, ControlValueAccessor {
     showResults = false;
     isLoading = false;
 
-    value: any;
-    onChange: any = () => {};
-    onTouch: any = () => {};
+    value: number | null = null;
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onChange: (value: number | null) => void = () => {};
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    onTouch: () => void = () => {};
 
-    private searchTimeout: any;
+    private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
     constructor(private locationService: LocationService) {}
 
@@ -376,7 +378,7 @@ export class CitySelectorComponent implements OnInit, ControlValueAccessor {
     onDepartmentChange(): void {
         if (!this.selectedDepartmentId) {
             this.filteredCities = [];
-            this.value = '';
+            this.value = null;
             return;
         }
 
@@ -414,7 +416,9 @@ export class CitySelectorComponent implements OnInit, ControlValueAccessor {
     }
 
     onSearch(): void {
-        clearTimeout(this.searchTimeout);
+        if (this.searchTimeout) {
+            clearTimeout(this.searchTimeout);
+        }
 
         if (this.searchTerm.length < 2) {
             this.searchResults = [];
@@ -445,21 +449,21 @@ export class CitySelectorComponent implements OnInit, ControlValueAccessor {
 
     clearSelection(): void {
         this.selectedCity = null;
-        this.value = '';
+        this.value = null;
         this.searchTerm = '';
         this.onChange(this.value);
     }
 
     // ControlValueAccessor implementation
-    writeValue(value: any): void {
+    writeValue(value: number | null): void {
         this.value = value;
     }
 
-    registerOnChange(fn: any): void {
+    registerOnChange(fn: (value: number | null) => void): void {
         this.onChange = fn;
     }
 
-    registerOnTouched(fn: any): void {
+    registerOnTouched(fn: () => void): void {
         this.onTouch = fn;
     }
 

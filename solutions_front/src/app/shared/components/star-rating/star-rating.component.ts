@@ -11,14 +11,14 @@ import { IconComponent } from '@shared/components/icon/icon.component';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class StarRatingComponent {
-  @Input() rating: number = 0;
-  @Input() maxStars: number = 5;
-  @Input() readonly: boolean = false;
+  @Input() rating = 0;
+  @Input() maxStars = 5;
+  @Input() readonly = false;
   @Input() size: 'small' | 'medium' | 'large' = 'medium';
 
   @Output() ratingChange = new EventEmitter<number>();
 
-  hoverRating: number = 0;
+  hoverRating = 0;
 
   get stars(): number[] {
     return Array(this.maxStars).fill(0).map((_, i) => i + 1);

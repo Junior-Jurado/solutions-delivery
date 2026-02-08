@@ -18,7 +18,7 @@ export const RoleGuard: CanActivateFn = async(route) => {
         // Rol no permitido -> redirección
         router.navigate(['/dashboard']);
         return false;
-    } catch (error) {
+    } catch {
         router.navigate(['/login']);
         return false;
     }

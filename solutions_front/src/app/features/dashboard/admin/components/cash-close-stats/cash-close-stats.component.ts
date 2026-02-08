@@ -16,7 +16,7 @@ export interface CashCloseStats {
 })
 export class CashCloseStatsComponent {
   @Input() stats: CashCloseStats | null = null;
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
 
   /**
    * Obtiene el año actual

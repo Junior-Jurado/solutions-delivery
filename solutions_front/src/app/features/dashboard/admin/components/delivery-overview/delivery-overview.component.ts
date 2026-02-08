@@ -10,11 +10,11 @@ import { IconComponent } from '@shared/components/icon/icon.component';
   imports: [CommonModule, IconComponent]
 })
 export class DeliveryOverviewComponent {
-  @Input() deliveriesToday: number = 0;
-  @Input() completed: number = 0;
-  @Input() pending: number = 0;
-  @Input() averageTime: number = 0;
-  @Input() satisfaction: number = 0;
+  @Input() deliveriesToday = 0;
+  @Input() completed = 0;
+  @Input() pending = 0;
+  @Input() averageTime = 0;
+  @Input() satisfaction = 0;
 
   get formattedAverageTime(): string {
     if (this.averageTime === 0) return 'N/A';

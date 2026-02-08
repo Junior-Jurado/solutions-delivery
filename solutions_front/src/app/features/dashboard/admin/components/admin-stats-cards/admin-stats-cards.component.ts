@@ -23,16 +23,16 @@ export interface AdminStatCard {
   imports: [CommonModule, IconComponent]
 })
 export class AdminStatsCardsComponent {
-  @Input() isLoading: boolean = false;
-  @Input() shipmentsToday: number = 0;
-  @Input() shipmentsChange: number = 0;
-  @Input() delivered: number = 0;
-  @Input() deliverySuccessRate: number = 0;
-  @Input() pending: number = 0;
-  @Input() pendingInRoute: number = 0;
-  @Input() pendingInOffice: number = 0;
-  @Input() revenueToday: number = 0;
-  @Input() revenueChange: number = 0;
+  @Input() isLoading = false;
+  @Input() shipmentsToday = 0;
+  @Input() shipmentsChange = 0;
+  @Input() delivered = 0;
+  @Input() deliverySuccessRate = 0;
+  @Input() pending = 0;
+  @Input() pendingInRoute = 0;
+  @Input() pendingInOffice = 0;
+  @Input() revenueToday = 0;
+  @Input() revenueChange = 0;
 
   getStatCards(): AdminStatCard[] {
     return [

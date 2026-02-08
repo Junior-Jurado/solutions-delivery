@@ -99,16 +99,17 @@ export class CashCloseService {
 
             console.log('Cierre de caja generado:', response);
             return response;
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error al generar cierre de caja:', error);
-            throw new Error(error.error?.error || 'Error al generar el cierre de caja');
+            const message = error instanceof Error ? error.message : 'Error al generar el cierre de caja';
+            throw new Error(message);
         }
     }
 
     /**
      * Obtiene lista de cierres de caja
      */
-    async listCashCloses(limit: number = 20, offset: number = 0): Promise<CashCloseListResponse> {
+    async listCashCloses(limit = 20, offset = 0): Promise<CashCloseListResponse> {
         const headers = this.getHeaders();
         const params = new HttpParams()
             .set('limit', limit.toString())

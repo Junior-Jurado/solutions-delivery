@@ -547,7 +547,7 @@ import { TranslationService } from '@shared/services/translation.service';
 })
 export class GuideDetailsModalComponent {
   @Input() guide: ShippingGuide | null = null;
-  @Input() isOpen: boolean = false;
+  @Input() isOpen = false;
   @Output() closeModal = new EventEmitter<void>();
   @Output() downloadPDFEvent = new EventEmitter<number>();
 

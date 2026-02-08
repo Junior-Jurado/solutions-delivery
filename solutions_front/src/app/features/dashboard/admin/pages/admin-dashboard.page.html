@@ -366,8 +366,8 @@
       warningMessage="Verifique la información. Como administrador, puede modificar el precio antes de confirmar."
       confirmButtonText="Crear Guía"
       cancelButtonText="Cancelar"
-      (confirm)="confirmGuideCreation($event)"
-      (cancel)="cancelGuideCreation()"
+      (confirmAction)="confirmGuideCreation($event)"
+      (cancelAction)="cancelGuideCreation()"
       (closeModal)="cancelGuideCreation()">
     </app-guide-preview-modal>
 

@@ -21,7 +21,7 @@ export interface DeliveryItem {
 })
 export class RealtimeDeliveriesComponent {
   @Input() deliveries: DeliveryItem[] = [];
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
   @Output() viewGuide = new EventEmitter<number>();
 
   getStatusClass(status: string): string {
@@ -63,7 +63,7 @@ export class RealtimeDeliveriesComponent {
 
   getServiceTypeLabel(serviceType: string | undefined): string {
     if (!serviceType) return 'Estándar';
-    const types: { [key: string]: string } = {
+    const types: Record<string, string> = {
       'STANDARD': 'Estándar',
       'EXPRESS': 'Express',
       'SAME_DAY': 'Mismo día',

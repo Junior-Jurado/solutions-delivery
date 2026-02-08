@@ -4,18 +4,19 @@ import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 
 // Services
-import { 
-    GuideService, 
+import {
+    GuideService,
     ShippingGuide,
     GuideStatus,
-    GuideStatsResponse
+    GuideStatsResponse,
+    GuideFormValue
 } from "@core/services/guide.service";
 import { LocationService, City } from "@core/services/location.service";
 import { ToastService } from "@shared/services/toast.service";
 import { TranslationService } from "@shared/services/translation.service";
 
 // Components
-import { GuidePreviewModalComponent, GuidePreviewData } from "@shared/components/guide-preview-modal/guide-preview-modal.component";
+import { GuidePreviewModalComponent } from "@shared/components/guide-preview-modal/guide-preview-modal.component";
 import { GuideFormComponent } from '@shared/components/guide-form/guide-form.component';
 import { GuideListComponent } from "../components/guide-list/guide-list.component";
 import { GuideFiltersComponent, GuideFilterValues } from "../components/guide-filters/guide-filters.component";
@@ -73,42 +74,42 @@ export class SecretaryDashboardPage implements OnInit {
     // ==========================================
     // NAVIGATION
     // ==========================================
-    activeTab: string = 'create-guide';
+    activeTab = 'create-guide';
 
     // ==========================================
     // USER
     // ==========================================
-    currentUserId: string = '';
-    userName: string = '';
+    currentUserId = '';
+    userName = '';
 
     // ==========================================
     // GUIDES MANAGEMENT
     // ==========================================
     guides: ShippingGuide[] = [];
-    isLoadingGuides: boolean = false;
-    totalGuides: number = 0;
-    currentPage: number = 0;
-    pageSize: number = 20;
+    isLoadingGuides = false;
+    totalGuides = 0;
+    currentPage = 0;
+    pageSize = 20;
 
     // Filters
     filterCities: City[] = [];
     selectedStatusFilter: GuideStatus | '' = '';
     selectedCityFilter: number | '' = '';
-    dateFromFilter: string = '';
-    dateToFilter: string = '';
+    dateFromFilter = '';
+    dateToFilter = '';
 
     // ==========================================
     // SEARCH & TRACKING
     // ==========================================
-    trackingSearch: string = '';
+    trackingSearch = '';
     searchResults: ShippingGuide[] = [];
-    isSearching: boolean = false;
+    isSearching = false;
 
     // ==========================================
     // STATISTICS
     // ==========================================
     stats: GuideStatsResponse | null = null;
-    isLoadingStats: boolean = false;
+    isLoadingStats = false;
 
     // Estados disponibles para Status Distribution
     availableStatuses: { value: GuideStatus; label: string }[] = [
@@ -122,21 +123,21 @@ export class SecretaryDashboardPage implements OnInit {
     // ==========================================
     // GUIDE PREVIEW MODAL
     // ==========================================
-    showGuidePreview: boolean = false;
+    showGuidePreview = false;
     guidePreviewData: GuidePreview | null = null;
-    pendingGuideData: any = null;
-    isCreatingGuide: boolean = false;
+    pendingGuideData: GuideFormValue | null = null;
+    isCreatingGuide = false;
 
     // ==========================================
     // MODAL
     // ==========================================
     selectedGuideForDetails: ShippingGuide | null = null;
-    isDetailsModalOpen: boolean = false;
+    isDetailsModalOpen = false;
 
     // ==========================================
     // REFRESH
     // ==========================================
-    isRefreshing: boolean = false;
+    isRefreshing = false;
 
     // ==========================================
     // CONSTRUCTOR
@@ -229,7 +230,7 @@ export class SecretaryDashboardPage implements OnInit {
     // ==========================================
     // GUIDE FORM HANDLERS 
     // ==========================================
-    handleGuideFormSubmit(formData: any): void {
+    handleGuideFormSubmit(formData: GuideFormValue): void {
         // Calculamos el precio
         const calculatedPrice = this.guideService.calculatePrice(formData);
         
@@ -240,24 +241,24 @@ export class SecretaryDashboardPage implements OnInit {
         this.guidePreviewData = {
             // Remitente
             senderName: formData.senderName,
-            senderCity: formData.senderCityName,
+            senderCity: formData.senderCityName || '',
             senderAddress: formData.senderAddress,
             senderPhone: formData.senderPhone,
-            senderDoc: `${formData.senderDocType} ${formData.senderDoc}`,
-      
+            senderDoc: `${formData.senderDocType || 'CC'} ${formData.senderDoc}`,
+
             // Destinatario
             receiverName: formData.receiverName,
-            receiverCity: formData.receiverCityName,
+            receiverCity: formData.receiverCityName || '',
             receiverAddress: formData.receiverAddress,
             receiverPhone: formData.receiverPhone,
-            receiverDoc: `${formData.receiverDocType} ${formData.receiverDoc}`,
-      
+            receiverDoc: `${formData.receiverDocType || 'CC'} ${formData.receiverDoc}`,
+
             // Paquete
-            weight: formData.weight,
-            declaredValue: formData.declaredValue,
+            weight: Number(formData.weight) || 0,
+            declaredValue: Number(formData.declaredValue) || 0,
             serviceType: formData.serviceType,
-            pieces: formData.pieces || 1,
-            dimensions: formData.dimensions || '',
+            pieces: Number(formData.pieces) || 1,
+            dimensions: formData.dimensions || '20x15x10',
 
             // Precio
             calculatedPrice: calculatedPrice
@@ -270,9 +271,8 @@ export class SecretaryDashboardPage implements OnInit {
 
     /**
      * Confirma y crea la guía
-     * @param finalPrice - El precio final (viene del modal, puede ser el calculado o personalizado por admin)
      */
-    async confirmGuideCreation(finalPrice?: number): Promise<void> {
+    async confirmGuideCreation(_finalPrice?: number): Promise<void> {
         if (!this.pendingGuideData) return;
 
         this.isCreatingGuide = true;
@@ -310,9 +310,10 @@ export class SecretaryDashboardPage implements OnInit {
             this.setActiveTab('manage-guides');
             await this.loadGuides();
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error creating guide:', error);
-            this.toast.error(error.message || 'Error al crear la guía');
+            const message = error instanceof Error ? error.message : 'Error al crear la guía';
+            this.toast.error(message);
         } finally {
             this.isCreatingGuide = false;
             this.guideFormComponent.setSubmitting(false);
@@ -339,15 +340,15 @@ export class SecretaryDashboardPage implements OnInit {
         this.guides = [];
         this.cdr.detectChanges();
 
-        const filters: any = {
+        const filters: Record<string, string | number> = {
             limit: this.pageSize,
             offset: this.currentPage * this.pageSize
         };
 
-        if (this.selectedStatusFilter) filters.status = this.selectedStatusFilter;
-        if (this.selectedCityFilter) filters.destination_city_id = Number(this.selectedCityFilter);
-        if (this.dateFromFilter) filters.date_from = this.dateFromFilter;
-        if (this.dateToFilter) filters.date_to = this.dateToFilter;
+        if (this.selectedStatusFilter) filters['status'] = this.selectedStatusFilter;
+        if (this.selectedCityFilter) filters['destination_city_id'] = Number(this.selectedCityFilter);
+        if (this.dateFromFilter) filters['date_from'] = this.dateFromFilter;
+        if (this.dateToFilter) filters['date_to'] = this.dateToFilter;
 
         try {
             const response = await this.guideService.listGuides(filters);
@@ -355,7 +356,7 @@ export class SecretaryDashboardPage implements OnInit {
             this.totalGuides = response.total || 0;
 
             console.log('Guías cargadas:', this.guides.length, 'de', this.totalGuides);
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error al cargar guías:', error);
             this.guides = [];
             this.totalGuides = 0;
@@ -443,7 +444,7 @@ export class SecretaryDashboardPage implements OnInit {
             } else {
                 this.toast.success(`Se encontraron ${this.searchResults.length} resultado(s)`);
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error en búsqueda:', error);
             this.searchResults = [];
             this.toast.error('Error al buscar guías');

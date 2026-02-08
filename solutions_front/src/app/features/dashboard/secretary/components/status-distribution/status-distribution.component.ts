@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { GuideStatus } from '@core/services/guide.service';
 import { IconComponent } from '@shared/components/icon/icon.component';
 
-export interface StatusCount {
-  [key: string]: number;
-}
+export type StatusCount = Record<string, number>;
 
 export interface StatusItem {
   value: GuideStatus;
@@ -21,7 +19,7 @@ export interface StatusItem {
 })
 export class StatusDistributionComponent {
   @Input() statusCounts: StatusCount = {};
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
 
   // Estados disponibles para mostrar
   availableStatuses: StatusItem[] = [

@@ -11,7 +11,7 @@ import { IconComponent } from '@shared/components/icon/icon.component';
   styleUrls: ['./tracking-card.component.scss']
 })
 export class TrackingCardComponent {
-  trackingNumber: string = '';
+  trackingNumber = '';
   
   @Output() trackingSubmit = new EventEmitter<string>();
 

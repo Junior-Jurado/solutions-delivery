@@ -14,7 +14,6 @@ import {
 } from "@core/services/cash-close.service";
 import {
     AdminService,
-    AdminDashboardStats,
     Employee as BackendEmployee,
     SystemAlert as BackendAlert,
     WorkerStats,
@@ -23,7 +22,7 @@ import {
     StatusCount
 } from "@core/services/admin.service";
 import { AssignmentService, DeliveryUser, PendingGuide } from "@core/services/assignment.service";
-import { GuideService } from "@core/services/guide.service";
+import { GuideService, GuideFormValue } from "@core/services/guide.service";
 
 // Shared Components
 import { IconComponent } from "@shared/components/icon/icon.component";
@@ -148,7 +147,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // ==========================================
     // NAVIGATION
     // ==========================================
-    activeTab: string = 'stats';
+    activeTab = 'stats';
 
     // Sub-tabs para Operaciones (Empleados + Guías + Clientes)
     operationsSubTab: 'employees' | 'guides' | 'clients' = 'employees';
@@ -159,29 +158,29 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // ==========================================
     // USER
     // ==========================================
-    currentUserId: string = '';
-    userName: string = '';
+    currentUserId = '';
+    userName = '';
 
     // ==========================================
     // LOADING STATES
     // ==========================================
-    isLoadingStats: boolean = false;
-    isLoadingEmployees: boolean = false;
-    isLoadingDeliveries: boolean = false;
-    isLoadingRoutes: boolean = false;
-    isRefreshing: boolean = false;
+    isLoadingStats = false;
+    isLoadingEmployees = false;
+    isLoadingDeliveries = false;
+    isLoadingRoutes = false;
+    isRefreshing = false;
 
     // ==========================================
     // CASH CLOSE
     // ==========================================
-    isGeneratingClose: boolean = false;
+    isGeneratingClose = false;
     cashCloses: CashClose[] = [];
-    isLoadingCloses: boolean = false;
-    totalCloses: number = 0;
-    currentClosePage: number = 0;
-    closePageSize: number = 10;
+    isLoadingCloses = false;
+    totalCloses = 0;
+    currentClosePage = 0;
+    closePageSize = 10;
     cashCloseStats: CashCloseStatsResponse | null = null;
-    isLoadingCloseStats: boolean = false;
+    isLoadingCloseStats = false;
 
     // ==========================================
     // STATS DATA
@@ -243,17 +242,17 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // ==========================================
     // GUIDE MODAL
     // ==========================================
-    isGuideModalOpen: boolean = false;
+    isGuideModalOpen = false;
     selectedGuideId: number | null = null;
 
     // ==========================================
     // GUIDE CREATION (Admin)
     // ==========================================
     guidesSubTab: 'create' | 'manage' = 'manage';
-    showGuidePreview: boolean = false;
+    showGuidePreview = false;
     guidePreviewData: GuidePreviewData | null = null;
-    pendingGuideData: any = null;
-    isCreatingGuide: boolean = false;
+    pendingGuideData: GuideFormValue | null = null;
+    isCreatingGuide = false;
 
     // ==========================================
     // VIEW CHILDREN
@@ -265,7 +264,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // ==========================================
     // REFRESH INTERVAL
     // ==========================================
-    private refreshInterval: any = null;
+    private refreshInterval: ReturnType<typeof setInterval> | null = null;
 
     // ==========================================
     // CONSTRUCTOR
@@ -400,7 +399,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // ==========================================
     // DATA LOADERS
     // ==========================================
-    async loadStats(silent: boolean = false): Promise<void> {
+    async loadStats(silent = false): Promise<void> {
         if (!silent) {
             this.isLoadingStats = true;
             this.cdr.detectChanges();
@@ -567,13 +566,13 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // ==========================================
     // EVENT HANDLERS
     // ==========================================
-    handleUserUpdated(employee: any): void {
+    handleUserUpdated(employee: BackendEmployee): void {
         console.log('User updated:', employee);
         // Reload employees list
         this.loadEmployees();
     }
 
-    handleUserFound(employee: any): void {
+    handleUserFound(employee: BackendEmployee): void {
         console.log('User found via document search:', employee);
         // Reload stats and employees to show updated statistics
         this.loadStats(true);
@@ -621,7 +620,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
         }
     }
 
-    handleGuideFormSubmit(formData: any): void {
+    handleGuideFormSubmit(formData: GuideFormValue): void {
         // Calcular el precio
         const calculatedPrice = this.guideService.calculatePrice(formData);
 
@@ -631,19 +630,19 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
         // Preparar datos para el preview
         this.guidePreviewData = {
             senderName: formData.senderName,
-            senderCity: formData.senderCityName,
+            senderCity: formData.senderCityName || '',
             senderAddress: formData.senderAddress,
             senderPhone: formData.senderPhone,
-            senderDoc: `${formData.senderDocType} ${formData.senderDoc}`,
+            senderDoc: `${formData.senderDocType || ''} ${formData.senderDoc}`,
             receiverName: formData.receiverName,
-            receiverCity: formData.receiverCityName,
+            receiverCity: formData.receiverCityName || '',
             receiverAddress: formData.receiverAddress,
             receiverPhone: formData.receiverPhone,
-            receiverDoc: `${formData.receiverDocType} ${formData.receiverDoc}`,
-            weight: formData.weight,
-            declaredValue: formData.declaredValue,
+            receiverDoc: `${formData.receiverDocType || ''} ${formData.receiverDoc}`,
+            weight: Number(formData.weight) || 0,
+            declaredValue: Number(formData.declaredValue) || 0,
             serviceType: formData.serviceType,
-            pieces: formData.pieces || 1,
+            pieces: Number(formData.pieces) || 1,
             dimensions: formData.dimensions || '',
             calculatedPrice: calculatedPrice
         };
@@ -695,9 +694,10 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
             // Cambiar a la sub-tab de gestión y recargar
             this.setGuidesSubTab('manage');
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error creating guide:', error);
-            this.toast.error(error.message || 'Error al crear la guía');
+            const message = error instanceof Error ? error.message : 'Error al crear la guía';
+            this.toast.error(message);
         } finally {
             this.isCreatingGuide = false;
             if (this.guideFormComponent) {
@@ -752,7 +752,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     }
 
     private translateStatus(status: string): string {
-        const statusMap: { [key: string]: string } = {
+        const statusMap: Record<string, string> = {
             'CREATED': 'Creado',
             'IN_ROUTE': 'En ruta',
             'IN_WAREHOUSE': 'En bodega',
@@ -763,7 +763,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     }
 
     private getStatusColor(status: string): string {
-        const colorMap: { [key: string]: string } = {
+        const colorMap: Record<string, string> = {
             'CREATED': 'warning',
             'IN_ROUTE': 'primary',
             'IN_WAREHOUSE': 'secondary',
@@ -774,7 +774,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     }
 
     private translateRole(role: string): string {
-        const roleMap: { [key: string]: string } = {
+        const roleMap: Record<string, string> = {
             'CLIENT': 'Cliente',
             'ADMIN': 'Administrador',
             'SECRETARY': 'Secretaria',
@@ -784,7 +784,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     }
 
     private mapDeliveryStatus(status: string): 'En ruta' | 'Entregado' | 'Pendiente' {
-        const statusMap: { [key: string]: 'En ruta' | 'Entregado' | 'Pendiente' } = {
+        const statusMap: Record<string, 'En ruta' | 'Entregado' | 'Pendiente'> = {
             'IN_ROUTE': 'En ruta',
             'OUT_FOR_DELIVERY': 'En ruta',
             'DELIVERED': 'Entregado',
@@ -847,9 +847,10 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
             await this.loadCashCloses();
             await this.loadCashCloseStats();
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error al generar cierre:', error);
-            this.toast.error(error.message || 'Error al generar el cierre de caja');
+            const message = error instanceof Error ? error.message : 'Error al generar el cierre de caja';
+            this.toast.error(message);
         } finally {
             this.isGeneratingClose = false;
             this.cdr.detectChanges();

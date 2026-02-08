@@ -15,13 +15,13 @@ import { ToastService } from '@shared/services/toast.service';
 })
 export class GuideAdminModalComponent implements OnChanges {
   @Input() guideId: number | null = null;
-  @Input() isOpen: boolean = false;
+  @Input() isOpen = false;
   @Output() closeModal = new EventEmitter<void>();
   @Output() statusUpdated = new EventEmitter<{ guideId: number; newStatus: GuideStatus }>();
 
   guide: ShippingGuide | null = null;
-  isLoading: boolean = false;
-  isUpdatingStatus: boolean = false;
+  isLoading = false;
+  isUpdatingStatus = false;
   selectedStatus: GuideStatus | null = null;
   errorMessage: string | null = null;
   private lastLoadedGuideId: number | null = null;
@@ -101,9 +101,9 @@ export class GuideAdminModalComponent implements OnChanges {
         this.errorMessage = errMsg;
         this.toast.error(errMsg);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error al cargar guía:', error);
-      const errMsg = error?.error?.message || error?.message || 'Error al cargar los detalles de la guía';
+      const errMsg = error instanceof Error ? error.message : 'Error al cargar los detalles de la guía';
       this.errorMessage = errMsg;
       this.toast.error(errMsg);
     } finally {
@@ -168,7 +168,7 @@ export class GuideAdminModalComponent implements OnChanges {
   }
 
   getStatusBadgeClass(status: string): string {
-    const classMap: { [key: string]: string } = {
+    const classMap: Record<string, string> = {
       'CREATED': 'badge-warning',
       'IN_ROUTE': 'badge-info',
       'IN_WAREHOUSE': 'badge-secondary',
@@ -178,16 +178,11 @@ export class GuideAdminModalComponent implements OnChanges {
     return classMap[status] || 'badge-default';
   }
 
-  canChangeToStatus(status: GuideStatus): boolean {
+  canChangeToStatus(_status: GuideStatus): boolean {
     if (!this.guide) return false;
 
-    // Admin can change to any status, but we provide visual hints
-    // based on the workflow
-    const currentIndex = this.availableStatuses.findIndex(s => s.value === this.guide!.current_status);
-    const targetIndex = this.availableStatuses.findIndex(s => s.value === status);
-
-    // Allow going forward in the workflow, or going back if needed
-    return true; // Admin has full control
+    // Admin has full control over status changes
+    return true;
   }
 
   formatDate(dateString: string): string {

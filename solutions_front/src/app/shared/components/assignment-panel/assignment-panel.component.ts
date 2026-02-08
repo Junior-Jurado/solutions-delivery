@@ -8,8 +8,7 @@ import {
     PendingGuide,
     PendingGuidesResponse,
     AssignmentStatsResponse,
-    DeliveryAssignment,
-    AssignmentType
+    DeliveryAssignment
 } from '@core/services/assignment.service';
 import { ToastService } from '@shared/services/toast.service';
 import { IconComponent } from '@shared/components/icon/icon.component';
@@ -33,17 +32,17 @@ export class AssignmentPanelComponent implements OnInit {
     stats: AssignmentStatsResponse | null = null;
 
     // Loading states
-    isLoadingUsers: boolean = false;
-    isLoadingGuides: boolean = false;
-    isLoadingStats: boolean = false;
-    isLoadingAssignments: boolean = false;
-    isAssigning: boolean = false;
+    isLoadingUsers = false;
+    isLoadingGuides = false;
+    isLoadingStats = false;
+    isLoadingAssignments = false;
+    isAssigning = false;
 
     // Assignment modal
-    showAssignModal: boolean = false;
+    showAssignModal = false;
     selectedGuide: PendingGuide | null = null;
-    selectedDeliveryUserId: string = '';
-    assignmentNotes: string = '';
+    selectedDeliveryUserId = '';
+    assignmentNotes = '';
 
     // View toggle
     activeView: 'pickups' | 'deliveries' | 'history' = 'pickups';
@@ -158,7 +157,7 @@ export class AssignmentPanelComponent implements OnInit {
         this.cdr.detectChanges();
 
         try {
-            const response = await this.assignmentService.createAssignment({
+            await this.assignmentService.createAssignment({
                 guide_id: this.selectedGuide.guide_id,
                 delivery_user_id: this.selectedDeliveryUserId,
                 assignment_type: this.selectedGuide.assignment_type,
@@ -179,9 +178,10 @@ export class AssignmentPanelComponent implements OnInit {
             // Recargar datos
             await this.loadAll();
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error al asignar:', error);
-            this.toast.error(error.message || 'Error al crear la asignación');
+            const message = error instanceof Error ? error.message : 'Error al crear la asignación';
+            this.toast.error(message);
         } finally {
             this.isAssigning = false;
             this.cdr.detectChanges();

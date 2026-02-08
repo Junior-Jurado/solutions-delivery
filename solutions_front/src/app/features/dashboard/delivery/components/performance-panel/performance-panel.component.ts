@@ -14,5 +14,5 @@ import { StarRatingComponent } from '@shared/components/star-rating/star-rating.
 })
 export class PerformancePanelComponent {
   @Input() performanceStats: PerformanceStats | null = null;
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
 }

@@ -12,20 +12,20 @@ import { ShippingGuide, GuideStatus } from '@core/services/guide.service';
 })
 export class GuideSearchComponent {
   @Input() searchResults: ShippingGuide[] = [];
-  @Input() isSearching: boolean = false;
+  @Input() isSearching = false;
 
-  @Output() search = new EventEmitter<string>();
+  @Output() searchGuide = new EventEmitter<string>();
   @Output() viewDetails = new EventEmitter<number>();
   @Output() downloadPDF = new EventEmitter<number>();
 
-  searchQuery: string = '';
+  searchQuery = '';
 
   /**
    * Maneja el envío del formulario de búsqueda
    */
   onSearch(): void {
     if (this.searchQuery && this.searchQuery.length >= 3) {
-      this.search.emit(this.searchQuery);
+      this.searchGuide.emit(this.searchQuery);
     }
   }
 

@@ -13,7 +13,7 @@ import { ClientProfile } from '@core/services/client.service';
 })
 export class DashboardHeaderComponent {
   @Input() currentUser: ClientProfile | null = null;
-  @Input() isMobile: boolean = false;
+  @Input() isMobile = false;
   
   @Output() logout = new EventEmitter<void>();
 

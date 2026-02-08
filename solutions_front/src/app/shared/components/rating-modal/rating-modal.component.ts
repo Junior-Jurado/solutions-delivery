@@ -20,18 +20,18 @@ export interface RatingSubmitData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RatingModalComponent {
-  @Input() isOpen: boolean = false;
-  @Input() deliveryUserName: string = '';
-  @Input() guideId: number = 0;
-  @Input() assignmentId: number = 0;
-  @Input() serviceType: string = '';
-  @Input() isSubmitting: boolean = false;
+  @Input() isOpen = false;
+  @Input() deliveryUserName = '';
+  @Input() guideId = 0;
+  @Input() assignmentId = 0;
+  @Input() serviceType = '';
+  @Input() isSubmitting = false;
 
   @Output() closeModal = new EventEmitter<void>();
   @Output() submitRating = new EventEmitter<RatingSubmitData>();
 
-  rating: number = 0;
-  comment: string = '';
+  rating = 0;
+  comment = '';
 
   constructor(private cdr: ChangeDetectorRef) {}
 

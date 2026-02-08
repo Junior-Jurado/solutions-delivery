@@ -87,9 +87,10 @@ export class RatingService {
                 )
             );
             return response;
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error al crear calificación:', error);
-            throw new Error(error.error?.error || 'Error al enviar la calificación');
+            const message = error instanceof Error ? error.message : 'Error al enviar la calificación';
+            throw new Error(message);
         }
     }
 

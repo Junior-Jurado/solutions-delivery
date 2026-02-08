@@ -13,5 +13,5 @@ import { IconComponent } from '@shared/components/icon/icon.component';
 })
 export class DeliveryStatsComponent {
   @Input() stats: MyAssignmentStats | null = null;
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
 }

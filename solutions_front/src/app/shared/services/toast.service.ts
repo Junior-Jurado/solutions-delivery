@@ -1,4 +1,4 @@
-import { Injectable, ApplicationRef, Injector, EnvironmentInjector, createComponent, ComponentRef } from '@angular/core';
+import { Injectable, ApplicationRef, EnvironmentInjector, createComponent, ComponentRef } from '@angular/core';
 import { ToastComponent } from '@shared/components/toast.component';
 
 export type ToastType = 'success' | 'error' | 'info' | 'warning';
@@ -27,7 +27,7 @@ export class ToastService {
   /**
    * Muestra un toast de éxito
    */
-  success(message: string, duration: number = 3000): void {
+  success(message: string, duration = 3000): void {
     console.log('Toast success:', message);
     this.show({
       message,
@@ -40,7 +40,7 @@ export class ToastService {
   /**
    * Muestra un toast de error
    */
-  error(message: string, duration: number = 4000): void {
+  error(message: string, duration = 4000): void {
     console.log('Toast error:', message);
     this.show({
       message,
@@ -53,7 +53,7 @@ export class ToastService {
   /**
    * Muestra un toast informativo (centrado para mensajes largos)
    */
-  info(message: string, duration: number = 5000): void {
+  info(message: string, duration = 5000): void {
     console.log('Toast info:', message);
     this.show({
       message,
@@ -67,7 +67,7 @@ export class ToastService {
   /**
    * Muestra un toast de advertencia
    */
-  warning(message: string, duration: number = 3500): void {
+  warning(message: string, duration = 3500): void {
     console.log('Toast warning:', message);
     this.show({
       message,

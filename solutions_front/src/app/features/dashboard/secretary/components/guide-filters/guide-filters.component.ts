@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { City } from '@core/services/location.service';
@@ -18,9 +18,9 @@ export interface GuideFilterValues {
   styleUrls: ['./guide-filters.component.scss'],
   imports: [CommonModule, FormsModule]
 })
-export class GuideFiltersComponent implements OnInit {
+export class GuideFiltersComponent {
   @Input() cities: City[] = [];
-  @Input() isLoading: boolean = false;
+  @Input() isLoading = false;
 
   @Output() filterApplied = new EventEmitter<GuideFilterValues>();
   @Output() filterCleared = new EventEmitter<void>();
@@ -28,12 +28,12 @@ export class GuideFiltersComponent implements OnInit {
   // Valores del formulario
   selectedStatus: GuideStatus | '' = '';
   selectedCity: number | '' = '';
-  dateFrom: string = '';
-  dateTo: string = '';
+  dateFrom = '';
+  dateTo = '';
 
   // Para display de fechas en formato dd/mm/yyyy
-  displayDateFrom: string = '';
-  displayDateTo: string = '';
+  displayDateFrom = '';
+  displayDateTo = '';
 
   // Estados disponibles
   availableStatuses: { value: GuideStatus; label: string }[] = [
@@ -43,10 +43,6 @@ export class GuideFiltersComponent implements OnInit {
     { value: 'OUT_FOR_DELIVERY', label: 'En reparto' },
     { value: 'DELIVERED', label: 'Entregada' }
   ];
-
-  ngOnInit(): void {
-    // Inicialización si es necesaria
-  }
 
   /**
    * Aplica los filtros

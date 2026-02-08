@@ -14,11 +14,11 @@ import { IconComponent } from '@shared/components/icon/icon.component';
 })
 export class ClientRankingComponent implements OnInit {
   // Loading state
-  isLoading: boolean = false;
+  isLoading = false;
 
   // Data
   clients: ClientRanking[] = [];
-  totalClients: number = 0;
+  totalClients = 0;
 
   // Filters
   filters: ClientRankingFilters = {
@@ -29,8 +29,8 @@ export class ClientRankingComponent implements OnInit {
   };
 
   // Date range for filtering
-  dateFrom: string = '';
-  dateTo: string = '';
+  dateFrom = '';
+  dateTo = '';
 
   // Sort options
   sortOptions: { value: string; label: string }[] = [

@@ -32,8 +32,8 @@ export class RouteAssignmentFormComponent {
   @Input() availablePackages: PackageItem[] = [];
   @Output() assignRoute = new EventEmitter<RouteAssignment>();
 
-  selectedDeliveryPerson: string = '';
-  selectedPriority: string = '';
+  selectedDeliveryPerson = '';
+  selectedPriority = '';
 
   priorities = [
     { value: 'high', label: 'Alta' },

@@ -34,12 +34,12 @@ import { Observable } from 'rxjs';
   `]
 })
 export class IconComponent implements OnInit {
-  @Input() category: string = 'common';
+  @Input() category = 'common';
   @Input() name!: string;
-  @Input() size: string = '20px';
+  @Input() size = '20px';
   @Input() color?: string;
   @Input() customClass?: string;
-  @Input() preserveColors: boolean = false;
+  @Input() preserveColors = false;
 
   icon$!: Observable<SafeHtml>;
 
