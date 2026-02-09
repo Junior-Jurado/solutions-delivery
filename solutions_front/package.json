@@ -41,12 +41,14 @@
     "leaflet": "^1.9.4",
     "process": "^0.11.10",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "zone.js": "^0.15.1"
   },
   "devDependencies": {
     "@angular/build": "^20.3.3",
     "@angular/cli": "^20.3.3",
     "@angular/compiler-cli": "^20.3.0",
+    "@angular/platform-browser-dynamic": "^20.3.16",
     "@types/express": "^5.0.1",
     "@types/jasmine": "~5.1.0",
     "@types/leaflet": "^1.9.8",

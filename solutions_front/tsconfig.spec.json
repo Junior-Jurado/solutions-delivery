@@ -5,9 +5,10 @@
     "types": ["jasmine", "node"]
   },
   "files": [
-    "src/polyfills.browser.ts"
+    "src/test.ts"
   ],
   "include": [
+    "src/polyfills.browser.ts",
     "src/**/*.spec.ts",
     "src/**/*.d.ts"
   ]
