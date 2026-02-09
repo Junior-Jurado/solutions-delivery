@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '@environments/environments.dev';
+import { environment } from '@environments/environment';
 import { ShippingGuide, GuideStatus } from './guide.service';
 
 export interface ClientProfile {

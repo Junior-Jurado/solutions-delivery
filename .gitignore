@@ -95,8 +95,16 @@ npm-debug.log
 yarn-error.log
 pnpm-debug.log
 
-# Ignorar toda la carpeta environments del frontend
-solutions_front/src/app/environments/
+###########################################################
+# ANGULAR ENVIRONMENTS
+###########################################################
+
+# permitir environments base versionados
+!solutions_front/src/environments/
+
+# ignorar archivos locales sensibles
+solutions_front/src/environments/*.local.ts
+solutions_front/src/environments/*.secrets.ts
 
 
 ###########################################################

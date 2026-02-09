@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { from, of, Observable } from 'rxjs';
 import { firstValueFrom, catchError } from 'rxjs';
-import { environment } from '../../environments/environments.dev';
+import { environment } from '../../environments/environment.dev';
 
 const poolData = {
     UserPoolId: environment.cognito.userPoolId,

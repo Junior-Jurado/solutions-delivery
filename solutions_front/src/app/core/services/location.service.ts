@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
-import { environment } from '../../environments/environments.dev';
+import { environment } from '../../environments/environment.dev';
 
 export interface Department {
     id: number;
