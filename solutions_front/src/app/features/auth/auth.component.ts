@@ -42,9 +42,18 @@ export class AuthComponent implements OnInit {
     confirmCode = '';
 
     // ==========================================
+    // FORGOT PASSWORD FIELDS
+    // ==========================================
+    forgotEmail = '';
+    forgotCode = '';
+    forgotNewPassword = '';
+    forgotConfirmPassword = '';
+    forgotStep: 'email' | 'confirm' = 'email';
+
+    // ==========================================
     // UI STATE
     // ==========================================
-    authTab: 'login' | 'register' | 'confirm' = 'login';
+    authTab: 'login' | 'register' | 'confirm' | 'forgot' = 'login';
     isLoading = false;
     isResendingCode = false;
 
@@ -60,6 +69,10 @@ export class AuthComponent implements OnInit {
     regNumberDocumentError = '';
     regPasswordError = '';
     confirmCodeError = '';
+    forgotEmailError = '';
+    forgotCodeError = '';
+    forgotNewPasswordError = '';
+    forgotConfirmPasswordError = '';
 
     // ==========================================
     // CONSTRUCTOR
@@ -504,8 +517,111 @@ export class AuthComponent implements OnInit {
         if (this.isLoading) return;
         this.clearRegisterErrors();
         this.clearConfirmErrors();
+        this.clearForgotErrors();
         this.authTab = 'login';
         this.cdr.detectChanges();
+    }
+
+    switchToForgotPassword(): void {
+        if (this.isLoading) return;
+        this.clearLoginErrors();
+        this.forgotEmail = this.email; // Pre-llenar con el email del login si existe
+        this.forgotStep = 'email';
+        this.authTab = 'forgot';
+        this.cdr.detectChanges();
+    }
+
+    // ==========================================
+    // FORGOT PASSWORD HANDLERS
+    // ==========================================
+
+    clearForgotErrors(): void {
+        this.forgotEmailError = '';
+        this.forgotCodeError = '';
+        this.forgotNewPasswordError = '';
+        this.forgotConfirmPasswordError = '';
+    }
+
+    async handleForgotSendCode(event: Event): Promise<void> {
+        event.preventDefault();
+        if (this.isLoading) return;
+
+        this.clearForgotErrors();
+        this.forgotEmailError = this.validateEmail(this.forgotEmail);
+
+        if (this.forgotEmailError) {
+            return;
+        }
+
+        this.isLoading = true;
+        this.cdr.detectChanges();
+
+        try {
+            await this.authService.requestPasswordReset(this.forgotEmail.trim().toLowerCase());
+            this.forgotStep = 'confirm';
+            this.toast.success('Código de verificación enviado a tu correo electrónico.', 5000);
+        } catch (error) {
+            console.error('Error al enviar código:', error);
+            const friendlyMessage = this.getErrorMessage(error);
+            this.toast.error(friendlyMessage);
+        } finally {
+            this.isLoading = false;
+            this.cdr.detectChanges();
+        }
+    }
+
+    async handleForgotConfirm(event: Event): Promise<void> {
+        event.preventDefault();
+        if (this.isLoading) return;
+
+        this.clearForgotErrors();
+        this.forgotCodeError = this.validateConfirmationCode(this.forgotCode);
+        this.forgotNewPasswordError = this.validatePassword(this.forgotNewPassword);
+
+        if (!this.forgotConfirmPassword) {
+            this.forgotConfirmPasswordError = 'Debes confirmar la contraseña';
+        } else if (this.forgotNewPassword !== this.forgotConfirmPassword) {
+            this.forgotConfirmPasswordError = 'Las contraseñas no coinciden';
+        }
+
+        if (this.forgotCodeError || this.forgotNewPasswordError || this.forgotConfirmPasswordError) {
+            return;
+        }
+
+        this.isLoading = true;
+        this.cdr.detectChanges();
+
+        try {
+            await this.authService.confirmPasswordReset(
+                this.forgotEmail.trim().toLowerCase(),
+                this.forgotCode.trim(),
+                this.forgotNewPassword
+            );
+
+            this.toast.success('¡Contraseña cambiada exitosamente! Ya puedes iniciar sesión.', 3000);
+
+            const emailToRemember = this.forgotEmail.trim().toLowerCase();
+
+            // Limpiar campos
+            this.forgotEmail = '';
+            this.forgotCode = '';
+            this.forgotNewPassword = '';
+            this.forgotConfirmPassword = '';
+            this.forgotStep = 'email';
+
+            setTimeout(() => {
+                this.authTab = 'login';
+                this.email = emailToRemember;
+                this.cdr.detectChanges();
+            }, 1000);
+        } catch (error) {
+            console.error('Error al confirmar contraseña:', error);
+            const friendlyMessage = this.getErrorMessage(error);
+            this.toast.error(friendlyMessage);
+        } finally {
+            this.isLoading = false;
+            this.cdr.detectChanges();
+        }
     }
 
     goHome(): void {

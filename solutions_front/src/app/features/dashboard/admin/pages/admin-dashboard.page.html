@@ -9,8 +9,16 @@
     [showUserName]="true"
     [showRefresh]="false"
     [isRefreshing]="isRefreshing"
-    (logout)="handleLogout()">
+    (logout)="handleLogout()"
+    (profileClick)="openProfile()">
   </app-dashboard-header>
+
+  <!-- User Profile Modal -->
+  <app-user-profile
+    *ngIf="showUserProfile"
+    (closeProfile)="closeProfile()"
+    (profileUpdated)="userName = $event">
+  </app-user-profile>
 
   <!-- ========================================
        MAIN PANEL

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DeliveryAssignment } from '@core/services/delivery.service';
 import { IconComponent } from '@shared/components/icon/icon.component';
@@ -9,8 +9,7 @@ import { AssignmentCardComponent } from '../assignment-card/assignment-card.comp
   standalone: true,
   templateUrl: './assignments-list.component.html',
   styleUrls: ['./assignments-list.component.scss'],
-  imports: [CommonModule, IconComponent, AssignmentCardComponent],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [CommonModule, IconComponent, AssignmentCardComponent]
 })
 export class AssignmentsListComponent {
   @Input() pickups: DeliveryAssignment[] = [];
@@ -28,6 +27,10 @@ export class AssignmentsListComponent {
 
   get pendingDeliveries(): DeliveryAssignment[] {
     return this.deliveries.filter(d => d.status === 'PENDING' || d.status === 'IN_PROGRESS');
+  }
+
+  trackByAssignment(_index: number, assignment: DeliveryAssignment): string | number {
+    return assignment.assignment_id;
   }
 
   onStartRoute(assignment: DeliveryAssignment): void {

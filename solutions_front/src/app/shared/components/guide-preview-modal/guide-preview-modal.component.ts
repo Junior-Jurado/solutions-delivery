@@ -49,13 +49,15 @@ export class GuidePreviewModalComponent {
   @Input() cancelButtonText = 'Cancelar';
   @Input() allowPriceEdit = false; // Permite editar el precio (solo admin)
 
-  @Output() confirmAction = new EventEmitter<number>(); // Emite el precio final
+  @Output() confirmAction = new EventEmitter<{ price: number; reason: string }>(); // Emite el precio final y razón
   @Output() cancelAction = new EventEmitter<void>();
   @Output() closeModal = new EventEmitter<void>();
 
   // Estado de edición del precio
   isEditingPrice = false;
   customPrice = 0;
+  priceChangeReason = '';
+  priceValidationError = '';
 
   constructor(
     public translationService: TranslationService,
@@ -79,27 +81,54 @@ export class GuidePreviewModalComponent {
   cancelEditPrice(): void {
     this.isEditingPrice = false;
     this.customPrice = 0;
+    this.priceChangeReason = '';
+    this.priceValidationError = '';
     this.cdr.markForCheck();
   }
 
   savePrice(): void {
-    if (this.customPrice < 0) {
-      this.customPrice = 0;
+    const calculatedPrice = this.guideData?.calculatedPrice || 0;
+    const minAllowedPrice = calculatedPrice * 0.5;
+
+    if (this.customPrice <= 0) {
+      this.priceValidationError = 'El precio debe ser mayor a $0.';
+      this.cdr.markForCheck();
+      return;
     }
+
+    if (this.customPrice < minAllowedPrice) {
+      this.priceValidationError = `El descuento no puede superar el 50%. Precio mínimo: ${this.formatPrice(minAllowedPrice)}`;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.priceValidationError = '';
     this.isEditingPrice = false;
     this.cdr.markForCheck();
   }
 
   resetToCalculatedPrice(): void {
     this.customPrice = 0;
+    this.priceChangeReason = '';
+    this.priceValidationError = '';
     this.isEditingPrice = false;
     this.cdr.markForCheck();
   }
 
+  get isPriceModified(): boolean {
+    return this.customPrice > 0 && this.customPrice !== this.guideData?.calculatedPrice;
+  }
+
   onConfirm(): void {
     if (!this.isCreating) {
-      // Emitir el precio final (personalizado o calculado)
-      this.confirmAction.emit(this.currentPrice);
+      // Si el precio fue modificado, la razón es obligatoria
+      if (this.isPriceModified && !this.priceChangeReason.trim()) {
+        return;
+      }
+      this.confirmAction.emit({
+        price: this.currentPrice,
+        reason: this.isPriceModified ? this.priceChangeReason.trim() : ''
+      });
     }
   }
 

@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { from, of, Observable } from 'rxjs';
 import { firstValueFrom, catchError } from 'rxjs';
-import { environment } from '../../environments/environment.dev';
+import { environment } from '@environments/environment';
 
 const poolData = {
     UserPoolId: environment.cognito.userPoolId,
@@ -246,6 +246,72 @@ export class AuthService {
         }
 
         return this.fetchAndCacheUserRole(idToken);
+    }
+
+    // ==========================================
+    // PASSWORD RESET
+    // ==========================================
+
+    /**
+     * Solicita código de verificación para cambio de contraseña
+     */
+    async requestPasswordReset(email: string): Promise<void> {
+        const user = new CognitoUser({
+            Username: email,
+            Pool: this.userPool
+        });
+
+        return new Promise((resolve, reject) => {
+            user.forgotPassword({
+                onSuccess: () => {
+                    resolve();
+                },
+                onFailure: (err) => {
+                    console.error('Error al solicitar reset de contraseña:', err);
+                    reject(err);
+                },
+                inputVerificationCode: () => {
+                    resolve();
+                }
+            });
+        });
+    }
+
+    /**
+     * Confirma el cambio de contraseña con código de verificación
+     */
+    async confirmPasswordReset(email: string, code: string, newPassword: string): Promise<void> {
+        const user = new CognitoUser({
+            Username: email,
+            Pool: this.userPool
+        });
+
+        return new Promise((resolve, reject) => {
+            user.confirmPassword(code, newPassword, {
+                onSuccess: () => {
+                    resolve();
+                },
+                onFailure: (err) => {
+                    console.error('Error al confirmar nueva contraseña:', err);
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    /**
+     * Obtiene el email del usuario actual desde el token
+     */
+    getCurrentUserEmail(): string {
+        const idToken = sessionStorage.getItem('idToken');
+        if (!idToken) return '';
+
+        try {
+            const payload = JSON.parse(atob(idToken.split('.')[1]));
+            return payload.email || '';
+        } catch {
+            return '';
+        }
     }
 
     // ==========================================

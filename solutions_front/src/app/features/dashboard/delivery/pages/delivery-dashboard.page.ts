@@ -28,6 +28,7 @@ import { AssignmentsListComponent } from '../components/assignments-list/assignm
 import { ConfirmDeliveryFormComponent, ConfirmDeliveryData } from '../components/confirm-delivery-form/confirm-delivery-form.component';
 import { ReportIssueFormComponent, ReportIssueData } from '../components/report-issue-form/report-issue-form.component';
 import { PerformancePanelComponent } from '../components/performance-panel/performance-panel.component';
+import { UserProfileComponent } from '@shared/components/user-profile/user-profile.component';
 
 @Component({
   selector: 'app-delivery',
@@ -43,7 +44,8 @@ import { PerformancePanelComponent } from '../components/performance-panel/perfo
     AssignmentsListComponent,
     ConfirmDeliveryFormComponent,
     ReportIssueFormComponent,
-    PerformancePanelComponent
+    PerformancePanelComponent,
+    UserProfileComponent
   ]
 })
 export class DeliveryDashboardPage implements OnInit, OnDestroy {
@@ -82,6 +84,9 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   userName = '';
   userRole = 'DELIVERY';
 
+  // User Profile
+  showUserProfile = false;
+
   // Map modal
   isMapModalOpen = false;
   selectedMapLocation: MapLocation | null = null;
@@ -116,7 +121,8 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
     if (idToken) {
       try {
         const payload = JSON.parse(atob(idToken.split('.')[1]));
-        const rawName = payload['custom:full_name'] || payload.name || 'Repartidor';
+        const savedName = sessionStorage.getItem('userDisplayName');
+        const rawName = savedName || payload['custom:full_name'] || payload.name || 'Repartidor';
         this.userName = this.fixUtf8Encoding(rawName);
         this.userRole = sessionStorage.getItem('role') || 'DELIVERY';
       } catch (error) {
@@ -202,9 +208,8 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
   async handleStartRoute(assignment: DeliveryAssignment): Promise<void> {
     try {
       await this.deliveryService.startRoute(assignment.assignment_id, 'Ruta iniciada');
-      assignment.status = 'IN_PROGRESS';
       this.toastService.success('Ruta iniciada exitosamente');
-      this.cdr.detectChanges();
+      await this.loadDeliveries();
     } catch (error) {
       console.error('Error starting route:', error);
       this.toastService.error('Error al iniciar la ruta');
@@ -398,6 +403,20 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
       this.isRefreshing = false;
       this.cdr.detectChanges();
     }
+  }
+
+  // ==========================================
+  // PROFILE
+  // ==========================================
+
+  openProfile(): void {
+    this.showUserProfile = true;
+    this.cdr.detectChanges();
+  }
+
+  closeProfile(): void {
+    this.showUserProfile = false;
+    this.cdr.detectChanges();
   }
 
   // ==========================================

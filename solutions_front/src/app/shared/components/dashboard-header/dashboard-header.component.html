@@ -29,7 +29,7 @@
         <span class="refresh-text" *ngIf="!isMobile">Actualizar</span>
       </button>
 
-      <div class="user-info">
+      <div class="user-info" (click)="onProfileClick()" title="Ver perfil" style="cursor: pointer;">
         <div class="user-avatar">
           <app-icon category="users" name="user" size="20px" color="#ffffff"></app-icon>
         </div>

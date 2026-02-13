@@ -17,15 +17,18 @@
         <div class="card">
           <div class="card-header">
             <h2>
-              {{ authTab === 'login' ? 'Iniciar Sesión' : 
-                 authTab === 'register' ? 'Crear Cuenta' : 
+              {{ authTab === 'login' ? 'Iniciar Sesión' :
+                 authTab === 'register' ? 'Crear Cuenta' :
+                 authTab === 'forgot' ? 'Recuperar Contraseña' :
                  'Confirmar Correo' }}
             </h2>
             <p>
-              {{ authTab === 'login' 
+              {{ authTab === 'login'
                 ? 'Accede para rastrear tus envíos y gestionar tus paquetes'
                 : authTab === 'register'
                 ? 'Regístrate como cliente para comenzar a enviar paquetes'
+                : authTab === 'forgot'
+                ? (forgotStep === 'email' ? 'Ingresa tu correo para recibir un código de recuperación' : 'Ingresa el código y tu nueva contraseña')
                 : 'Ingresa el código que enviamos a tu correo electrónico'
               }}
             </p>
@@ -75,11 +78,21 @@
                 </span>
               </button>
 
+              <div class="form-footer">
+                <button
+                  type="button"
+                  (click)="switchToForgotPassword()"
+                  class="link-button"
+                  [disabled]="isLoading">
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
+
               <p class="form-footer">
                 ¿No tienes cuenta?
-                <button 
-                  type="button" 
-                  (click)="switchToRegister()" 
+                <button
+                  type="button"
+                  (click)="switchToRegister()"
                   class="link-button"
                   [disabled]="isLoading">
                   Regístrate aquí
@@ -204,6 +217,124 @@
                   class="link-button"
                   [disabled]="isLoading">
                   Inicia sesión
+                </button>
+              </p>
+            </form>
+
+            <!-- ========================================
+                 FORGOT PASSWORD FORM
+                 ======================================== -->
+            <!-- Step 1: Email -->
+            <form *ngIf="authTab === 'forgot' && forgotStep === 'email'" (ngSubmit)="handleForgotSendCode($event)" class="form">
+              <div class="form-group">
+                <label for="forgot-email">Correo electrónico</label>
+                <input
+                  id="forgot-email"
+                  type="email"
+                  [(ngModel)]="forgotEmail"
+                  name="forgotEmail"
+                  required
+                  [disabled]="isLoading"
+                  [class.input-error]="forgotEmailError"
+                  autocomplete="email"
+                  placeholder="usuario@ejemplo.com"
+                />
+                <span *ngIf="forgotEmailError" class="error-message">{{ forgotEmailError }}</span>
+              </div>
+
+              <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                <span *ngIf="!isLoading">Enviar código de recuperación</span>
+                <span *ngIf="isLoading" class="loading-content">
+                  <span class="spinner"></span>
+                  Enviando código...
+                </span>
+              </button>
+
+              <p class="form-footer">
+                <button
+                  type="button"
+                  (click)="switchToLogin()"
+                  class="link-button"
+                  [disabled]="isLoading">
+                  Volver al inicio de sesión
+                </button>
+              </p>
+            </form>
+
+            <!-- Step 2: Code + New Password -->
+            <form *ngIf="authTab === 'forgot' && forgotStep === 'confirm'" (ngSubmit)="handleForgotConfirm($event)" class="form">
+              <div class="confirm-info">
+                <div class="info-box">
+                  <app-icon category="communication" name="mail" size="20px"></app-icon>
+                  <p>Código enviado a: <strong>{{ forgotEmail }}</strong></p>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="forgot-code">Código de verificación</label>
+                <input
+                  id="forgot-code"
+                  type="text"
+                  [(ngModel)]="forgotCode"
+                  name="forgotCode"
+                  required
+                  maxlength="6"
+                  [disabled]="isLoading"
+                  [class.input-error]="forgotCodeError"
+                  autocomplete="one-time-code"
+                  placeholder="123456"
+                />
+                <span *ngIf="forgotCodeError" class="error-message">{{ forgotCodeError }}</span>
+              </div>
+
+              <div class="form-group">
+                <label for="forgot-new-password">Nueva contraseña</label>
+                <input
+                  id="forgot-new-password"
+                  type="password"
+                  [(ngModel)]="forgotNewPassword"
+                  name="forgotNewPassword"
+                  required
+                  [disabled]="isLoading"
+                  [class.input-error]="forgotNewPasswordError"
+                  autocomplete="new-password"
+                  placeholder="••••••••"
+                />
+                <span *ngIf="forgotNewPasswordError" class="error-message">{{ forgotNewPasswordError }}</span>
+                <small class="input-hint">Mínimo 8 caracteres, incluye mayúsculas, minúsculas, números y caracteres especiales</small>
+              </div>
+
+              <div class="form-group">
+                <label for="forgot-confirm-password">Confirmar contraseña</label>
+                <input
+                  id="forgot-confirm-password"
+                  type="password"
+                  [(ngModel)]="forgotConfirmPassword"
+                  name="forgotConfirmPassword"
+                  required
+                  [disabled]="isLoading"
+                  [class.input-error]="forgotConfirmPasswordError"
+                  autocomplete="new-password"
+                  placeholder="••••••••"
+                />
+                <span *ngIf="forgotConfirmPasswordError" class="error-message">{{ forgotConfirmPasswordError }}</span>
+              </div>
+
+              <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                <span *ngIf="!isLoading">Cambiar Contraseña</span>
+                <span *ngIf="isLoading" class="loading-content">
+                  <span class="spinner"></span>
+                  Cambiando contraseña...
+                </span>
+              </button>
+
+              <p class="form-footer">
+                <button
+                  type="button"
+                  (click)="switchToLogin()"
+                  class="link-button"
+                  [disabled]="isLoading">
+                  Volver al inicio de sesión
                 </button>
               </p>
             </form>

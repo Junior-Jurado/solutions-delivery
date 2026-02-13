@@ -47,8 +47,10 @@ import { CashCloseStatsComponent } from "../components/cash-close-stats/cash-clo
 import { GuideAdminModalComponent } from "../components/guide-admin-modal/guide-admin-modal.component";
 import { AdminGuidesComponent } from "../components/admin-guides/admin-guides.component";
 import { ClientRankingComponent } from "../components/client-ranking/client-ranking.component";
+
 import { GuideFormComponent } from "@shared/components/guide-form/guide-form.component";
 import { GuidePreviewModalComponent, GuidePreviewData } from "@shared/components/guide-preview-modal/guide-preview-modal.component";
+import { UserProfileComponent } from "@shared/components/user-profile/user-profile.component";
 
 // Guide Service
 import { GuideStatus } from "@core/services/guide.service";
@@ -140,7 +142,8 @@ export interface ActiveRoute {
         AdminGuidesComponent,
         GuideFormComponent,
         GuidePreviewModalComponent,
-        ClientRankingComponent
+        ClientRankingComponent,
+        UserProfileComponent
     ]
 })
 export class AdminDashboardPage implements OnInit, OnDestroy {
@@ -262,6 +265,11 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     @ViewChild(ClientRankingComponent) clientRankingComponent?: ClientRankingComponent;
 
     // ==========================================
+    // USER PROFILE
+    // ==========================================
+    showUserProfile = false;
+
+    // ==========================================
     // REFRESH INTERVAL
     // ==========================================
     private refreshInterval: ReturnType<typeof setInterval> | null = null;
@@ -321,7 +329,8 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
             try {
                 const payload = JSON.parse(atob(idToken.split('.')[1]));
                 this.currentUserId = payload.sub || payload['cognito:username'];
-                const rawName = payload['custom:full_name'] || payload.name || 'Administrador';
+                const savedName = sessionStorage.getItem('userDisplayName');
+                const rawName = savedName || payload['custom:full_name'] || payload.name || 'Administrador';
                 this.userName = this.fixUtf8Encoding(rawName);
             } catch (error) {
                 console.error('Error al decodificar token:', error);
@@ -620,9 +629,9 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
         }
     }
 
-    handleGuideFormSubmit(formData: GuideFormValue): void {
-        // Calcular el precio
-        const calculatedPrice = this.guideService.calculatePrice(formData);
+    async handleGuideFormSubmit(formData: GuideFormValue): Promise<void> {
+        // Calcular el precio via backend
+        const calculatedPrice = await this.guideService.calculatePriceAsync(formData);
 
         // Guardar datos pendientes
         this.pendingGuideData = formData;
@@ -652,7 +661,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
         this.cdr.detectChanges();
     }
 
-    async confirmGuideCreation(finalPrice: number): Promise<void> {
+    async confirmGuideCreation(event: { price: number; reason: string }): Promise<void> {
         if (!this.pendingGuideData) return;
 
         this.isCreatingGuide = true;
@@ -666,8 +675,13 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
             const guideRequest = this.guideService.buildGuideRequest(
                 this.pendingGuideData,
                 this.currentUserId,
-                finalPrice // Precio personalizado
+                event.price // Precio personalizado
             );
+
+            // Agregar razón del override si existe
+            if (event.reason) {
+                guideRequest.pricing.override_reason = event.reason;
+            }
 
             const response = await this.guideService.createGuide(guideRequest);
 
@@ -969,6 +983,19 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
             this.isRefreshing = false;
             this.cdr.detectChanges();
         }
+    }
+
+    // ==========================================
+    // PROFILE
+    // ==========================================
+    openProfile(): void {
+        this.showUserProfile = true;
+        this.cdr.detectChanges();
+    }
+
+    closeProfile(): void {
+        this.showUserProfile = false;
+        this.cdr.detectChanges();
     }
 
     // ==========================================

@@ -22,6 +22,7 @@ export class DashboardHeaderComponent {
 
   @Output() logout = new EventEmitter<void>();
   @Output() refresh = new EventEmitter<void>();
+  @Output() profileClick = new EventEmitter<void>();
 
   /**
    * Devuelve el texto a mostrar en el header.
@@ -43,5 +44,9 @@ export class DashboardHeaderComponent {
     if (!this.isRefreshing) {
       this.refresh.emit();
     }
+  }
+
+  onProfileClick(): void {
+    this.profileClick.emit();
   }
 }

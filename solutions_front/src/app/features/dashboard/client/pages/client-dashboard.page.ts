@@ -25,6 +25,7 @@ import { QuoteComponent, QuoteData } from '../components/quote/quote.component';
 import { DashboardHeaderComponent } from '@shared/components/dashboard-header/dashboard-header.component';
 import { DashboardFooterComponent } from '../components/dashboard-footer/dashboard-footer.component';
 import { RatingModalComponent, RatingSubmitData } from '@shared/components/rating-modal/rating-modal.component';
+import { UserProfileComponent } from '@shared/components/user-profile/user-profile.component';
 
 interface GuidePreview {
   senderName: string;
@@ -64,7 +65,8 @@ interface GuidePreview {
     DashboardHeaderComponent,
     DashboardFooterComponent,
     GuidePreviewModalComponent,
-    RatingModalComponent
+    RatingModalComponent,
+    UserProfileComponent
   ]
 })
 export class ClientDashboardPage implements OnInit, OnDestroy {
@@ -118,6 +120,9 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
 
   // Refresh
   isRefreshing = false;
+
+  // User Profile
+  showUserProfile = false;
 
   // Rating
   pendingRatings: PendingRating[] = [];
@@ -336,9 +341,9 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   // ==========================================
 
   /**
-   * Calcula la cotización del envío usando el método del GuideService
+   * Calcula la cotización del envío usando el backend
    */
-  calculateQuote(quoteData: QuoteData): void {
+  async calculateQuote(quoteData: QuoteData): Promise<void> {
     if (!quoteData.weight || quoteData.weight <= 0) {
       this.toastService.error('Por favor ingrese un peso válido');
       return;
@@ -360,9 +365,13 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
       observations: quoteData.observations
     };
 
-    this.quoteResult = this.guideService.calculatePrice(formValue);
-    
-    this.toastService.success('Cotización calculada exitosamente');
+    try {
+      this.quoteResult = await this.guideService.calculatePriceAsync(formValue);
+      this.toastService.success('Cotización calculada exitosamente');
+    } catch {
+      this.quoteResult = this.guideService.calculatePrice(formValue);
+      this.toastService.success('Cotización calculada (estimado)');
+    }
     this.cdr.detectChanges();
   }
 
@@ -399,11 +408,11 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
   /**
    * Cuando el formulario se envía
    */
-  onGuideFormSubmit(formData: GuideFormValue): void {
-    const calculatedPrice = this.guideService.calculatePrice(formData);
-    
+  async onGuideFormSubmit(formData: GuideFormValue): Promise<void> {
+    const calculatedPrice = await this.guideService.calculatePriceAsync(formData);
+
     this.pendingGuideData = formData;
-    
+
     this.guidePreviewData = {
       // Remitente
       senderName: formData.senderName,
@@ -637,6 +646,27 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
       this.toastService.error('Error al actualizar los datos');
     } finally {
       this.isRefreshing = false;
+      this.cdr.detectChanges();
+    }
+  }
+
+  // ==========================================
+  // PROFILE
+  // ==========================================
+
+  openProfile(): void {
+    this.showUserProfile = true;
+    this.cdr.detectChanges();
+  }
+
+  closeProfile(): void {
+    this.showUserProfile = false;
+    this.cdr.detectChanges();
+  }
+
+  onProfileUpdated(newName: string): void {
+    if (this.currentUser) {
+      this.currentUser.full_name = newName;
       this.cdr.detectChanges();
     }
   }

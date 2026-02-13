@@ -113,6 +113,11 @@
       border: 3px solid var(--color-verde);
       border-radius: $radius-lg;
       text-align: center;
+      overflow: hidden;
+
+      @include respond-to($breakpoint-sm) {
+        padding: $spacing-md $spacing-sm;
+      }
 
       &.editable {
         border-style: dashed;
@@ -237,6 +242,12 @@
         width: 100%;
         max-width: 300px;
         margin: 0 auto;
+        box-sizing: border-box;
+
+        @include respond-to($breakpoint-sm) {
+          max-width: 100%;
+          padding: 0 $spacing-xs;
+        }
 
         .price-input-group {
           display: flex;
@@ -262,10 +273,54 @@
             background: var(--card-bg);
             color: var(--text-primary);
             transition: all var(--transition-theme);
+            box-sizing: border-box;
+            max-width: 100%;
+            min-width: 0;
+
+            @include respond-to($breakpoint-sm) {
+              font-size: $font-lg;
+              padding: $spacing-sm;
+            }
 
             &:focus {
               border-color: var(--color-azul-dark);
               box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.2);
+            }
+          }
+        }
+
+        .price-reason-group {
+          width: 100%;
+
+          .reason-label {
+            display: block;
+            font-size: $font-xs;
+            font-weight: $font-medium;
+            color: var(--text-secondary);
+            margin-bottom: $spacing-xs;
+            text-align: left;
+          }
+
+          .reason-input {
+            width: 100%;
+            padding: $spacing-sm;
+            font-size: $font-sm;
+            border: 2px solid var(--border-color);
+            border-radius: $radius-md;
+            outline: none;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            box-sizing: border-box;
+            transition: all var(--transition-theme);
+
+            &:focus {
+              border-color: var(--color-azul);
+              box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+            }
+
+            &::placeholder {
+              color: var(--text-secondary);
+              opacity: 0.6;
             }
           }
         }
@@ -306,6 +361,18 @@
               color: var(--text-primary);
             }
           }
+        }
+
+        .price-validation-error {
+          font-size: $font-sm;
+          color: var(--color-rojo);
+          font-weight: $font-medium;
+          padding: $spacing-xs $spacing-sm;
+          background: rgba(227, 30, 36, 0.1);
+          border-radius: $radius-base;
+          width: 100%;
+          box-sizing: border-box;
+          text-align: center;
         }
 
         .price-hint {

@@ -21,7 +21,7 @@
     <!-- Pickups -->
     <div class="deliveries-list" *ngIf="pendingPickups.length > 0">
       <app-assignment-card
-        *ngFor="let assignment of pendingPickups"
+        *ngFor="let assignment of pendingPickups; trackBy: trackByAssignment"
         [assignment]="assignment"
         (startRoute)="onStartRoute($event)"
         (confirmDelivery)="onConfirmDelivery($event)"
@@ -49,7 +49,7 @@
     <!-- Deliveries -->
     <div class="deliveries-list" *ngIf="pendingDeliveries.length > 0">
       <app-assignment-card
-        *ngFor="let assignment of pendingDeliveries"
+        *ngFor="let assignment of pendingDeliveries; trackBy: trackByAssignment"
         [assignment]="assignment"
         (startRoute)="onStartRoute($event)"
         (confirmDelivery)="onConfirmDelivery($event)"

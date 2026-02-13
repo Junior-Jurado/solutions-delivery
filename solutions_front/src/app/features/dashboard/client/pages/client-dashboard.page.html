@@ -6,8 +6,16 @@
     [userName]="currentUser?.full_name || ''"
     [showUserName]="true"
     [isMobile]="isMobile"
-    (logout)="logout()">
+    (logout)="logout()"
+    (profileClick)="openProfile()">
   </app-dashboard-header>
+
+  <!-- User Profile Modal -->
+  <app-user-profile
+    *ngIf="showUserProfile"
+    (closeProfile)="closeProfile()"
+    (profileUpdated)="onProfileUpdated($event)">
+  </app-user-profile>
 
   <!-- Rating Banner -->
   <div class="rating-banner" *ngIf="pendingRatings.length > 0">

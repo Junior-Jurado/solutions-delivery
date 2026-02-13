@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DeliveryAssignment } from '@core/services/delivery.service';
 import { IconComponent } from '@shared/components/icon/icon.component';
@@ -8,8 +8,7 @@ import { IconComponent } from '@shared/components/icon/icon.component';
   standalone: true,
   templateUrl: './assignment-card.component.html',
   styleUrls: ['./assignment-card.component.scss'],
-  imports: [CommonModule, IconComponent],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  imports: [CommonModule, IconComponent]
 })
 export class AssignmentCardComponent {
   @Input() assignment!: DeliveryAssignment;

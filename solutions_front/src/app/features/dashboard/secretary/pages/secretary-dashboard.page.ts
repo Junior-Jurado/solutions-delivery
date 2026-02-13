@@ -27,6 +27,7 @@ import { StatusDistributionComponent } from "../components/status-distribution/s
 import { AssignmentPanelComponent } from "@shared/components/assignment-panel/assignment-panel.component";
 import { IconComponent } from "@shared/components/icon/icon.component";
 import { DashboardHeaderComponent } from "@shared/components/dashboard-header/dashboard-header.component";
+import { UserProfileComponent } from "@shared/components/user-profile/user-profile.component";
 
 interface GuidePreview {
   senderName: string;
@@ -65,7 +66,8 @@ interface GuidePreview {
         AssignmentPanelComponent,
         IconComponent,
         GuidePreviewModalComponent,
-        DashboardHeaderComponent
+        DashboardHeaderComponent,
+        UserProfileComponent
     ]
 })
 export class SecretaryDashboardPage implements OnInit {
@@ -135,6 +137,11 @@ export class SecretaryDashboardPage implements OnInit {
     isDetailsModalOpen = false;
 
     // ==========================================
+    // USER PROFILE
+    // ==========================================
+    showUserProfile = false;
+
+    // ==========================================
     // REFRESH
     // ==========================================
     isRefreshing = false;
@@ -170,7 +177,8 @@ export class SecretaryDashboardPage implements OnInit {
             try {
                 const payload = JSON.parse(atob(idToken.split('.')[1]));
                 this.currentUserId = payload.sub || payload['cognito:username'];
-                const rawName = payload['custom:full_name'] || payload.name || 'Secretari@';
+                const savedName = sessionStorage.getItem('userDisplayName');
+                const rawName = savedName || payload['custom:full_name'] || payload.name || 'Secretari@';
                 this.userName = this.fixUtf8Encoding(rawName);
                 console.log('Usuario actual:', this.currentUserId);
             } catch (error) {
@@ -230,13 +238,13 @@ export class SecretaryDashboardPage implements OnInit {
     // ==========================================
     // GUIDE FORM HANDLERS 
     // ==========================================
-    handleGuideFormSubmit(formData: GuideFormValue): void {
-        // Calculamos el precio
-        const calculatedPrice = this.guideService.calculatePrice(formData);
-        
+    async handleGuideFormSubmit(formData: GuideFormValue): Promise<void> {
+        // Calculamos el precio via backend
+        const calculatedPrice = await this.guideService.calculatePriceAsync(formData);
+
         // Guardamos los datos pendientes
         this.pendingGuideData = formData;
-        
+
         // Preparamos los datos para el preview
         this.guidePreviewData = {
             // Remitente
@@ -272,7 +280,7 @@ export class SecretaryDashboardPage implements OnInit {
     /**
      * Confirma y crea la guía
      */
-    async confirmGuideCreation(_finalPrice?: number): Promise<void> {
+    async confirmGuideCreation(_event?: { price: number; reason: string }): Promise<void> {
         if (!this.pendingGuideData) return;
 
         this.isCreatingGuide = true;
@@ -560,6 +568,19 @@ export class SecretaryDashboardPage implements OnInit {
             this.isRefreshing = false;
             this.cdr.detectChanges();
         }
+    }
+
+    // ==========================================
+    // PROFILE
+    // ==========================================
+    openProfile(): void {
+        this.showUserProfile = true;
+        this.cdr.detectChanges();
+    }
+
+    closeProfile(): void {
+        this.showUserProfile = false;
+        this.cdr.detectChanges();
     }
 
     // ==========================================

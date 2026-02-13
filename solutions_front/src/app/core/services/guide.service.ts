@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { environment } from '../../environments/environment.dev';
+import { environment } from '@environments/environment';
+import { ShippingService, ShippingPriceRequest } from '@shared/services/shipping.service';
 
 // Interfaces para el request
 export interface ServiceInfo {
@@ -13,6 +14,7 @@ export interface ServiceInfo {
 export interface PricingInfo {
     declared_value: number;
     price: number;
+    override_reason?: string;
 }
 
 export interface RouteInfo {
@@ -214,7 +216,10 @@ export interface GuideStatsResponse {
 export class GuideService {
     private readonly BASE_URL = `${environment.apiBaseUrl}/guides`;
 
-    constructor(private http: HttpClient) {}
+    constructor(
+        private http: HttpClient,
+        private shippingService: ShippingService
+    ) {}
 
     // ==========================================
     // API METHODS
@@ -511,15 +516,43 @@ export class GuideService {
     // ==========================================
 
     /**
-     * Calcula el precio de una guía basado en peso y prioridad
-     * Este método es público para permitir calcular el precio antes de crear la guía
-     * IMPORTANTE: Esta lógica debe coincidir con la del backend
+     * Calcula el precio de una guía usando el backend (tarifas reales de BD)
+     */
+    async calculatePriceAsync(formValue: Partial<GuideFormValue>): Promise<number> {
+        const dimensions = this.parseDimensions(String(formValue.dimensions || '20x15x10'));
+        const originCityId = this.getCityId(formValue.senderCity as number | { city_id: number });
+        const destCityId = this.getCityId(formValue.receiverCity as number | { city_id: number });
+
+        if (!originCityId || !destCityId) {
+            return this.calculatePrice(formValue);
+        }
+
+        try {
+            const request: ShippingPriceRequest = {
+                origin_city_id: originCityId,
+                destination_city_id: destCityId,
+                weight_kg: parseFloat(String(formValue.weight ?? '0')) || 0,
+                length_cm: dimensions.length,
+                width_cm: dimensions.width,
+                height_cm: dimensions.height
+            };
+
+            const response = await this.shippingService.calculatePrice(request);
+            return Math.round(response.price);
+        } catch (error) {
+            console.warn('Error al calcular precio via backend, usando cálculo local:', error);
+            return this.calculatePrice(formValue);
+        }
+    }
+
+    /**
+     * Calcula el precio de una guía basado en peso y prioridad (fallback local)
      */
     calculatePrice(formValue: Partial<GuideFormValue>): number {
         const weight = parseFloat(String(formValue.weight ?? '0')) || 0;
         const basePrice = 15000;
         const pricePerKg = 3000;
-        
+
         let price = basePrice + (weight * pricePerKg);
 
         // Aplicar multiplicadores según prioridad

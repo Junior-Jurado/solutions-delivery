@@ -40,15 +40,15 @@
           </div>
           <div class="price-details">
             <span>Peso: {{ guideData.weight }} kg | Tipo: {{ guideData.serviceType }}</span>
-            <span *ngIf="customPrice > 0" class="price-modified-badge">
+            <span *ngIf="isPriceModified" class="price-modified-badge">
               <app-icon category="actions" name="edit" size="12px"></app-icon>
-              Precio modificado
+              Precio modificado{{ priceChangeReason ? ': ' + priceChangeReason : '' }}
               <button class="btn-reset-price" (click)="resetToCalculatedPrice()" title="Restaurar precio calculado">
                 <app-icon category="navigation" name="x" size="12px"></app-icon>
               </button>
             </span>
           </div>
-          <div *ngIf="customPrice > 0" class="original-price">
+          <div *ngIf="isPriceModified" class="original-price">
             Precio calculado: ${{ formatPrice(guideData.calculatedPrice) }}
           </div>
         </ng-container>
@@ -65,8 +65,17 @@
               step="1000"
               placeholder="Ingrese el precio">
           </div>
+          <div class="price-reason-group">
+            <label class="reason-label">Razón del cambio de precio *</label>
+            <input
+              type="text"
+              [(ngModel)]="priceChangeReason"
+              class="reason-input"
+              placeholder="Ej: Descuento cliente frecuente"
+              maxlength="200">
+          </div>
           <div class="price-edit-actions">
-            <button class="btn-save-price" (click)="savePrice()">
+            <button class="btn-save-price" (click)="savePrice()" [disabled]="!priceChangeReason.trim()">
               <app-icon category="status" name="check" size="16px"></app-icon>
               Aplicar
             </button>
@@ -74,6 +83,9 @@
               <app-icon category="navigation" name="x" size="16px"></app-icon>
               Cancelar
             </button>
+          </div>
+          <div *ngIf="priceValidationError" class="price-validation-error">
+            {{ priceValidationError }}
           </div>
           <div class="price-hint">
             Precio calculado automáticamente: ${{ formatPrice(guideData.calculatedPrice) }}

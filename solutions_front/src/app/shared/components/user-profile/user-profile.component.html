@@ -1,0 +1,135 @@
+<div class="profile-overlay" (click)="onOverlayClick()">
+  <div class="profile-panel" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="profile-header">
+      <h2>
+        <app-icon category="users" name="user-circle" size="24px"></app-icon>
+        Mi Perfil
+      </h2>
+      <button class="btn-close" (click)="onClose()">
+        <app-icon category="navigation" name="x" size="20px"></app-icon>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div class="profile-body" *ngIf="isLoading">
+      <div class="loading-state">
+        <app-icon category="status" name="loader" size="32px" customClass="spinner"></app-icon>
+        <span>Cargando perfil...</span>
+      </div>
+    </div>
+
+    <!-- Profile Content -->
+    <div class="profile-body" *ngIf="!isLoading && profile">
+      <!-- Readonly Fields -->
+      <div class="profile-section">
+        <h3>Datos de Cuenta</h3>
+        <div class="field-group">
+          <div class="field readonly">
+            <label>Email</label>
+            <span>{{ profile.email }}</span>
+          </div>
+          <div class="field readonly">
+            <label>Documento</label>
+            <span>{{ profile.document_type }} {{ profile.document_number }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editable Fields -->
+      <div class="profile-section">
+        <div class="section-header">
+          <h3>Datos Personales</h3>
+          <button *ngIf="!isEditing" class="btn-edit" (click)="startEdit()">
+            <app-icon category="actions" name="edit" size="16px"></app-icon>
+            Editar
+          </button>
+        </div>
+
+        <!-- View Mode -->
+        <div class="field-group" *ngIf="!isEditing">
+          <div class="field">
+            <label>Nombre Completo</label>
+            <span>{{ profile.full_name }}</span>
+          </div>
+          <div class="field">
+            <label>Teléfono</label>
+            <span>{{ profile.phone || 'No registrado' }}</span>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div class="field-group" *ngIf="isEditing">
+          <div class="field editable">
+            <label>Nombre Completo</label>
+            <input type="text" [(ngModel)]="editFullName" placeholder="Nombre completo" maxlength="100">
+          </div>
+          <div class="field editable">
+            <label>Teléfono</label>
+            <input type="tel" [(ngModel)]="editPhone" placeholder="Número de teléfono" maxlength="20">
+          </div>
+          <div class="edit-actions">
+            <button class="btn-save" (click)="saveProfile()" [disabled]="isSaving">
+              <app-icon *ngIf="isSaving" category="status" name="loader" size="16px" customClass="spinner"></app-icon>
+              <app-icon *ngIf="!isSaving" category="status" name="check" size="16px"></app-icon>
+              {{ isSaving ? 'Guardando...' : 'Guardar' }}
+            </button>
+            <button class="btn-cancel" (click)="cancelEdit()" [disabled]="isSaving">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Password Change -->
+      <div class="profile-section">
+        <h3>Seguridad</h3>
+
+        <!-- Idle state -->
+        <div *ngIf="passwordStep === 'idle'" class="password-section">
+          <button class="btn-password" (click)="requestPasswordChange()">
+            <app-icon category="actions" name="lock" size="18px"></app-icon>
+            Cambiar Contraseña
+          </button>
+        </div>
+
+        <!-- Requesting -->
+        <div *ngIf="passwordStep === 'requesting'" class="password-section">
+          <div class="loading-inline">
+            <app-icon category="status" name="loader" size="18px" customClass="spinner"></app-icon>
+            <span>Enviando código de verificación...</span>
+          </div>
+        </div>
+
+        <!-- Confirm step -->
+        <div *ngIf="passwordStep === 'confirm' || passwordStep === 'confirming'" class="password-form">
+          <p class="password-info">
+            Se ha enviado un código de verificación a tu email. Ingrésalo junto con tu nueva contraseña.
+          </p>
+          <div class="field editable">
+            <label>Código de Verificación</label>
+            <input type="text" [(ngModel)]="verificationCode" placeholder="123456" maxlength="10">
+          </div>
+          <div class="field editable">
+            <label>Nueva Contraseña</label>
+            <input type="password" [(ngModel)]="newPassword" placeholder="Mínimo 8 caracteres" minlength="8">
+          </div>
+          <div class="field editable">
+            <label>Confirmar Contraseña</label>
+            <input type="password" [(ngModel)]="confirmPassword" placeholder="Repetir contraseña">
+          </div>
+          <div class="edit-actions">
+            <button class="btn-save" (click)="confirmPasswordChange()" [disabled]="passwordStep === 'confirming'">
+              <app-icon *ngIf="passwordStep === 'confirming'" category="status" name="loader" size="16px" customClass="spinner"></app-icon>
+              <app-icon *ngIf="passwordStep !== 'confirming'" category="status" name="check" size="16px"></app-icon>
+              {{ passwordStep === 'confirming' ? 'Cambiando...' : 'Cambiar Contraseña' }}
+            </button>
+            <button class="btn-cancel" (click)="cancelPasswordChange()" [disabled]="passwordStep === 'confirming'">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
