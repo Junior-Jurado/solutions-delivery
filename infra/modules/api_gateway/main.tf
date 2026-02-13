@@ -183,6 +183,16 @@ resource "aws_apigatewayv2_route" "guides_status" {
   authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
+# POST /shipping/calculate
+resource "aws_apigatewayv2_route" "shipping_calculate" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "POST /api/v1/shipping/calculate"
+
+  target             = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
 # -----------------------------------------
 # Cash Closes
 
@@ -553,6 +563,29 @@ resource "aws_apigatewayv2_route" "admin_employees_update" {
 resource "aws_apigatewayv2_route" "admin_clients_ranking" {
   api_id = aws_apigatewayv2_api.api.id
   route_key = "GET /api/v1/admin/clients/ranking"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+# -----------------------------------------
+# Users
+
+// GET /user/profile
+resource "aws_apigatewayv2_route" "user_profile" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "GET /api/v1/user/profile"
+
+  target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
+}
+
+// PUT /user/profile
+resource "aws_apigatewayv2_route" "update_user" {
+  api_id = aws_apigatewayv2_api.api.id
+  route_key = "PUT /api/v1/user/profile"
 
   target = "integrations/${aws_apigatewayv2_integration.lambda.id}"
   authorization_type = "JWT"

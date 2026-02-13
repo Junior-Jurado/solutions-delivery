@@ -137,6 +137,66 @@ type GuideStatsResponse struct {
 	ByStatus       map[string]int `json:"by_status"`
 }
 
+// CreateGuideRequest petición para crear una guía
+type CreateGuideRequest struct {
+	CreatedBy string          `json:"created_by"`
+	Service   ServiceInfo     `json:"service"`
+	Pricing   PricingInfo     `json:"pricing"`
+	Route     RouteInfo       `json:"route"`
+	Sender    PartyInfo       `json:"sender"`
+	Receiver  PartyInfo       `json:"receiver"`
+	Package   PackageInfo     `json:"package"`
+}
+
+type ServiceInfo struct {
+	ServiceType   string `json:"service_type"`
+	PaymentMethod string `json:"payment_method"`
+	ShippingType  string `json:"shipping_type"`
+}
+
+type PricingInfo struct {
+	DeclaredValue  float64 `json:"declared_value"`
+	Price          float64 `json:"price"`
+	OverrideReason string  `json:"override_reason,omitempty"`
+}
+
+type RouteInfo struct {
+	OriginCityID      int `json:"origin_city_id"`
+	DestinationCityID int `json:"destination_city_id"`
+}
+
+type PartyInfo struct {
+	FullName       string `json:"full_name"`
+	DocumentType   string `json:"document_type"`
+	DocumentNumber string `json:"document_number"`
+	Phone          string `json:"phone"`
+	Email          string `json:"email"`
+	Address        string `json:"address"`
+	CityID         int    `json:"city_id"`
+	CityName       string `json:"city_name"`
+}
+
+type PackageInfo struct {
+	WeightKg     float64 `json:"weight_kg"`
+	Pieces       int     `json:"pieces"`
+	LengthCm     float64 `json:"length_cm"`
+	WidthCm      float64 `json:"width_cm"`
+	HeightCm     float64 `json:"height_cm"`
+	Insured      bool    `json:"insured"`
+	Description  string  `json:"description"`
+	SpecialNotes string  `json:"special_notes"`
+}
+
+// CreateGuideResponse respuesta de creación de guía
+type CreateGuideResponse struct {
+	GuideID     int64  `json:"guide_id"`
+	GuideNumber string `json:"guide_number"`
+	PDFURL      string `json:"pdf_url"`
+	S3Key       string `json:"s3_key"`
+	PDFSize     int    `json:"pdf_size"`
+	Message     string `json:"message"`
+}
+
 // UpdateStatusRequest petición para actualizar estado
 type UpdateStatusRequest struct {
 	Status GuideStatus `json:"status"`

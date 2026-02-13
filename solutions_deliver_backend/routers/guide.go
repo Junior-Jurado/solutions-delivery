@@ -23,6 +23,9 @@ func init() {
 	}
 }
 
+// NOTE: POST /guides (CreateGuide) is handled by the Node.js Lambda in guides/guideHandler.js
+// The price override security logic lives there. Do NOT duplicate it here.
+
 // GetGuides obtiene la lista de guías con filtros
 func GetGuides(request events.APIGatewayV2HTTPRequest, userUUID string) (int, string) {
 	fmt.Println("GetGuides")

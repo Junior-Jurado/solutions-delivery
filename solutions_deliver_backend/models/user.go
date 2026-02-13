@@ -19,3 +19,9 @@ type User struct {
 	NumberDocument string   `json:"numberDocument"`
 	Role           UserRole `json:"role"`
 }
+
+// UserProfileUpdate campos permitidos para actualización de perfil (todos los roles)
+type UserProfileUpdate struct {
+	FullName string `json:"full_name,omitempty"`
+	Phone    string `json:"phone,omitempty"`
+}

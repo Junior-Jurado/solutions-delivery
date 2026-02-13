@@ -36,13 +36,21 @@ exports.handler = async (event) => {
       datos = event;
     }
 
+    // Extract user UUID from JWT authorizer (API Gateway V2)
+    let userUUID = null;
+    try {
+      userUUID = event?.requestContext?.authorizer?.jwt?.claims?.sub || null;
+    } catch (e) {
+      console.warn("Could not extract user UUID from authorizer:", e.message);
+    }
+
     // ROUTING: Determinar el tipo de operación
     if (datos.type === 'CASH_CLOSE') {
       console.log(">>> Tipo: CIERRE DE CAJA");
       return await handleCashClose(datos);
     } else {
       console.log(">>> Tipo: GUÍA DE TRANSPORTE");
-      return await handleGuide(datos);
+      return await handleGuide(datos, userUUID);
     }
 
   } catch (error) {
@@ -64,9 +72,9 @@ exports.handler = async (event) => {
 // ===================================
 // HANDLER PARA GUÍA
 // ===================================
-async function handleGuide(datos) {
+async function handleGuide(datos, userUUID) {
   try {
-    const result = await createGuide(datos, LOGO_BASE64);
+    const result = await createGuide(datos, LOGO_BASE64, userUUID);
 
     return {
       statusCode: 201,

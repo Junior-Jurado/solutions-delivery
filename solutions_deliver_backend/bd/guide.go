@@ -8,6 +8,147 @@ import (
 	"github.com/Junior_Jurado/solutions_delivery/solutions_deliver_backend/models"
 )
 
+// CreateGuide crea una nueva guía con todas sus relaciones
+func CreateGuide(request models.CreateGuideRequest, userUUID string) (int64, string, error) {
+	fmt.Println("CreateGuide")
+
+	err := DbConnect()
+	if err != nil {
+		return 0, "", err
+	}
+	defer Db.Close()
+
+	tx, err := Db.Begin()
+	if err != nil {
+		return 0, "", err
+	}
+
+	// 1. Insertar la guía principal
+	guideQuery := `
+		INSERT INTO shipping_guides (
+			service_type, payment_method, declared_value, price,
+			current_status, origin_city_id, destination_city_id,
+			created_by, created_at, updated_at
+		) VALUES (?, ?, ?, ?, 'CREATED', ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+	`
+
+	result, err := tx.Exec(guideQuery,
+		request.Service.ServiceType,
+		request.Service.PaymentMethod,
+		request.Pricing.DeclaredValue,
+		request.Pricing.Price,
+		request.Route.OriginCityID,
+		request.Route.DestinationCityID,
+		userUUID,
+	)
+	if err != nil {
+		tx.Rollback()
+		return 0, "", fmt.Errorf("error al insertar guía: %s", err.Error())
+	}
+
+	guideID, err := result.LastInsertId()
+	if err != nil {
+		tx.Rollback()
+		return 0, "", err
+	}
+
+	guideNumber := fmt.Sprintf("%d", guideID)
+
+	// 2. Insertar remitente
+	partyQuery := `
+		INSERT INTO guide_parties (
+			guide_id, party_role, full_name, document_type, document_number,
+			phone, email, address, city_id
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`
+
+	_, err = tx.Exec(partyQuery,
+		guideID, "SENDER",
+		request.Sender.FullName, request.Sender.DocumentType, request.Sender.DocumentNumber,
+		request.Sender.Phone, request.Sender.Email, request.Sender.Address, request.Sender.CityID,
+	)
+	if err != nil {
+		tx.Rollback()
+		return 0, "", fmt.Errorf("error al insertar remitente: %s", err.Error())
+	}
+
+	// 3. Insertar destinatario
+	_, err = tx.Exec(partyQuery,
+		guideID, "RECEIVER",
+		request.Receiver.FullName, request.Receiver.DocumentType, request.Receiver.DocumentNumber,
+		request.Receiver.Phone, request.Receiver.Email, request.Receiver.Address, request.Receiver.CityID,
+	)
+	if err != nil {
+		tx.Rollback()
+		return 0, "", fmt.Errorf("error al insertar destinatario: %s", err.Error())
+	}
+
+	// 4. Insertar paquete
+	packageQuery := `
+		INSERT INTO packages (
+			guide_id, weight_kg, pieces, length_cm, width_cm, height_cm,
+			insured, description, special_notes
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+	`
+
+	_, err = tx.Exec(packageQuery,
+		guideID,
+		request.Package.WeightKg, request.Package.Pieces,
+		request.Package.LengthCm, request.Package.WidthCm, request.Package.HeightCm,
+		request.Package.Insured, request.Package.Description, request.Package.SpecialNotes,
+	)
+	if err != nil {
+		tx.Rollback()
+		return 0, "", fmt.Errorf("error al insertar paquete: %s", err.Error())
+	}
+
+	// 5. Insertar historial inicial
+	historyQuery := `
+		INSERT INTO guide_status_history (guide_id, status, updated_by, updated_at)
+		VALUES (?, 'CREATED', ?, CURRENT_TIMESTAMP)
+	`
+
+	_, err = tx.Exec(historyQuery, guideID, userUUID)
+	if err != nil {
+		tx.Rollback()
+		return 0, "", fmt.Errorf("error al insertar historial: %s", err.Error())
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return 0, "", err
+	}
+
+	return guideID, guideNumber, nil
+}
+
+// SavePriceOverride guarda un registro de modificación de precio
+func SavePriceOverride(guideID int64, override models.PriceOverride) error {
+	fmt.Printf("SavePriceOverride -> GuideID: %d\n", guideID)
+
+	err := DbConnect()
+	if err != nil {
+		return err
+	}
+	defer Db.Close()
+
+	query := `
+		INSERT INTO guide_price_overrides (
+			guide_id, original_price, new_price, reason, overridden_by
+		) VALUES (?, ?, ?, ?, ?)
+	`
+
+	_, err = Db.Exec(query,
+		guideID,
+		override.OriginalPrice,
+		override.NewPrice,
+		override.Reason,
+		override.OverriddenBy,
+	)
+
+	return err
+}
+
 // GetGuidesByFilters obtiene guías aplicando filtros
 func GetGuidesByFilters(filters models.GuideFilters) ([]models.ShippingGuide, int, error) {
 	fmt.Println("GetGuidesByFilters")

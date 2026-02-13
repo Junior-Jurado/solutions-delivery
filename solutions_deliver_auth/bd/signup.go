@@ -31,6 +31,7 @@ func SignUp(sig models.SignUp) error {
 			last_login
 		)
 		VALUES (?, ?, ?, ?, ?, ?, 'client', ?, ?)
+		ON DUPLICATE KEY UPDATE last_login = VALUES(last_login)
 	`
 
 	fmt.Println(query)

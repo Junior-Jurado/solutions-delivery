@@ -52,6 +52,12 @@ func Manejadores(path string, method string, body string, headers map[string]str
 	case strings.HasPrefix(path, "/assignments"):
 		return ProccessAssignments(body, path, method, userUUID, request)
 
+	case strings.HasPrefix(path, "/shipping"):
+		return ProccessShipping(body, path, method, userUUID, request)
+
+	case strings.HasPrefix(path, "/user"):
+		return ProccessUser(body, path, method, userUUID, request)
+
 	default:
 		return 400, "Method Invalid"
 	}
@@ -463,6 +469,38 @@ func extractAssignmentIDFromPath(path string, suffix string) int64 {
 		return 0
 	}
 	return id
+}
+
+// ProccessShipping maneja las peticiones de cálculo de envío
+func ProccessShipping(body string, path string, method string, user string, request events.APIGatewayV2HTTPRequest) (int, string) {
+	fmt.Printf("ProccessShipping -> Path:%s, Method: %s\n", path, method)
+
+	switch {
+	// POST /shipping/calculate - Calcular precio de envío
+	case path == "/shipping/calculate" && method == "POST":
+		return routers.CalculateShippingPrice(body)
+
+	default:
+		return 400, "Method Invalid"
+	}
+}
+
+// ProccessUser maneja las peticiones de perfil de usuario (todos los roles)
+func ProccessUser(body string, path string, method string, user string, request events.APIGatewayV2HTTPRequest) (int, string) {
+	fmt.Printf("ProccessUser -> Path:%s, Method: %s\n", path, method)
+
+	switch {
+	// GET /user/profile - Obtener perfil del usuario
+	case path == "/user/profile" && method == "GET":
+		return routers.GetUserProfile(user)
+
+	// PUT /user/profile - Actualizar perfil del usuario (solo full_name y phone)
+	case path == "/user/profile" && method == "PUT":
+		return routers.UpdateUserProfile(body, user)
+
+	default:
+		return 400, "Method Invalid"
+	}
 }
 
 // ProccessAdmin maneja las peticiones del panel de administración

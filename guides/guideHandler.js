@@ -8,9 +8,9 @@ const { generateGuideHtml } = require("./guideTemplate");
 const s3Client = new S3Client({ region: process.env.AWS_REGION || "us-east-1" });
 const BUCKET_NAME = process.env.S3_BUCKET || "guia-app-pdfs";
 
-async function createGuide(datos, logoBase64) {
+async function createGuide(datos, logoBase64, userUUID) {
   console.log("=== Iniciando creación de guía ===");
-  
+
   let browser = null;
   let connection = null;
   let guide_id = null;
@@ -26,6 +26,76 @@ async function createGuide(datos, logoBase64) {
     // Conectar a la base de datos
     connection = await getConnection();
     console.log("Conexión a DB establecida");
+
+    // ==========================================
+    // PRICE OVERRIDE SECURITY
+    // ==========================================
+    const submittedPrice = pricing.price;
+
+    // Validate price is not negative
+    if (submittedPrice < 0) {
+      throw new Error("El precio no puede ser negativo");
+    }
+
+    // Recalculate price server-side using shipping_rates table
+    let calculatedPrice = 0;
+    try {
+      calculatedPrice = await calculateServerPrice(
+        connection,
+        route.origin_city_id,
+        route.destination_city_id,
+        service.service_type,
+        package_data.weight_kg,
+        package_data.length_cm || 0,
+        package_data.width_cm || 0,
+        package_data.height_cm || 0
+      );
+      console.log("Precio calculado server-side:", calculatedPrice, "Precio enviado:", submittedPrice);
+    } catch (calcErr) {
+      console.warn("No se pudo calcular precio server-side:", calcErr.message);
+    }
+
+    // Determine final price and check for override
+    let finalPrice = submittedPrice;
+    let priceOverride = null;
+
+    if (calculatedPrice > 0 && submittedPrice !== calculatedPrice) {
+      // Price differs - verify user is ADMIN
+      const userRole = userUUID ? await getUserRole(connection, userUUID) : null;
+
+      if (!userRole || userRole !== 'ADMIN') {
+        throw new Error("Solo administradores pueden modificar el precio calculado");
+      }
+
+      // Validate: price cannot be $0 if calculation gives > 0
+      if (submittedPrice === 0 && calculatedPrice > 0) {
+        throw new Error("El precio no puede ser $0 cuando el cálculo arroja un valor mayor");
+      }
+
+      // Validate: discount cannot exceed 50%
+      if (submittedPrice < calculatedPrice * 0.5) {
+        throw new Error("El descuento no puede ser mayor al 50% del precio calculado");
+      }
+
+      // Validate: reason is required for override
+      const overrideReason = pricing.override_reason || '';
+      if (!overrideReason.trim()) {
+        throw new Error("Debe proporcionar una razón para modificar el precio");
+      }
+
+      finalPrice = submittedPrice;
+      priceOverride = {
+        originalPrice: calculatedPrice,
+        newPrice: submittedPrice,
+        reason: overrideReason,
+        overriddenBy: userUUID
+      };
+      console.log("Price override registrado:", priceOverride);
+    } else if (calculatedPrice > 0) {
+      // Use server-calculated price (no override)
+      finalPrice = calculatedPrice;
+    }
+    // If calculatedPrice is 0 (no rate found), use submitted price as fallback
 
     await connection.beginTransaction();
 
@@ -49,7 +119,7 @@ async function createGuide(datos, logoBase64) {
         service.service_type,
         service.payment_method || 'CONTADO',
         pricing.declared_value,
-        pricing.price,
+        finalPrice,
         route.origin_city_id,
         route.destination_city_id,
         created_by
@@ -180,6 +250,23 @@ async function createGuide(datos, logoBase64) {
 
     const fullGuideData = guideData[0];
     console.log("Datos completos obtenidos");
+
+    // Save price override record if applicable
+    if (priceOverride) {
+      await connection.execute(
+        `INSERT INTO guide_price_overrides
+        (guide_id, original_price, new_price, reason, overridden_by)
+        VALUES (?, ?, ?, ?, ?)`,
+        [
+          guide_id,
+          priceOverride.originalPrice,
+          priceOverride.newPrice,
+          priceOverride.reason,
+          priceOverride.overriddenBy
+        ]
+      );
+      console.log("Price override guardado en BD");
+    }
 
     await connection.commit();
     console.log("Transacción comprometida");
@@ -324,6 +411,54 @@ async function createGuide(datos, logoBase64) {
       }
     }
   }
+}
+
+/**
+ * Recalculates shipping price server-side using shipping_rates table.
+ * Mirrors the Go logic in bd/shipping_rates.go
+ */
+async function calculateServerPrice(connection, originCityId, destinationCityId, serviceType, weightKg, lengthCm, widthCm, heightCm) {
+  const [rates] = await connection.execute(
+    `SELECT price_per_kg, min_value
+     FROM shipping_rates
+     WHERE origin_city_id = ? AND destination_city_id = ?
+     LIMIT 1`,
+    [originCityId, destinationCityId]
+  );
+
+  if (!rates.length) {
+    throw new Error("No shipping rate found for this route");
+  }
+
+  const rate = rates[0];
+
+  // MENSAJERIA: flat min_value
+  if (serviceType === 'MENSAJERIA') {
+    return parseFloat(rate.min_value);
+  }
+
+  // PAQUETERIA: use billable weight (max of real weight vs volumetric)
+  const volumetric = (lengthCm || 0) * (widthCm || 0) * (heightCm || 0);
+  const billableWeight = Math.max(weightKg || 0, volumetric);
+  const price = billableWeight * 400 * parseFloat(rate.price_per_kg);
+
+  return price;
+}
+
+/**
+ * Gets the role of a user by their UUID from the users table.
+ */
+async function getUserRole(connection, userUUID) {
+  const [rows] = await connection.execute(
+    `SELECT role FROM users WHERE user_uuid = ? LIMIT 1`,
+    [userUUID]
+  );
+
+  if (!rows.length) {
+    return null;
+  }
+
+  return rows[0].role;
 }
 
 module.exports = { createGuide };
