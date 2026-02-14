@@ -1,0 +1,11 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+:host {
+  display: block;
+}
+
+.forgot-password-link {
+  text-align: center;
+}

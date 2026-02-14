@@ -1,0 +1,117 @@
+<form (ngSubmit)="handleRegister($event)" class="form">
+  <div class="form-group">
+    <label for="reg-fullname">Nombre completo *</label>
+    <input
+      id="reg-fullname"
+      type="text"
+      placeholder="Juan Pérez"
+      [(ngModel)]="regFullName"
+      name="regFullName"
+      required
+      [disabled]="isLoading"
+      [class.input-error]="regFullNameError"
+      autocomplete="name"
+    />
+    <span *ngIf="regFullNameError" class="error-message">{{ regFullNameError }}</span>
+  </div>
+
+  <div class="form-group">
+    <label for="reg-email">Correo electrónico *</label>
+    <input
+      id="reg-email"
+      type="email"
+      placeholder="usuario@ejemplo.com"
+      [(ngModel)]="regEmail"
+      name="regEmail"
+      required
+      [disabled]="isLoading"
+      [class.input-error]="regEmailError"
+      autocomplete="email"
+    />
+    <span *ngIf="regEmailError" class="error-message">{{ regEmailError }}</span>
+  </div>
+
+  <div class="form-group">
+    <label for="reg-phone">Teléfono</label>
+    <input
+      id="reg-phone"
+      type="tel"
+      placeholder="+57 300 123 4567"
+      [(ngModel)]="regPhone"
+      name="regPhone"
+      [disabled]="isLoading"
+      [class.input-error]="regPhoneError"
+      autocomplete="tel"
+    />
+    <span *ngIf="regPhoneError" class="error-message">{{ regPhoneError }}</span>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label for="reg-type-doc">Tipo de documento</label>
+      <select
+        id="reg-type-doc"
+        [(ngModel)]="regTypeDocument"
+        name="regTypeDocument"
+        [disabled]="isLoading"
+        [class.input-error]="regTypeDocumentError">
+        <option value="">Seleccionar</option>
+        <option value="CC">Cédula de Ciudadanía</option>
+        <option value="CE">Cédula de Extranjería</option>
+        <option value="NIT">NIT</option>
+        <option value="PP">Pasaporte</option>
+      </select>
+      <span *ngIf="regTypeDocumentError" class="error-message">{{ regTypeDocumentError }}</span>
+    </div>
+
+    <div class="form-group">
+      <label for="reg-number-doc">Número de documento</label>
+      <input
+        id="reg-number-doc"
+        type="text"
+        placeholder="123456789"
+        [(ngModel)]="regNumberDocument"
+        name="regNumberDocument"
+        [disabled]="isLoading"
+        [class.input-error]="regNumberDocumentError"
+      />
+      <span *ngIf="regNumberDocumentError" class="error-message">{{ regNumberDocumentError }}</span>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="reg-password">Contraseña *</label>
+    <input
+      id="reg-password"
+      type="password"
+      placeholder="••••••••"
+      [(ngModel)]="regPassword"
+      name="regPassword"
+      required
+      [disabled]="isLoading"
+      [class.input-error]="regPasswordError"
+      autocomplete="new-password"
+    />
+    <span *ngIf="regPasswordError" class="error-message">{{ regPasswordError }}</span>
+    <small class="input-hint">Mínimo 8 caracteres, incluye mayúsculas, minúsculas, números y caracteres especiales</small>
+  </div>
+
+  <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+    <span *ngIf="!isLoading">Crear Cuenta</span>
+    <span *ngIf="isLoading" class="loading-content">
+      <span class="spinner"></span>
+      Creando cuenta...
+    </span>
+  </button>
+
+  <p class="form-footer">
+    ¿Ya tienes cuenta?
+    <button
+      type="button"
+      (click)="onSwitchToLogin()"
+      class="link-button"
+      [disabled]="isLoading">
+      Inicia sesión
+    </button>
+  </p>
+</form>

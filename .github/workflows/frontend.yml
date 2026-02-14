@@ -116,6 +116,9 @@ jobs:
             - name: Instalar dependencias
               run: npm ci
 
+            - name: Validar variables de entorno
+              run: npm run validate:env
+
             - name: Ejecutar ESLint
               run: npm run lint
 

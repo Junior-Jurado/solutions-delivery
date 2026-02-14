@@ -1,0 +1,62 @@
+<form (ngSubmit)="handleLogin($event)" class="form">
+  <div class="form-group">
+    <label for="login-email">Correo electrónico</label>
+    <input
+      id="login-email"
+      type="email"
+      [(ngModel)]="email"
+      name="email"
+      required
+      [disabled]="isLoading"
+      [class.input-error]="emailError"
+      autocomplete="email"
+      placeholder="usuario@ejemplo.com"
+    />
+    <span *ngIf="emailError" class="error-message">{{ emailError }}</span>
+  </div>
+
+  <div class="form-group">
+    <label for="login-password">Contraseña</label>
+    <input
+      id="login-password"
+      type="password"
+      [(ngModel)]="password"
+      name="password"
+      required
+      [disabled]="isLoading"
+      [class.input-error]="passwordError"
+      autocomplete="current-password"
+      placeholder="••••••••"
+    />
+    <span *ngIf="passwordError" class="error-message">{{ passwordError }}</span>
+  </div>
+
+  <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+    <span *ngIf="!isLoading">Iniciar sesión</span>
+    <span *ngIf="isLoading" class="loading-content">
+      <span class="spinner"></span>
+      Iniciando sesión...
+    </span>
+  </button>
+
+  <div class="forgot-password-link">
+    <button
+      type="button"
+      (click)="onSwitchToForgot()"
+      class="link-button"
+      [disabled]="isLoading">
+      ¿Olvidaste tu contraseña?
+    </button>
+  </div>
+
+  <p class="form-footer">
+    ¿No tienes cuenta?
+    <button
+      type="button"
+      (click)="onSwitchToRegister()"
+      class="link-button"
+      [disabled]="isLoading">
+      Regístrate aquí
+    </button>
+  </p>
+</form>

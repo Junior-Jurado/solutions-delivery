@@ -1,0 +1,17 @@
+@use "colors" as *;
+@use "variables" as *;
+@use "mixins" as *;
+
+:host {
+  display: block;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-md;
+
+  @include respond-to($breakpoint-sm) {
+    grid-template-columns: 1fr;
+  }
+}

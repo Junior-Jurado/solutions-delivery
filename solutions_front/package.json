@@ -8,6 +8,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --no-watch --no-progress --browsers=ChromeHeadless --code-coverage",
+    "validate:env": "node scripts/validate-env.js",
+    "prebuild": "node scripts/validate-env.js",
     "serve:ssr:solutions_front": "node dist/solutions_front/server/server.mjs",
     "lint": "ng lint"
   },
