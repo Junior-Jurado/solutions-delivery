@@ -194,8 +194,22 @@ jobs:
             - name: Instalar dependencias
               run: npm ci
 
-            - name: Build de produccion
-              run: npm run build -- --configuration=production
+            - name: Determinar configuracion de build
+              id: build-config
+              run: |
+                  if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+                    echo "config=production" >> $GITHUB_OUTPUT
+                    echo "label=PRODUCCIÓN"
+                  elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+                    echo "config=production" >> $GITHUB_OUTPUT
+                    echo "label=PRODUCCIÓN (manual)"
+                  else
+                    echo "config=development" >> $GITHUB_OUTPUT
+                    echo "label=DESARROLLO"
+                  fi
+
+            - name: Build (${{ steps.build-config.outputs.config }})
+              run: npm run build -- --configuration=${{ steps.build-config.outputs.config }}
 
             - name: Subir artefacto de build
               uses: actions/upload-artifact@v4
