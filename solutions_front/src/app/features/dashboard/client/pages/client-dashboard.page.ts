@@ -174,6 +174,7 @@ export class ClientDashboardPage implements OnInit, OnDestroy {
       // Corregir encoding UTF-8 del nombre
       if (this.currentUser.full_name) {
         this.currentUser.full_name = this.fixUtf8Encoding(this.currentUser.full_name);
+        sessionStorage.setItem('userDisplayName', this.currentUser.full_name);
       }
       this.userId = this.currentUser.user_id;
       this.cdr.detectChanges();

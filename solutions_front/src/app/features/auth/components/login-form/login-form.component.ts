@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ChangeDetectorRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectorRef, OnChanges } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -13,7 +13,7 @@ import { getCognitoErrorMessage } from '@core/utils/cognito-error-handler';
     styleUrls: ['./login-form.component.scss'],
     imports: [FormsModule, CommonModule]
 })
-export class LoginFormComponent {
+export class LoginFormComponent implements OnChanges {
     @Input() initialEmail = '';
     @Output() switchTab = new EventEmitter<string>();
     @Output() emailForForgot = new EventEmitter<string>();

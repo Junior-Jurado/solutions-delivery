@@ -23,6 +23,7 @@ import {
 } from "@core/services/admin.service";
 import { AssignmentService, DeliveryUser, PendingGuide } from "@core/services/assignment.service";
 import { GuideService, GuideFormValue } from "@core/services/guide.service";
+import { UserService } from "@shared/services/user.service";
 
 // Shared Components
 import { IconComponent } from "@shared/components/icon/icon.component";
@@ -285,6 +286,7 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
         private adminService: AdminService,
         private assignmentService: AssignmentService,
         private guideService: GuideService,
+        private userService: UserService,
         private cdr: ChangeDetectorRef
     ) {}
 
@@ -325,20 +327,38 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
     // ==========================================
     private loadCurrentUser(): void {
         const idToken = sessionStorage.getItem('idToken');
-        if (idToken) {
+        if (!idToken) {
+            this.router.navigate(['/auth']);
+            return;
+        }
+
+        try {
+            const payload = JSON.parse(atob(idToken.split('.')[1]));
+            this.currentUserId = payload.sub || payload['cognito:username'];
+            // Nombre temporal mientras carga de la API
+            this.userName = 'Administrador';
+        } catch (error) {
+            console.error('Error al decodificar token:', error);
+            this.router.navigate(['/auth']);
+            return;
+        }
+
+        // Cargar nombre fresco desde la API (fuente de verdad)
+        this.userService.getProfile().then(profile => {
+            const rawName = profile.full_name || 'Administrador';
+            this.userName = this.fixUtf8Encoding(rawName);
+            sessionStorage.setItem('userDisplayName', this.userName);
+            this.cdr.detectChanges();
+        }).catch(error => {
+            console.error('Error al cargar perfil:', error);
+            // Fallback al token si la API falla
             try {
                 const payload = JSON.parse(atob(idToken.split('.')[1]));
-                this.currentUserId = payload.sub || payload['cognito:username'];
-                const savedName = sessionStorage.getItem('userDisplayName');
-                const rawName = savedName || payload['custom:full_name'] || payload.name || 'Administrador';
-                this.userName = this.fixUtf8Encoding(rawName);
-            } catch (error) {
-                console.error('Error al decodificar token:', error);
-                this.router.navigate(['/auth']);
-            }
-        } else {
-            this.router.navigate(['/auth']);
-        }
+                const fallbackName = payload['custom:full_name'] || payload.name || 'Administrador';
+                this.userName = this.fixUtf8Encoding(fallbackName);
+                this.cdr.detectChanges();
+            } catch { /* usar nombre por defecto */ }
+        });
     }
 
     private fixUtf8Encoding(text: string): string {

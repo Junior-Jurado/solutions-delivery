@@ -11,6 +11,12 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Navegar al directorio del frontend
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR" || { echo -e "${RED}No se pudo acceder al directorio del frontend${NC}"; exit 1; }
+echo -e "Directorio de trabajo: ${YELLOW}$(pwd)${NC}"
+echo ""
+
 # Función para verificar si el último comando falló
 check_status() {
     if [ $? -eq 0 ]; then
@@ -33,23 +39,28 @@ echo -e "${YELLOW}Paso 2: Instalando dependencias (npm ci)...${NC}"
 npm ci
 check_status "Instalación de dependencias"
 
-# Paso 3: Lint
-echo -e "${YELLOW}Paso 3: Ejecutando ESLint...${NC}"
+# Paso 3: Validar variables de entorno
+echo -e "${YELLOW}Paso 3: Validando variables de entorno...${NC}"
+npm run validate:env
+check_status "Validación de entorno"
+
+# Paso 4: Lint
+echo -e "${YELLOW}Paso 4: Ejecutando ESLint...${NC}"
 npm run lint
 check_status "Lint"
 
-# Paso 4: Tests
-echo -e "${YELLOW}Paso 4: Ejecutando tests unitarios...${NC}"
+# Paso 5: Tests
+echo -e "${YELLOW}Paso 5: Ejecutando tests unitarios...${NC}"
 npm run test:ci
 check_status "Tests"
 
-# Paso 5: Build
-echo -e "${YELLOW}Paso 5: Build de producción...${NC}"
+# Paso 6: Build
+echo -e "${YELLOW}Paso 6: Build de producción...${NC}"
 npm run build -- --configuration=production
 check_status "Build"
 
-# Paso 6: Verificar artefactos
-echo -e "${YELLOW}Paso 6: Verificando artefactos generados...${NC}"
+# Paso 7: Verificar artefactos
+echo -e "${YELLOW}Paso 7: Verificando artefactos generados...${NC}"
 if [ -d "dist/solutions_front/browser" ]; then
     echo -e "${GREEN}Artefactos generados correctamente${NC}"
     ls -lh dist/solutions_front/browser/ | head -10

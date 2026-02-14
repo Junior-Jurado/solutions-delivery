@@ -117,7 +117,12 @@ jobs:
               run: npm ci
 
             - name: Validar variables de entorno
-              run: npm run validate:env
+              run: |
+                  if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+                    npm run validate:env:prod
+                  else
+                    npm run validate:env
+                  fi
 
             - name: Ejecutar ESLint
               run: npm run lint

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ChangeDetectorRef, OnDestroy, ElementRef, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectorRef, OnChanges, OnDestroy, ElementRef, ViewChildren, QueryList, AfterViewInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '@core/services/auth.service';
@@ -13,7 +13,7 @@ import { getCognitoErrorMessage } from '@core/utils/cognito-error-handler';
     styleUrls: ['./forgot-password-form.component.scss'],
     imports: [FormsModule, CommonModule, IconComponent]
 })
-export class ForgotPasswordFormComponent implements OnDestroy, AfterViewInit {
+export class ForgotPasswordFormComponent implements OnChanges, OnDestroy, AfterViewInit {
     @Input() initialEmail = '';
     @Output() switchTab = new EventEmitter<string>();
     @Output() emailForLogin = new EventEmitter<string>();

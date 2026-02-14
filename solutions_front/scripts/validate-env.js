@@ -1,9 +1,11 @@
 /**
  * Script de validación de variables de entorno.
- * Se ejecuta antes del build (prebuild) y puede ejecutarse manualmente con: npm run validate:env
  *
- * Valida AMBOS archivos de entorno (dev y prod) para asegurar que no
- * se haga build ni push con configuraciones inválidas.
+ * Uso:
+ *   node scripts/validate-env.js              → valida solo dev (por defecto)
+ *   node scripts/validate-env.js --env=dev    → valida solo dev
+ *   node scripts/validate-env.js --env=prod   → valida solo prod
+ *   node scripts/validate-env.js --env=all    → valida ambos
  */
 
 const fs = require('fs');
@@ -22,19 +24,15 @@ const POOL_ID_REGEX = /^[\w-]+_[a-zA-Z0-9]+$/;
 function extractValues(fileContent, fileName) {
     const errors = [];
 
-    // Extraer userPoolId
     const poolIdMatch = fileContent.match(/userPoolId:\s*['"`]([^'"`]*)['"`]/);
     const poolId = poolIdMatch ? poolIdMatch[1].trim() : '';
 
-    // Extraer clientId
     const clientIdMatch = fileContent.match(/clientId:\s*['"`]([^'"`]*)['"`]/);
     const clientId = clientIdMatch ? clientIdMatch[1].trim() : '';
 
-    // Extraer apiBaseUrl
     const apiUrlMatch = fileContent.match(/apiBaseUrl:\s*['"`]([^'"`]*)['"`]/);
     const apiUrl = apiUrlMatch ? apiUrlMatch[1].trim() : '';
 
-    // Validar userPoolId
     if (!poolId) {
         errors.push(`[${fileName}] cognito.userPoolId está vacío`);
     } else if (PLACEHOLDERS.userPoolId.includes(poolId)) {
@@ -43,14 +41,12 @@ function extractValues(fileContent, fileName) {
         errors.push(`[${fileName}] cognito.userPoolId tiene formato inválido: "${poolId}" (esperado: region_poolId)`);
     }
 
-    // Validar clientId
     if (!clientId) {
         errors.push(`[${fileName}] cognito.clientId está vacío`);
     } else if (PLACEHOLDERS.clientId.includes(clientId)) {
         errors.push(`[${fileName}] cognito.clientId tiene un valor placeholder: "${clientId}"`);
     }
 
-    // Validar apiBaseUrl
     if (!apiUrl) {
         errors.push(`[${fileName}] apiBaseUrl está vacío`);
     } else if (PLACEHOLDERS.apiBaseUrl.includes(apiUrl)) {
@@ -60,13 +56,31 @@ function extractValues(fileContent, fileName) {
     return errors;
 }
 
-function main() {
-    console.log('\n🔍 Validando archivos de entorno...\n');
+function getTargetEnv() {
+    const envArg = process.argv.find(a => a.startsWith('--env='));
+    if (envArg) {
+        return envArg.split('=')[1];
+    }
+    return 'dev';
+}
 
-    const filesToValidate = [
-        { file: 'environment.dev.ts', label: 'Desarrollo' },
-        { file: 'environment.prod.ts', label: 'Producción' }
-    ];
+function main() {
+    const target = getTargetEnv();
+    console.log(`\n🔍 Validando entorno: ${target}\n`);
+
+    const envFiles = {
+        dev:  { file: 'environment.dev.ts', label: 'Desarrollo' },
+        prod: { file: 'environment.prod.ts', label: 'Producción' }
+    };
+
+    let filesToValidate = [];
+    if (target === 'all') {
+        filesToValidate = [envFiles.dev, envFiles.prod];
+    } else if (target === 'prod') {
+        filesToValidate = [envFiles.prod];
+    } else {
+        filesToValidate = [envFiles.dev];
+    }
 
     let allErrors = [];
 
@@ -89,20 +103,6 @@ function main() {
         }
     }
 
-    // También validar el environment.ts base (no debería tener valores vacíos en uso directo)
-    const baseFile = path.join(ENV_DIR, 'environment.ts');
-    if (fs.existsSync(baseFile)) {
-        const baseContent = fs.readFileSync(baseFile, 'utf8');
-        const basePoolId = baseContent.match(/userPoolId:\s*['"`]([^'"`]*)['"`]/);
-        const baseClientId = baseContent.match(/clientId:\s*['"`]([^'"`]*)['"`]/);
-        const baseApiUrl = baseContent.match(/apiBaseUrl:\s*['"`]([^'"`]*)['"`]/);
-
-        const hasEmptyBase = (!basePoolId?.[1] || !baseClientId?.[1] || !baseApiUrl?.[1]);
-        if (hasEmptyBase) {
-            console.log(`\n  ⚠️  environment.ts base tiene valores vacíos (OK si se usa fileReplacements en angular.json)`);
-        }
-    }
-
     console.log('');
 
     if (allErrors.length > 0) {
@@ -112,7 +112,7 @@ function main() {
         process.exit(1);
     }
 
-    console.log('✅ Todas las variables de entorno son válidas.\n');
+    console.log('✅ Variables de entorno válidas.\n');
 }
 
 main();

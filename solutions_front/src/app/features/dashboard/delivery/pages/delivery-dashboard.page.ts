@@ -16,6 +16,7 @@ import { AuthService } from '@core/services/auth.service';
 import { ToastService } from '@shared/services/toast.service';
 import { TranslationService } from '@shared/services/translation.service';
 import { DeviceDetectionService } from '@shared/services/device-detection.service';
+import { UserService } from '@shared/services/user.service';
 
 // Shared Components
 import { IconComponent } from '@shared/components/icon/icon.component';
@@ -97,6 +98,7 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
     private toastService: ToastService,
     public translationService: TranslationService,
     private deviceService: DeviceDetectionService,
+    private userService: UserService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
@@ -118,18 +120,25 @@ export class DeliveryDashboardPage implements OnInit, OnDestroy {
 
   private loadUserData(): void {
     const idToken = sessionStorage.getItem('idToken');
-    if (idToken) {
+    this.userRole = sessionStorage.getItem('role') || 'DELIVERY';
+    this.userName = 'Repartidor';
+
+    if (!idToken) return;
+
+    this.userService.getProfile().then(profile => {
+      const rawName = profile.full_name || 'Repartidor';
+      this.userName = this.fixUtf8Encoding(rawName);
+      sessionStorage.setItem('userDisplayName', this.userName);
+      this.cdr.detectChanges();
+    }).catch(error => {
+      console.error('Error al cargar perfil:', error);
       try {
         const payload = JSON.parse(atob(idToken.split('.')[1]));
-        const savedName = sessionStorage.getItem('userDisplayName');
-        const rawName = savedName || payload['custom:full_name'] || payload.name || 'Repartidor';
-        this.userName = this.fixUtf8Encoding(rawName);
-        this.userRole = sessionStorage.getItem('role') || 'DELIVERY';
-      } catch (error) {
-        console.error('Error al decodificar token:', error);
-        this.userName = 'Repartidor';
-      }
-    }
+        const fallbackName = payload['custom:full_name'] || payload.name || 'Repartidor';
+        this.userName = this.fixUtf8Encoding(fallbackName);
+        this.cdr.detectChanges();
+      } catch { /* usar nombre por defecto */ }
+    });
   }
 
   private fixUtf8Encoding(text: string): string {

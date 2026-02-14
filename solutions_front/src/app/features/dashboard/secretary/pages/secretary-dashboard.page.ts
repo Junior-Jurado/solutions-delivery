@@ -13,6 +13,7 @@ import {
 } from "@core/services/guide.service";
 import { LocationService, City } from "@core/services/location.service";
 import { ToastService } from "@shared/services/toast.service";
+import { UserService } from "@shared/services/user.service";
 import { TranslationService } from "@shared/services/translation.service";
 
 // Components
@@ -155,6 +156,7 @@ export class SecretaryDashboardPage implements OnInit {
         private locationService: LocationService,
         private translationService: TranslationService,
         private toast: ToastService,
+        private userService: UserService,
         private cdr: ChangeDetectorRef
     ) {}
 
@@ -173,21 +175,35 @@ export class SecretaryDashboardPage implements OnInit {
     // ==========================================
     private loadCurrentUser(): void {
         const idToken = sessionStorage.getItem('idToken');
-        if (idToken) {
+        if (!idToken) {
+            this.router.navigate(['/auth']);
+            return;
+        }
+
+        try {
+            const payload = JSON.parse(atob(idToken.split('.')[1]));
+            this.currentUserId = payload.sub || payload['cognito:username'];
+            this.userName = 'Secretari@';
+        } catch (error) {
+            console.error('Error al decodificar token:', error);
+            this.router.navigate(['/auth']);
+            return;
+        }
+
+        this.userService.getProfile().then(profile => {
+            const rawName = profile.full_name || 'Secretari@';
+            this.userName = this.fixUtf8Encoding(rawName);
+            sessionStorage.setItem('userDisplayName', this.userName);
+            this.cdr.detectChanges();
+        }).catch(error => {
+            console.error('Error al cargar perfil:', error);
             try {
                 const payload = JSON.parse(atob(idToken.split('.')[1]));
-                this.currentUserId = payload.sub || payload['cognito:username'];
-                const savedName = sessionStorage.getItem('userDisplayName');
-                const rawName = savedName || payload['custom:full_name'] || payload.name || 'Secretari@';
-                this.userName = this.fixUtf8Encoding(rawName);
-                console.log('Usuario actual:', this.currentUserId);
-            } catch (error) {
-                console.error('Error al decodificar token:', error);
-                this.router.navigate(['/auth']);
-            }
-        } else {
-            this.router.navigate(['/auth']);
-        }
+                const fallbackName = payload['custom:full_name'] || payload.name || 'Secretari@';
+                this.userName = this.fixUtf8Encoding(fallbackName);
+                this.cdr.detectChanges();
+            } catch { /* usar nombre por defecto */ }
+        });
     }
 
     /**

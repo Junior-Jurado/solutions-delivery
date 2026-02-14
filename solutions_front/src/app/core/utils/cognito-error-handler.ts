@@ -121,10 +121,6 @@ export function getCognitoErrorMessage(error: unknown): string {
         case 'DeviceNotRememberedException':
             return 'Este dispositivo no está registrado. Intenta iniciar sesión nuevamente.';
 
-        // Token inválido o expirado
-        case 'NotAuthorizedException':
-            return 'Tu sesión ha expirado. Inicia sesión nuevamente.';
-
         // Error interno de Cognito
         case 'InternalErrorException':
             return 'Error interno del servicio de autenticación. Intenta más tarde.';
