@@ -21,25 +21,25 @@ type TokenJson struct {
 	Username  string
 }
 
-func ValidarToken(token string) (bool, error, string) {
+func ValidarToken(token string) (bool, string, error) {
 	parts := strings.Split(token, ".")
 
 	if len(parts) != 3 {
 		fmt.Println("El token no es válido")
-		return false, nil, "El token no es válido"
+		return false, "El token no es válido", nil
 	}
 
 	userInfo, err := base64.StdEncoding.DecodeString(parts[1])
 	if err != nil {
 		fmt.Println("Error al decodificar el token ", err.Error())
-		return false, err, err.Error()
+		return false, err.Error(), err
 	}
 
 	var tokenJson TokenJson
 	err = json.Unmarshal(userInfo, &tokenJson)
 	if err != nil {
 		fmt.Println("Error al decodificar a la estructura JSON ", err.Error())
-		return false, err, err.Error()
+		return false, err.Error(), err
 	}
 
 	hora_actual := time.Now()
@@ -47,8 +47,8 @@ func ValidarToken(token string) (bool, error, string) {
 
 	if hora_expiracion.Before(hora_actual) {
 		fmt.Println("El token ha expirado, fecha de expiracion: ", hora_expiracion.String())
-		return false, nil, "El token ha expirado"
+		return false, "El token ha expirado", nil
 	}
 
-	return true, nil, string(tokenJson.Username)
+	return true, string(tokenJson.Username), nil
 }

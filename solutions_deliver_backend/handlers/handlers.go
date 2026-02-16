@@ -174,7 +174,7 @@ func ProcesoUbicaciones(body string, path string, method string, user string, id
 		cityIDStr := strings.TrimPrefix(path, "/locations/cities/")
 		cityID, err := strconv.ParseInt(cityIDStr, 10, 64)
 		if err != nil {
-			return 400, fmt.Sprintf(`{"error": "ID de ciudad inválido"}`)
+			return 400, `{"error": "ID de ciudad inválido"}`
 		}
 		return routers.GetCityByID(cityID)
 
@@ -331,6 +331,7 @@ func ProccessFrequentParties(body string, path string, method string, user strin
 		}
 
 		var partyType models.PartyType
+
 		if partyTypeStr == "SENDER" {
 			partyType = models.PartySender
 		} else if partyTypeStr == "RECEIVER" {

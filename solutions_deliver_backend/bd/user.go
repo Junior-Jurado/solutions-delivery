@@ -41,7 +41,7 @@ func GetUserRole(userUUID string) (models.User, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return user, fmt.Errorf("Usuario no encontrado")
+			return user, fmt.Errorf("usuario no encontrado")
 		}
 		return user, err
 	}

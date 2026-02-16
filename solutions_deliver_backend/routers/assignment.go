@@ -120,7 +120,7 @@ func ReassignDelivery(body string, userUUID string, path string) (int, string) {
 		Message:      "Reasignación realizada correctamente",
 	}
 
-	jsonResponse, err := json.Marshal(response)
+	jsonResponse, _ := json.Marshal(response)
 
 	return 200, string(jsonResponse)
 }
@@ -259,7 +259,7 @@ func UpdateAssignmentStatus(body string, userUUID string, path string) (int, str
 		Message:    message,
 	}
 
-	jsonResponse, err := json.Marshal(response)
+	jsonResponse, _ := json.Marshal(response)
 	return 200, string(jsonResponse)
 }
 
@@ -324,7 +324,7 @@ func GetAssignments(request events.APIGatewayV2HTTPRequest) (int, string) {
 		response.Assignments = []models.DeliveryAssignment{}
 	}
 
-	jsonResponse, err := json.Marshal(response)
+	jsonResponse, _ := json.Marshal(response)
 	return 200, string(jsonResponse)
 }
 
@@ -349,7 +349,7 @@ func GetMyAssignments(userUUID string) (int, string) {
 		response.Deliveries = []models.DeliveryAssignment{}
 	}
 
-	jsonResponse, err := json.Marshal(response)
+	jsonResponse, _ := json.Marshal(response)
 	return 200, string(jsonResponse)
 }
 

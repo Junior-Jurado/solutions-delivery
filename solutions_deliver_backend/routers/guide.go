@@ -131,8 +131,8 @@ func GetGuideByID(guideID int64) (int, string) {
 
 	guide, err := bd.GetGuideByID(guideID)
 	if err != nil {
-		if err.Error() == "Guía no encontrada" {
-			return 404, fmt.Sprintf(`{"error": "Guía no encontrada"}`)
+		if err.Error() == "guía no encontrada" {
+			return 404, `{"error": "Guía no encontrada"}`
 		}
 		return 500, fmt.Sprintf(`{"error": "Error al obtener la guía: %s"}`, err.Error())
 	}
@@ -161,7 +161,7 @@ func UpdateGuideStatus(guideID int64, body string, userUUID string) (int, string
 
 	// Verificar que la guía existe
 	if !bd.GuideExists(guideID) {
-		return 404, fmt.Sprintf(`{"error": "Guía no encontrada"}`)
+		return 404, `{"error": "Guía no encontrada"}`
 	}
 
 	// Parsear body
@@ -190,7 +190,7 @@ func UpdateGuideStatus(guideID int64, body string, userUUID string) (int, string
 	}
 
 	if !isValid {
-		return 400, fmt.Sprintf(`{"error": "Estado inválido"}`)
+		return 400, `{"error": "Estado inválido"}`
 	}
 
 	// Validar permisos según rol

@@ -91,7 +91,7 @@ func GenerateCashClosePDFWithLambda(close models.CashClose, details []models.Cas
 
 	// Verificar que tengamos los datos necesarios
 	if pdfResp.PDFURL == "" || pdfResp.S3Key == "" {
-		return "", "", fmt.Errorf("PDF URL or S3 Key missing in response")
+		return "", "", fmt.Errorf("pdf URL or S3 key missing in response")
 	}
 
 	fmt.Printf("PDF generado exitosamente - URL: %s, S3 Key: %s\n", pdfResp.PDFURL, pdfResp.S3Key)

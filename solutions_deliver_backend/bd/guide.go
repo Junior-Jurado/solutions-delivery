@@ -429,7 +429,7 @@ func GetGuideByID(guideID int64) (models.ShippingGuide, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return guide, fmt.Errorf("Guía no encontrada")
+			return guide, fmt.Errorf("guía no encontrada")
 		}
 		return guide, err
 	}
@@ -553,7 +553,7 @@ func getGuidePackage(guideID int64) (models.Package, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return pkg, fmt.Errorf("Paquete no encontrado")
+			return pkg, fmt.Errorf("paquete no encontrado")
 		}
 		return pkg, err
 	}
@@ -770,13 +770,13 @@ func GetGuidePDFInfo(guideID int64) (string, error) {
 	err = Db.QueryRow(query, guideID).Scan(&pdfS3Key)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return "", fmt.Errorf("Guía no encontrada")
+			return "", fmt.Errorf("guía no encontrada")
 		}
 		return "", err
 	}
 
 	if pdfS3Key == "" {
-		return "", fmt.Errorf("La guía no tiene PDF asociado")
+		return "", fmt.Errorf("la guía no tiene PDF asociado")
 	}
 
 	return pdfS3Key, nil

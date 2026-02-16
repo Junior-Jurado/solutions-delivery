@@ -50,7 +50,7 @@ func GetUserProfile(userUUID string) (models.ClientProfile, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return profile, fmt.Errorf("Usuario no encontrado")
+			return profile, fmt.Errorf("usuario no encontrado")
 		}
 		return profile, err
 	}

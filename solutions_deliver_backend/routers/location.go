@@ -43,12 +43,12 @@ func GetCities(deparmentIDStr string) (int, string) {
 		departmentID, parseErr := strconv.ParseInt(deparmentIDStr, 10, 64)
 
 		if parseErr != nil {
-			return 400, fmt.Sprintf(`{"error": "ID de departamento inválido"}`)
+			return 400, `{"error": "ID de departamento inválido"}`
 		}
 
 		// Verificar que el departamento existe
 		if !bd.DepartmentExists(departmentID) {
-			return 404, fmt.Sprintf(`{"error": "Departamento no encontrado"}`)
+			return 404, `{"error": "Departamento no encontrado"}`
 		}
 
 		cities, err = bd.GetCitiesByDepartment(departmentID)
@@ -81,8 +81,8 @@ func GetCityByID(cityID int64) (int, string) {
 
 	city, err := bd.GetCityByID(cityID)
 	if err != nil {
-		if err.Error() == "Ciudad no encontrada" {
-			return 404, fmt.Sprintf(`{"error": "Ciudad no encontrada"}`)
+		if err.Error() == "ciudad no encontrada" {
+			return 404, `{"error": "Ciudad no encontrada"}`
 		}
 		return 500, fmt.Sprintf(`{"error": "Error al obtener la ciudad: %s"}`, err.Error())
 	}

@@ -184,7 +184,7 @@ func GetCityByID(cityID int64) (models.City, error) {
 
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return city, fmt.Errorf("Ciudad no encontrada")
+			return city, fmt.Errorf("ciudad no encontrada")
 		}
 		return city, err
 	}

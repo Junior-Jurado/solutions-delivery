@@ -62,13 +62,13 @@ func DownloadGuidePDFDirect(guideID int64) (int, []byte, string, error) {
 
 	// Verificar que la guía existe
 	if !bd.GuideExists(guideID) {
-		return 404, nil, "", fmt.Errorf("Guía no encontrada")
+		return 404, nil, "", fmt.Errorf("guía no encontrada")
 	}
 
 	// Obtener información del PDF
 	s3Key, err := bd.GetGuidePDFInfo(guideID)
 	if err != nil {
-		return 404, nil, "", fmt.Errorf("PDF no encontrado: %s", err.Error())
+		return 404, nil, "", fmt.Errorf("pdf no encontrado: %s", err.Error())
 	}
 
 	// Descargar archivo de S3
