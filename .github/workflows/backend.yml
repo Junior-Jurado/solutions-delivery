@@ -4,8 +4,8 @@
 # FLUJO:
 #   1. Lint    -> go vet + staticcheck
 #   2. Test    -> go test ./... -race
-#   3. Build   -> Compilar + subir .zip a S3
-#   4. Deploy  -> terraform apply (actualiza Lambda desde S3)
+#   3. Build   -> Compilar + subir artefacto a GitHub
+#   4. Deploy  -> Descargar artefacto, subir .zip a S3, terraform apply
 #
 # S3 como puente entre CI/CD y Terraform:
 #   CI/CD sube .zip a S3 -> Terraform lee de S3 -> sin conflicto con deploy local
@@ -137,10 +137,10 @@ jobs:
                   retention-days: 7
 
     # =========================================================================
-    # JOB 3: BUILD + UPLOAD A S3
+    # JOB 3: BUILD
     # =========================================================================
-    # Compila Go -> empaqueta .zip -> sube a S3
-    # En PRs solo valida que compila, NO sube a S3
+    # Compila Go -> empaqueta .zip -> sube artefacto a GitHub
+    # NO necesita AWS credentials (el upload a S3 lo hacen los jobs de deploy)
     # =========================================================================
     build:
         name: Build
@@ -177,33 +177,6 @@ jobs:
                   zip -j lambda.zip bootstrap
                   echo "Package size: $(du -h lambda.zip | cut -f1)"
 
-            - name: Determinar environment
-              id: env
-              run: |
-                  if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-                    echo "name=prod" >> $GITHUB_OUTPUT
-                  elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-                    echo "name=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
-                  else
-                    echo "name=dev" >> $GITHUB_OUTPUT
-                  fi
-
-            - name: Configurar AWS credentials
-              if: github.event_name != 'pull_request'
-              uses: aws-actions/configure-aws-credentials@v4
-              with:
-                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ env.AWS_REGION }}
-
-            - name: Subir .zip a S3
-              if: github.event_name != 'pull_request'
-              env:
-                  S3_BUCKET: ${{ env.NAME_PREFIX }}-lambda-artifacts-${{ steps.env.outputs.name }}
-              run: |
-                  aws s3 cp lambda.zip "s3://${S3_BUCKET}/backend/main.zip"
-                  echo "Uploaded to s3://${S3_BUCKET}/backend/main.zip"
-
             - name: Subir artefacto
               uses: actions/upload-artifact@v4
               with:
@@ -214,7 +187,7 @@ jobs:
     # =========================================================================
     # JOB 4: DEPLOY DEV
     # =========================================================================
-    # Terraform lee el .zip desde S3 y actualiza la Lambda
+    # Descarga artefacto, sube .zip a S3, ejecuta Terraform
     # =========================================================================
     deploy-dev:
         name: Deploy to DEV
@@ -229,6 +202,11 @@ jobs:
             - name: Checkout codigo
               uses: actions/checkout@v4
 
+            - name: Descargar artefacto
+              uses: actions/download-artifact@v4
+              with:
+                  name: backend-lambda-zip
+
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v3
               with:
@@ -240,6 +218,13 @@ jobs:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ env.AWS_REGION }}
+
+            - name: Subir .zip a S3
+              env:
+                  S3_BUCKET: ${{ env.NAME_PREFIX }}-lambda-artifacts-dev
+              run: |
+                  aws s3 cp lambda.zip "s3://${S3_BUCKET}/backend/main.zip"
+                  echo "Uploaded to s3://${S3_BUCKET}/backend/main.zip"
 
             - name: Terraform Init
               working-directory: infra/envs/dev
@@ -275,6 +260,11 @@ jobs:
             - name: Checkout codigo
               uses: actions/checkout@v4
 
+            - name: Descargar artefacto
+              uses: actions/download-artifact@v4
+              with:
+                  name: backend-lambda-zip
+
             - name: Setup Terraform
               uses: hashicorp/setup-terraform@v3
               with:
@@ -286,6 +276,13 @@ jobs:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
                   aws-region: ${{ env.AWS_REGION }}
+
+            - name: Subir .zip a S3
+              env:
+                  S3_BUCKET: ${{ env.NAME_PREFIX }}-lambda-artifacts-prod
+              run: |
+                  aws s3 cp lambda.zip "s3://${S3_BUCKET}/backend/main.zip"
+                  echo "Uploaded to s3://${S3_BUCKET}/backend/main.zip"
 
             - name: Terraform Init
               working-directory: infra/envs/prod
