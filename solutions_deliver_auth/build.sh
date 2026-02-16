@@ -1,95 +1,131 @@
 #!/bin/bash
-# =============================================================================
-# BUILD SCRIPT - Solutions Delivery Auth (Go Lambda Post-Confirmation)
-# =============================================================================
-# Compila la Lambda de autenticacion para AWS (ARM64)
-# Esta Lambda se ejecuta despues de que un usuario confirma su cuenta en Cognito
-# =============================================================================
+  # =============================================================================
+  # BUILD SCRIPT - Solutions Delivery Auth (Go Lambda Post-Confirmation)
+  # =============================================================================
+  # Compila la Lambda y sube el .zip a S3 (fuente única de verdad)
+  #
+  # Uso:
+  #   ./build.sh              → compila y sube a dev
+  #   ./build.sh prod         → compila y sube a prod
+  #   ./build.sh dev --local  → compila SIN subir a S3 (solo local)
+  # =============================================================================
 
-set -e
+  set -e
 
-# Colores
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+  # Colores
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[1;33m'
+  BLUE='\033[0;34m'
+  NC='\033[0m'
 
-echo -e "${BLUE}=============================================${NC}"
-echo -e "${BLUE}  Solutions Delivery - Auth Lambda Build${NC}"
-echo -e "${BLUE}=============================================${NC}"
+  # Parámetros
+  ENVIRONMENT="${1:-dev}"
+  LOCAL_ONLY="${2:-}"
+  NAME_PREFIX="solutions"
+  S3_BUCKET="${NAME_PREFIX}-lambda-artifacts-${ENVIRONMENT}"
+  S3_KEY="auth/main.zip"
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+  echo -e "${BLUE}=============================================${NC}"
+  echo -e "${BLUE}  Solutions Delivery - Auth Lambda Build${NC}"
+  echo -e "${BLUE}  Environment: ${ENVIRONMENT}${NC}"
+  echo -e "${BLUE}=============================================${NC}"
 
-# -----------------------------------------------------------------------------
-# 1. Verificar Go
-# -----------------------------------------------------------------------------
-echo -e "${YELLOW}[1/5]${NC} Verificando Go..."
-if ! command -v go &> /dev/null; then
-    echo -e "${RED}Error: Go no esta instalado${NC}"
-    exit 1
-fi
-echo -e "${GREEN}OK${NC}"
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  cd "$SCRIPT_DIR"
 
-# -----------------------------------------------------------------------------
-# 2. Dependencias
-# -----------------------------------------------------------------------------
-echo -e "${YELLOW}[2/5]${NC} Descargando dependencias..."
-go mod download
-go mod tidy
-echo -e "${GREEN}OK${NC}"
+  # -----------------------------------------------------------------------------
+  # 1. Verificar Go
+  # -----------------------------------------------------------------------------
+  echo -e "${YELLOW}[1/6]${NC} Verificando Go..."
+  if ! command -v go &> /dev/null; then
+      echo -e "${RED}Error: Go no esta instalado${NC}"
+      exit 1
+  fi
+  echo -e "${GREEN}OK${NC}"
 
-# -----------------------------------------------------------------------------
-# 3. Tests
-# -----------------------------------------------------------------------------
-echo -e "${YELLOW}[3/5]${NC} Ejecutando tests..."
-go test ./... -v 2>/dev/null || echo -e "${YELLOW}WARN${NC} - Sin tests"
+  # -----------------------------------------------------------------------------
+  # 2. Dependencias
+  # -----------------------------------------------------------------------------
+  echo -e "${YELLOW}[2/6]${NC} Descargando dependencias..."
+  go mod download
+  go mod tidy
+  echo -e "${GREEN}OK${NC}"
 
-# -----------------------------------------------------------------------------
-# 4. Compilar
-# -----------------------------------------------------------------------------
-echo -e "${YELLOW}[4/5]${NC} Compilando para AWS Lambda (linux/arm64)..."
+  # -----------------------------------------------------------------------------
+  # 3. Tests
+  # -----------------------------------------------------------------------------
+  echo -e "${YELLOW}[3/6]${NC} Ejecutando tests..."
+  go test ./... -v 2>/dev/null || echo -e "${YELLOW}WARN${NC} - Sin tests"
 
-export GOOS=linux
-export GOARCH=arm64
-export CGO_ENABLED=0
+  # -----------------------------------------------------------------------------
+  # 4. Compilar
+  # -----------------------------------------------------------------------------
+  echo -e "${YELLOW}[4/6]${NC} Compilando para AWS Lambda (linux/arm64)..."
 
-go build -tags lambda.norpc -ldflags="-s -w" -o bootstrap main.go
+  export GOOS=linux
+  export GOARCH=arm64
+  export CGO_ENABLED=0
 
-if [ ! -f "bootstrap" ]; then
-    echo -e "${RED}Error: No se genero bootstrap${NC}"
-    exit 1
-fi
+  go build -tags lambda.norpc -ldflags="-s -w" -o bootstrap main.go
 
-BOOTSTRAP_SIZE=$(du -h bootstrap | cut -f1)
-echo -e "${GREEN}OK${NC} - bootstrap ($BOOTSTRAP_SIZE)"
+  if [ ! -f "bootstrap" ]; then
+      echo -e "${RED}Error: No se genero bootstrap${NC}"
+      exit 1
+  fi
 
-# -----------------------------------------------------------------------------
-# 5. Empaquetar
-# -----------------------------------------------------------------------------
-echo -e "${YELLOW}[5/5]${NC} Empaquetando..."
+  BOOTSTRAP_SIZE=$(du -h bootstrap | cut -f1)
+  echo -e "${GREEN}OK${NC} - bootstrap ($BOOTSTRAP_SIZE)"
 
-rm -f main.zip
-zip -j main.zip bootstrap
+  # -----------------------------------------------------------------------------
+  # 5. Empaquetar
+  # -----------------------------------------------------------------------------
+  echo -e "${YELLOW}[5/6]${NC} Empaquetando..."
 
-INFRA_PATH="../infra/modules/lambda_custom_auth/src"
-mkdir -p "$INFRA_PATH"
-cp main.zip "$INFRA_PATH/main.zip"
+  rm -f main.zip
+  zip -j main.zip bootstrap
+  rm -f bootstrap
 
-rm -f bootstrap
+  ZIP_SIZE=$(du -h main.zip | cut -f1)
+  echo -e "${GREEN}OK${NC} - main.zip ($ZIP_SIZE)"
 
-ZIP_SIZE=$(du -h main.zip | cut -f1)
-echo -e "${GREEN}OK${NC} - main.zip ($ZIP_SIZE)"
+  # -----------------------------------------------------------------------------
+  # 6. Subir a S3
+  # -----------------------------------------------------------------------------
+  if [ "$LOCAL_ONLY" = "--local" ]; then
+      echo -e "${YELLOW}[6/6]${NC} Modo local - saltando S3"
 
-# -----------------------------------------------------------------------------
-# Resultado
-# -----------------------------------------------------------------------------
-echo ""
-echo -e "${GREEN}=============================================${NC}"
-echo -e "${GREEN}  Build completado!${NC}"
-echo -e "${GREEN}=============================================${NC}"
-echo ""
-echo -e "Copiado a: ${BLUE}$INFRA_PATH/main.zip${NC}"
+      # Mantener compatibilidad: copiar a infra (por si quieres terraform apply local)
+      INFRA_PATH="../infra/modules/lambda_custom_auth/src"
+      mkdir -p "$INFRA_PATH"
+      cp main.zip "$INFRA_PATH/main.zip"
+      echo -e "${GREEN}OK${NC} - Copiado a $INFRA_PATH"
+  else
+      echo -e "${YELLOW}[6/6]${NC} Subiendo a S3..."
 
-exit 0
+      if ! command -v aws &> /dev/null; then
+          echo -e "${RED}Error: AWS CLI no esta instalado${NC}"
+          exit 1
+      fi
+
+      aws s3 cp main.zip "s3://${S3_BUCKET}/${S3_KEY}"
+      echo -e "${GREEN}OK${NC} - s3://${S3_BUCKET}/${S3_KEY}"
+  fi
+
+  # -----------------------------------------------------------------------------
+  # Resultado
+  # -----------------------------------------------------------------------------
+  echo ""
+  echo -e "${GREEN}=============================================${NC}"
+  echo -e "${GREEN}  Build completado!${NC}"
+  echo -e "${GREEN}=============================================${NC}"
+  echo ""
+  if [ "$LOCAL_ONLY" != "--local" ]; then
+      echo -e "S3: ${BLUE}s3://${S3_BUCKET}/${S3_KEY}${NC}"
+      echo -e ""
+      echo -e "Para deployar con Terraform:"
+      echo -e "  cd ../infra/envs/${ENVIRONMENT}"
+      echo -e "  terraform apply -var-file=${ENVIRONMENT}.tfvars"
+  fi
+
+  exit 0

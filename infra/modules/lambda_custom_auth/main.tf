@@ -18,6 +18,11 @@ data "aws_security_groups" "default" {
   }
 }
 
+# LEER .zip DESDE S3
+data "aws_s3_object" "lambda_zip" {
+  bucket = var.artifacts_bucket
+  key = var.s3_key
+}
 
 resource "aws_iam_role" "lambda" {
   name = "${var.name_prefix}-lambda-role-${var.environment}"
@@ -73,17 +78,19 @@ resource "aws_iam_policy" "secrets_policy" {
 }
 
 resource "aws_lambda_function" "post_confirm" {
-  filename = "${path.module}/src/main.zip"
   function_name = "${var.name_prefix}-post-confirmation-${var.environment}"
   role = aws_iam_role.lambda.arn
   handler = "bootstrap"
   runtime = "provided.al2023"
-  source_code_hash = filebase64sha256("${path.module}/src/main.zip")
   architectures = [ "arm64" ]
 
   memory_size = 128
   timeout = 15
 
+  s3_bucket = var.artifacts_bucket
+  s3_key = var.s3_key
+  source_code_hash = data.aws_s3_object.lambda_zip.etag
+  
   environment {
     variables = {
       DB_SECRET_ARN = var.db_secret_arn,

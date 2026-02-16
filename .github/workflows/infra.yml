@@ -1,0 +1,356 @@
+# =============================================================================
+# PIPELINE: Infraestructura Terraform - Solutions Delivery
+# =============================================================================
+# FLUJO:
+#   - PR a main         -> terraform plan (muestra que cambiaria, NO aplica)
+#   - Push a develop     -> terraform apply en dev (automatico)
+#   - Push a main        -> terraform apply en prod (requiere aprobacion)
+#   - Manual             -> plan, apply o destroy en el environment que elijas
+#
+# STATE REMOTO:
+#   Bucket:   solutions-terraform-state-386452074334
+#   Lock:     solutions-terraform-locks (DynamoDB)
+#   Tu PC y este pipeline usan el MISMO state.
+#   terraform destroy desde tu PC borra TODO, incluido lo de CI/CD.
+#
+# SECRETS POR ENVIRONMENT:
+#   - AWS_ACCESS_KEY_ID      (usuario terraform_personal)
+#   - AWS_SECRET_ACCESS_KEY
+#   - AWS_REGION
+# =============================================================================
+
+name: Infrastructure (Terraform)
+
+on:
+    push:
+        branches:
+            - main
+            - develop
+        paths:
+            - "infra/**"
+            - ".github/workflows/infra.yml"
+
+    pull_request:
+        branches:
+            - main
+        paths:
+            - "infra/**"
+
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: "Entorno"
+                required: true
+                default: "dev"
+                type: choice
+                options:
+                    - dev
+                    - prod
+            action:
+                description: "Accion a ejecutar"
+                required: true
+                default: "plan"
+                type: choice
+                options:
+                    - plan
+                    - apply
+                    - destroy
+            confirm_destroy:
+                description: "Escribe DESTROY para confirmar destruccion"
+                required: false
+                type: string
+
+concurrency:
+    group: infra-${{ github.ref }}
+    cancel-in-progress: false  # NO cancelar: un apply a medias puede corromper el state
+
+env:
+    TF_VERSION: "1.14.4"
+
+jobs:
+    # =========================================================================
+    # JOB 1: VALIDATE + PLAN
+    # =========================================================================
+    # Se ejecuta SIEMPRE: PRs, push, y manual
+    # Valida la sintaxis y muestra que cambiaria sin tocar nada
+    # =========================================================================
+    plan:
+        name: "Plan (${{ github.event.inputs.environment || (github.ref == 'refs/heads/main' && 'prod') || 'dev' }})"
+        runs-on: ubuntu-latest
+        # En manual con action=apply o destroy, saltar plan (se hace inline)
+        if: |
+            github.event_name != 'workflow_dispatch' ||
+            github.event.inputs.action == 'plan'
+        outputs:
+            environment: ${{ steps.env.outputs.name }}
+
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Determinar environment
+              id: env
+              run: |
+                  if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+                    echo "name=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+                  elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+                    echo "name=prod" >> $GITHUB_OUTPUT
+                  else
+                    echo "name=dev" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: ${{ env.TF_VERSION }}
+
+            - name: Configurar AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Terraform Init
+              working-directory: infra/envs/${{ steps.env.outputs.name }}
+              run: terraform init
+
+            - name: Terraform Validate
+              working-directory: infra/envs/${{ steps.env.outputs.name }}
+              run: terraform validate
+
+            - name: Terraform Format Check
+              working-directory: infra/envs/${{ steps.env.outputs.name }}
+              run: terraform fmt -check -recursive ../../modules/ || true
+
+            - name: Terraform Plan
+              working-directory: infra/envs/${{ steps.env.outputs.name }}
+              run: |
+                  terraform plan \
+                    -var-file="${{ steps.env.outputs.name }}.tfvars" \
+                    -out=tfplan \
+                    -no-color 2>&1 | tee plan_output.txt
+
+            # En PRs, comentar el plan como review
+            - name: Comentar plan en PR
+              if: github.event_name == 'pull_request'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const plan = fs.readFileSync('infra/envs/${{ steps.env.outputs.name }}/plan_output.txt', 'utf8');
+
+                      // Truncar si es muy largo
+                      const maxLen = 60000;
+                      const truncated = plan.length > maxLen
+                        ? plan.substring(0, maxLen) + '\n\n... (truncado)'
+                        : plan;
+
+                      const body = `### Terraform Plan - \`${{ steps.env.outputs.name }}\`
+
+                      <details>
+                      <summary>Ver plan completo</summary>
+
+                      \`\`\`
+                      ${truncated}
+                      \`\`\`
+
+                      </details>
+
+                      *Ejecutado por: @${{ github.actor }}*`;
+
+                      github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: body
+                      });
+
+    # =========================================================================
+    # JOB 2: APPLY DEV
+    # =========================================================================
+    # Push a develop -> aplica cambios automaticamente en dev
+    # =========================================================================
+    apply-dev:
+        name: Apply to DEV
+        runs-on: ubuntu-latest
+        needs: plan
+        if: |
+            (github.ref == 'refs/heads/develop' && github.event_name == 'push')
+        environment: dev
+
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: ${{ env.TF_VERSION }}
+
+            - name: Configurar AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Terraform Init
+              working-directory: infra/envs/dev
+              run: terraform init
+
+            - name: Terraform Apply
+              working-directory: infra/envs/dev
+              run: |
+                  terraform apply \
+                    -var-file="dev.tfvars" \
+                    -auto-approve
+
+    # =========================================================================
+    # JOB 3: APPLY PROD
+    # =========================================================================
+    # Push a main -> aplica cambios en prod (requiere aprobacion del environment)
+    # Configura "Required reviewers" en GitHub > Settings > Environments > production
+    # =========================================================================
+    apply-prod:
+        name: Apply to PRODUCTION
+        runs-on: ubuntu-latest
+        needs: plan
+        if: |
+            (github.ref == 'refs/heads/main' && github.event_name == 'push')
+        environment: production
+
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: ${{ env.TF_VERSION }}
+
+            - name: Configurar AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Terraform Init
+              working-directory: infra/envs/prod
+              run: terraform init
+
+            - name: Terraform Apply
+              working-directory: infra/envs/prod
+              run: |
+                  terraform apply \
+                    -var-file="prod.tfvars" \
+                    -auto-approve
+
+    # =========================================================================
+    # JOB 4: MANUAL APPLY
+    # =========================================================================
+    # workflow_dispatch con action=apply
+    # =========================================================================
+    manual-apply:
+        name: "Manual Apply (${{ github.event.inputs.environment }})"
+        runs-on: ubuntu-latest
+        if: |
+            github.event_name == 'workflow_dispatch' &&
+            github.event.inputs.action == 'apply'
+        environment: ${{ github.event.inputs.environment == 'prod' && 'production' || github.event.inputs.environment }}
+
+        steps:
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: ${{ env.TF_VERSION }}
+
+            - name: Configurar AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Terraform Init
+              working-directory: infra/envs/${{ github.event.inputs.environment }}
+              run: terraform init
+
+            - name: Terraform Apply
+              working-directory: infra/envs/${{ github.event.inputs.environment }}
+              run: |
+                  terraform apply \
+                    -var-file="${{ github.event.inputs.environment }}.tfvars" \
+                    -auto-approve
+
+    # =========================================================================
+    # JOB 5: DESTROY (solo manual, con doble confirmacion)
+    # =========================================================================
+    # Para ejecutar:
+    #   1. Ve a Actions > Infrastructure (Terraform) > Run workflow
+    #   2. Selecciona environment (dev/prod)
+    #   3. Selecciona action: destroy
+    #   4. Escribe "DESTROY" en confirm_destroy
+    #
+    # Sin escribir "DESTROY" el job falla inmediatamente.
+    # Esto evita destrucciones accidentales.
+    # =========================================================================
+    destroy:
+        name: "DESTROY (${{ github.event.inputs.environment }})"
+        runs-on: ubuntu-latest
+        if: |
+            github.event_name == 'workflow_dispatch' &&
+            github.event.inputs.action == 'destroy'
+        environment: ${{ github.event.inputs.environment == 'prod' && 'production' || github.event.inputs.environment }}
+
+        steps:
+            - name: Validar confirmacion
+              run: |
+                  if [ "${{ github.event.inputs.confirm_destroy }}" != "DESTROY" ]; then
+                    echo "::error::Debes escribir DESTROY en el campo de confirmacion para continuar."
+                    echo ""
+                    echo "Esto es una medida de seguridad para evitar destrucciones accidentales."
+                    echo "Ve a Actions > Run workflow > escribe DESTROY en 'confirm_destroy'"
+                    exit 1
+                  fi
+                  echo "Confirmacion validada. Procediendo con destroy de ${{ github.event.inputs.environment }}..."
+
+            - name: Checkout codigo
+              uses: actions/checkout@v4
+
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: ${{ env.TF_VERSION }}
+
+            - name: Configurar AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Terraform Init
+              working-directory: infra/envs/${{ github.event.inputs.environment }}
+              run: terraform init
+
+            - name: Terraform Plan Destroy
+              working-directory: infra/envs/${{ github.event.inputs.environment }}
+              run: |
+                  echo "========================================="
+                  echo "  PLAN DE DESTRUCCION - ${{ github.event.inputs.environment }}"
+                  echo "========================================="
+                  terraform plan \
+                    -var-file="${{ github.event.inputs.environment }}.tfvars" \
+                    -destroy
+
+            - name: Terraform Destroy
+              working-directory: infra/envs/${{ github.event.inputs.environment }}
+              run: |
+                  terraform destroy \
+                    -var-file="${{ github.event.inputs.environment }}.tfvars" \
+                    -auto-approve
