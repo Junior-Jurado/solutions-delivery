@@ -175,5 +175,4 @@ typings/
 Thumbs.db
 
 # Angular cache
-./solutions_front/.angular/
-./solutions_front/.angular/cache/
+solutions_front/.angular/

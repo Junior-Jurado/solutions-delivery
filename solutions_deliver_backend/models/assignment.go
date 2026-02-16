@@ -74,9 +74,9 @@ type AssignmentHistory struct {
 	NewDeliveryUserID      string        `json:"new_delivery_user_id,omitempty"`
 	PreviousStatus         string        `json:"previous_status,omitempty"`
 	NewStatus              string        `json:"new_status,omitempty"`
-	ChangedBy               string        `json:"change_by"`
-	ChangedByName           string        `json:"change_by_name,omitempty"`
-	ChangedAt               time.Time     `json:"change_at"`
+	ChangedBy              string        `json:"change_by"`
+	ChangedByName          string        `json:"change_by_name,omitempty"`
+	ChangedAt              time.Time     `json:"change_at"`
 	Notes                  string        `json:"notes,omitempty"`
 }
 

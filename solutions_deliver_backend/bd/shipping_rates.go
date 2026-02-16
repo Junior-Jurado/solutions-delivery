@@ -33,11 +33,11 @@ func CalculateShippingPriceMessaging(originCityID, destinationCityID int) (float
 
 // CalculateShippingPricePackaging calcula el precio de un envio de embalaje
 func CalculateShippingPricePackaging(
-	originCityID int, 
-	destinationCityID int, 
-	weightKg float32, 
-	lengthCm float32, 
-	widthCm float32, 
+	originCityID int,
+	destinationCityID int,
+	weightKg float32,
+	lengthCm float32,
+	widthCm float32,
 	heightCm float32,
 ) (float64, models.PriceBreakdown, error) {
 	var price float64

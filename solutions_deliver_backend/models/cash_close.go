@@ -72,7 +72,7 @@ type CashCloseRequest struct {
 type CashCloseResponse struct {
 	Close   CashClose         `json:"close"`
 	Details []CashCloseDetail `json:"details"`
-	PDFURL  string            `json:"pdf_url, omitempty"`
+	PDFURL  string            `json:"pdf_url,omitempty"`
 }
 
 // CashCloseListResponse list of closes

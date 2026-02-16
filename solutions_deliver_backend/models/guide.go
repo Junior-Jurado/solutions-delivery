@@ -139,13 +139,13 @@ type GuideStatsResponse struct {
 
 // CreateGuideRequest petición para crear una guía
 type CreateGuideRequest struct {
-	CreatedBy string          `json:"created_by"`
-	Service   ServiceInfo     `json:"service"`
-	Pricing   PricingInfo     `json:"pricing"`
-	Route     RouteInfo       `json:"route"`
-	Sender    PartyInfo       `json:"sender"`
-	Receiver  PartyInfo       `json:"receiver"`
-	Package   PackageInfo     `json:"package"`
+	CreatedBy string      `json:"created_by"`
+	Service   ServiceInfo `json:"service"`
+	Pricing   PricingInfo `json:"pricing"`
+	Route     RouteInfo   `json:"route"`
+	Sender    PartyInfo   `json:"sender"`
+	Receiver  PartyInfo   `json:"receiver"`
+	Package   PackageInfo `json:"package"`
 }
 
 type ServiceInfo struct {

@@ -53,7 +53,7 @@ func CalculateShippingPrice(body string) (int, string) {
 	}
 
 	response := models.ShippingPriceResponse{
-		Price: price,
+		Price:     price,
 		Breakdown: breakdown,
 	}
 

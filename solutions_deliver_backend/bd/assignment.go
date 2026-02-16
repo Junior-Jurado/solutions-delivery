@@ -222,7 +222,6 @@ func GetAssignmentByID(assignmentID int64) (models.DeliveryAssignment, error) {
 	return assignment, nil
 }
 
-
 // ReassignDelivery reasigna una entrega a otro entregador (solo ADMIN)
 func ReassignDelivery(assignmentID int64, newDeliveryUserID string, notes string, changedBy string) (models.DeliveryAssignment, error) {
 	fmt.Printf("ReassignDelivery -> ID: %d, NewUser: %s\n", assignmentID, newDeliveryUserID)
