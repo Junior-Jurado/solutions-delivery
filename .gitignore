@@ -65,13 +65,11 @@ terraform.tfvars
 *.tfvars
 *.tfvars.json
 
-# Variables por entorno
+# Variables por entorno: ignorar todo excepto archivos .tf
 infra/envs/dev/*
+!infra/envs/dev/*.tf
 infra/envs/prod/*
-
-# (Permitir mantener carpetas vacías con .keep si quieres)
-# !infra/envs/dev/.keep
-# !infra/envs/prod/.keep
+!infra/envs/prod/*.tf
 
 
 ###########################################################
