@@ -74,7 +74,7 @@ func DownloadGuidePDFDirect(guideID int64) (int, []byte, string, error) {
 	// Descargar archivo de S3
 	fileData, contentType, err := bd.DownloadFileFromS3(s3Key)
 	if err != nil {
-		return 500, nil, "", fmt.Errorf("Error al descargar PDF: %s", err.Error())
+		return 500, nil, "", fmt.Errorf("error al descargar PDF: %s", err.Error())
 	}
 
 	return 200, fileData, contentType, nil

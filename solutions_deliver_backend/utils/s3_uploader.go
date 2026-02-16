@@ -80,7 +80,7 @@ func GenerateCashClosePDFWithLambda(close models.CashClose, details []models.Cas
 
 	// Verificar si hubo error en la Lambda
 	if lambdaResp.StatusCode != 200 {
-		return "", "", fmt.Errorf("Lambda retornó status %d: %s", lambdaResp.StatusCode, lambdaResp.Body)
+		return "", "", fmt.Errorf("lambda retornó status %d: %s", lambdaResp.StatusCode, lambdaResp.Body)
 	}
 
 	// Parsear el body (que viene como string JSON)
