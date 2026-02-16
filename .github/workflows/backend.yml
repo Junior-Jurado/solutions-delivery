@@ -13,7 +13,7 @@
 # SECRETS POR ENVIRONMENT (configurar en GitHub > Settings > Environments):
 #   - AWS_ACCESS_KEY_ID
 #   - AWS_SECRET_ACCESS_KEY
-#   - AWS_REGION
+# AWS_REGION se define como env global del workflow (no es un secreto)
 # =============================================================================
 
 name: Backend API Lambda CI/CD
@@ -52,6 +52,7 @@ env:
     GO_VERSION: "1.24"
     WORKING_DIRECTORY: "solutions_deliver_backend"
     NAME_PREFIX: "solutions"
+    AWS_REGION: "us-east-1"
 
 jobs:
     # =========================================================================
@@ -193,7 +194,7 @@ jobs:
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+                  aws-region: ${{ env.AWS_REGION }}
 
             - name: Subir .zip a S3
               if: github.event_name != 'pull_request'
@@ -238,7 +239,7 @@ jobs:
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+                  aws-region: ${{ env.AWS_REGION }}
 
             - name: Terraform Init
               working-directory: infra/envs/dev
@@ -284,7 +285,7 @@ jobs:
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+                  aws-region: ${{ env.AWS_REGION }}
 
             - name: Terraform Init
               working-directory: infra/envs/prod
