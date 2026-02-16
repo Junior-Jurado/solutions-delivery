@@ -1,0 +1,36 @@
+#!/bin/sh
+# Pre-commit hook: lint + test para el backend Go
+# Configurar con: git config core.hooksPath .githooks
+
+set -e
+
+BACKEND_DIR="solutions_deliver_backend"
+
+# Solo ejecutar si hay cambios en el backend
+CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "^${BACKEND_DIR}/" || true)
+if [ -z "$CHANGED_FILES" ]; then
+    echo "No hay cambios en el backend, saltando validaciones Go."
+    exit 0
+fi
+
+echo "==> Verificando formato con gofmt..."
+cd "$BACKEND_DIR"
+UNFORMATTED=$(gofmt -l . 2>&1 || true)
+if [ -n "$UNFORMATTED" ]; then
+    echo "ERROR: Los siguientes archivos no están formateados:"
+    echo "$UNFORMATTED"
+    echo "Ejecuta 'gofmt -w -s .' para corregirlos."
+    exit 1
+fi
+
+echo "==> Ejecutando go vet..."
+go vet ./...
+
+echo "==> Ejecutando tests..."
+RACE_FLAG=""
+if [ "$(go env CGO_ENABLED)" = "1" ]; then
+    RACE_FLAG="-race"
+fi
+go test ./... $RACE_FLAG -count=1
+
+echo "==> Todas las verificaciones pasaron."
