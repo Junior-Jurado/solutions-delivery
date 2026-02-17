@@ -100,6 +100,8 @@ module "lambda_api" {
   s3_bucket_name = module.guides.s3_bucket_name
   pdf_lambda_function_name = module.guides.lambda_function_name
   pdf_lambda_arn = module.guides.lambda_function_arn
+  artifacts_bucket = module.artifacts.bucket_name
+  s3_key           = "backend/main.zip"
 }
 
 # =============================================================================

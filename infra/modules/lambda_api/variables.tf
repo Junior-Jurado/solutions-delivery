@@ -30,3 +30,11 @@ variable "pdf_lambda_function_name" {
 variable "pdf_lambda_arn" {
   type = string
 }
+
+variable "artifacts_bucket" {
+  type = string
+}
+
+variable "s3_key" {
+  type = string
+}

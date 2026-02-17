@@ -82,6 +82,7 @@ jobs:
         if: |
             github.event_name != 'workflow_dispatch' ||
             github.event.inputs.action == 'plan'
+        environment: ${{ (github.event.inputs.environment == 'prod' || github.ref == 'refs/heads/main') && 'production' || 'dev' }}
         outputs:
             environment: ${{ steps.env.outputs.name }}
 

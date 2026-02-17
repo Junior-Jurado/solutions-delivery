@@ -15,14 +15,20 @@ resource "aws_iam_role" "lambda_role" {
   })
 }
 
+data "aws_s3_object" "lambda_zip" {
+  bucket = var.artifacts_bucket
+  key    = var.s3_key
+}
+
 resource "aws_lambda_function" "api" {
   function_name = "${var.name_prefix}-api-${var.environment}"
   handler = "bootstrap"
   runtime = "provided.al2023"
   role = aws_iam_role.lambda_role.arn
 
-  filename = "${path.module}/src/main.zip"
-  source_code_hash = filebase64sha256("${path.module}/src/main.zip")
+  s3_bucket        = var.artifacts_bucket
+  s3_key           = var.s3_key
+  source_code_hash = data.aws_s3_object.lambda_zip.etag
  
   architectures = [ "arm64" ]
   timeout = 60
