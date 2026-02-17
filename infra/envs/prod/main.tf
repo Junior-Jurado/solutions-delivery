@@ -56,6 +56,8 @@ module "lambda_custom_auth" {
   db_secret_arn         = module.secrets.secret_arn
   cognito_user_pool_arn = module.cognito.user_pool_arn
   secret_name           = module.secrets.secret_name
+  artifacts_bucket      = module.artifacts.bucket_name
+  s3_key                = "auth/main.zip"
 }
 
 module "api_gateway" {
