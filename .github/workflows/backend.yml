@@ -233,6 +233,7 @@ jobs:
             - name: Terraform Apply (solo API Lambda)
               working-directory: infra/envs/dev
               run: |
+                  touch dev.tfvars
                   terraform apply \
                     -var-file="dev.tfvars" \
                     -target=module.lambda_api \
@@ -291,6 +292,7 @@ jobs:
             - name: Terraform Apply (solo API Lambda)
               working-directory: infra/envs/prod
               run: |
+                  touch prod.tfvars
                   terraform apply \
                     -var-file="prod.tfvars" \
                     -target=module.lambda_api \

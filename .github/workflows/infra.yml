@@ -66,6 +66,7 @@ concurrency:
 
 env:
     TF_VERSION: "1.14.4"
+    AWS_REGION: "us-east-1"
 
 jobs:
     # =========================================================================
@@ -109,7 +110,7 @@ jobs:
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+                  aws-region: ${{ env.AWS_REGION }}
 
             - name: Terraform Init
               working-directory: infra/envs/${{ steps.env.outputs.name }}
@@ -126,6 +127,7 @@ jobs:
             - name: Terraform Plan
               working-directory: infra/envs/${{ steps.env.outputs.name }}
               run: |
+                  touch ${{ steps.env.outputs.name }}.tfvars
                   terraform plan \
                     -var-file="${{ steps.env.outputs.name }}.tfvars" \
                     -out=tfplan \
@@ -193,7 +195,7 @@ jobs:
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+                  aws-region: ${{ env.AWS_REGION }}
 
             - name: Terraform Init
               working-directory: infra/envs/dev
@@ -202,6 +204,7 @@ jobs:
             - name: Terraform Apply
               working-directory: infra/envs/dev
               run: |
+                  touch dev.tfvars
                   terraform apply \
                     -var-file="dev.tfvars" \
                     -auto-approve
@@ -234,7 +237,7 @@ jobs:
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+                  aws-region: ${{ env.AWS_REGION }}
 
             - name: Terraform Init
               working-directory: infra/envs/prod
@@ -243,6 +246,7 @@ jobs:
             - name: Terraform Apply
               working-directory: infra/envs/prod
               run: |
+                  touch prod.tfvars
                   terraform apply \
                     -var-file="prod.tfvars" \
                     -auto-approve
@@ -274,7 +278,7 @@ jobs:
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+                  aws-region: ${{ env.AWS_REGION }}
 
             - name: Terraform Init
               working-directory: infra/envs/${{ github.event.inputs.environment }}
@@ -283,6 +287,7 @@ jobs:
             - name: Terraform Apply
               working-directory: infra/envs/${{ github.event.inputs.environment }}
               run: |
+                  touch ${{ github.event.inputs.environment }}.tfvars
                   terraform apply \
                     -var-file="${{ github.event.inputs.environment }}.tfvars" \
                     -auto-approve
@@ -332,7 +337,7 @@ jobs:
               with:
                   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
                   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws-region: ${{ secrets.AWS_REGION }}
+                  aws-region: ${{ env.AWS_REGION }}
 
             - name: Terraform Init
               working-directory: infra/envs/${{ github.event.inputs.environment }}
@@ -344,6 +349,7 @@ jobs:
                   echo "========================================="
                   echo "  PLAN DE DESTRUCCION - ${{ github.event.inputs.environment }}"
                   echo "========================================="
+                  touch ${{ github.event.inputs.environment }}.tfvars
                   terraform plan \
                     -var-file="${{ github.event.inputs.environment }}.tfvars" \
                     -destroy
@@ -351,6 +357,7 @@ jobs:
             - name: Terraform Destroy
               working-directory: infra/envs/${{ github.event.inputs.environment }}
               run: |
+                  touch ${{ github.event.inputs.environment }}.tfvars
                   terraform destroy \
                     -var-file="${{ github.event.inputs.environment }}.tfvars" \
                     -auto-approve
