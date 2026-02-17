@@ -26,7 +26,7 @@ func AuthLambda(ctx context.Context, event events.CognitoEventUserPoolsPostConfi
 	if !ValidoParametros() {
 		// Verifica que se estan enviando los parámetros necesarios
 		fmt.Println("Error en los parámetros. debe enviar 'SecretName'")
-		err := errors.New("Error en los parámetros debe enviar SecretName")
+		err := errors.New("error en los parámetros debe enviar SecretName")
 		return event, err
 	}
 
